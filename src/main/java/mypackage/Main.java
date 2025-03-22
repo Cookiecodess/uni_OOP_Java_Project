@@ -13,8 +13,8 @@ import java.util.Scanner;
 //
 // To compile and run, first type this in your terminal
 // to change your directory to the project folder
-// (replace "<path>" with your path to mavenproject1):
-//   cd "C:\<path>\mavenproject1"
+// (replace "<path>" with your path to OOP_Java_Project):
+//   cd "C:\<path>\OOP_Java_Project"
 //
 // To compile, type:
 //   javac -d target/classes -cp target/classes  src/main/java/mypackage/*.java
