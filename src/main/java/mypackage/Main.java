@@ -59,14 +59,13 @@ public class Main {
     Returns an int: the list number of the selected option.
     */
     public static int generateMenu(String header, String[] options, Scanner scanner) {
+        final int LEFT_RIGHT_PADDING = 10;
+        
         boolean invalid = false;
         while (true) {
             clearScreen();
             
-            System.out.println(header);
-            System.out.println();
-            
-            
+            printHeader(header, LEFT_RIGHT_PADDING);
             
             for (int i=0; i<options.length; i++) {
                 System.out.print((i+1) + ". ");
@@ -100,4 +99,23 @@ public class Main {
         System.out.print("\033[H\033[2J");  
         System.out.flush();  
     }  
+    
+    public static void printHeader(String header, int leftRightPadding) {
+        int headerLength = header.length();
+        
+        for (int i=0; i<(2*leftRightPadding + headerLength); i++) {
+            System.out.print("=");
+        }        
+        System.out.println();
+        
+        for (int i=0; i<(leftRightPadding); i++) {
+            System.out.print(" ");
+        }        
+        System.out.println(header);
+        
+        for (int i=0; i<(2*leftRightPadding + headerLength); i++) {
+            System.out.print("=");
+        }        
+        System.out.print("\n\n");
+    }
 }
