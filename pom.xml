@@ -11,4 +11,21 @@
         <exec.mainClass>mypackage.Main</exec.mainClass>
     </properties>
     <name>OOP_Java_Project</name>
+    <dependencies>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>3.24.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline-terminal</artifactId>
+            <version>3.24.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline-terminal-jna</artifactId>
+            <version>3.24.1</version>
+        </dependency>
+    </dependencies>
 </project>
