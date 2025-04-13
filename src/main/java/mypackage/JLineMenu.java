@@ -12,6 +12,8 @@ import org.jline.terminal.TerminalBuilder;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // NOTE:
 // This interactive menu only works properly in a terminal
@@ -24,7 +26,8 @@ import java.io.IOException;
 // Then, to compile, type this in your terminal (cannot use the javac command, must use mvn):
 //   mvn compile
 //
-// To run, type:
+// To run JLineMenu.java, (BUT you may actually want to run Main.java instead...? If so, read the note at the top of Main.java)
+// type:
 //   mvn exec:java -D"exec.mainClass"="mypackage.JLineMenu" -D"exec.classpathScope"=runtime -D"exec.fork"=true
 //     (Note: I don't completely understand how or why this command works yet)
 //     (I also don't understand why this doesn't work:
@@ -35,9 +38,19 @@ import java.io.IOException;
 //     )
 
 public class JLineMenu {
-
-    public static void main(String[] args) throws Exception {
-        Terminal terminal = null;
+//    static final String SAV_CUR = "\033[s"; // save cursor position
+//    static final String RST_CUR = "\033[u"; // restore cursor position
+//    static final String CLEAR_LINE_CUR_TIL_END = "\033[K"; // clear from cursor until end of line
+    
+    public static final int BACK_OPTION = -1;    
+    public static final int LEFT_RIGHT_PADDING = 10;
+    
+    private static Terminal terminal;
+    private static Scanner scanner;
+    
+    // A static block is executed ONCE when this class is loaded.
+    static {
+        // Initialize terminal
         try {
             terminal = TerminalBuilder.builder()
                         .system(true)
@@ -45,186 +58,181 @@ public class JLineMenu {
                         .jansi(false)  // Avoid Jansi conflict
                         .build();
         } catch (IOException e) {
-            System.err.println("Failed to initialize terminal: " + e.getMessage());
-            return;
+            System.err.println("\nFailed to initialize terminal: " + e.getMessage() + "\n");
+            System.exit(1); // exits with error
         }
         
-        Scanner scanner = new Scanner(System.in);
-        
-        ArrayList<String> options = new ArrayList<>();
-        options.add("Login");        
-        options.add("Register");
-        options.add("About");
+        // Initialize scanner
+        scanner = new Scanner(System.in);
+    }
 
-        while (true) {
-            int selection = showMenu(terminal, options, false, true);
-            if (selection == -1) {
-                break;
-            }
-            System.out.println("You selected: " + selection);
-            System.out.println("Press any key to continue...");
-            scanner.nextLine();
-        }
-        
-        System.out.println("Finished execution");
-
-        terminal.close(); // must close terminal before exiting the program! to prevent resource leak/lingering threads
+    // For testing this class's functionality
+    public static void main(String[] args) throws IOException {
+        System.out.println("Hello from JLineMenu.main");
+        terminal.close(); // this line may throw an IOException, that's why the main method needs a throws clause ("throws IOException")
     }
     
-    // If returns -1, it means to exit
-    // If returns -2, it means "Back"
-    // Otherwise returns the index of the selected option in options
-    private static int showMenu(Terminal terminal, ArrayList<String> options, boolean hasBackOption, boolean hasExitOption) throws IOException {
-        
-        // Make a copy of the options ArrayList, so we don't modify the original ArrayList 
-        ArrayList<String> menuOptions = (ArrayList<String>) options.clone();
+    // Instance variables
+    private String textHeader;
+    private ArrayList<String> options;
+    private int numOfOptions;
+    private String textPrompt;
+    private boolean hasBackOption;    
+    private boolean hasExitOption;
+
+    // Public constructor of a JLineMenu object
+    public JLineMenu(String textHeader, ArrayList<String> options, String textPrompt, boolean hasBackOption, boolean hasExitOption) {
+
+        this.textHeader = textHeader;
+        this.options = (ArrayList<String>) options.clone(); // Make a copy of the options ArrayList, so we don't modify the original ArrayList 
+        this.textPrompt = textPrompt;
+        this.hasBackOption = hasBackOption;       
+        this.hasExitOption = hasExitOption;
         
         // Append "Back" and/or "Exit" to the menuOptions ArrayList
         if (hasBackOption) {
-            menuOptions.add("Back");
-        }
-        
+            this.options.add("Back");
+        }        
         if (hasExitOption) {
-            menuOptions.add("Exit");
+            this.options.add("Exit");
         }
         
-        int numOfOptions = menuOptions.size();
+        this.numOfOptions = this.options.size();
+    }
+    
+    /**
+     * Draws a menu that's navigable with arrow keys!
+     *     Returns JLineMenu.BACK_OPTION (an int) if "Back" is selected.
+     *     Selecting "Exit" is handled by another static method in this class: confirmExit().
+     *     When an options that's neither "Back" nor "Exit", is selected, returns the index of selected option.
+     */
+    public int drawMenu() {
         int selected = 0;
         boolean running = true;
 
         // Menu display loop
         while (running) {
             // Clear screen
-            terminal.writer().print("\u001b[2J\u001b[H");
-            terminal.writer().println("My Application Menu\n");
+            clearScreen();
+            
+            // Print header
+            printHeader(textHeader, LEFT_RIGHT_PADDING);
 
             // Display menu with highlighting
-            for (int i = 0; i < numOfOptions; i++) {
+            for (int i = 0; i < this.numOfOptions; i++) {
                 if (i == selected) {
                     // Highlight selected item
-                    terminal.writer().println("\u001b[7m> " + menuOptions.get(i) + "\u001b[0m");
+                    terminal.writer().println("\u001b[7m> " + this.options.get(i) + "\u001b[0m");
                 } else {
-                    terminal.writer().println("  " + menuOptions.get(i));
+                    terminal.writer().println("  " + this.options.get(i));
                 }
             }
-
-            terminal.writer().println("\nUse arrow keys to navigate, Enter to select");
-            terminal.writer().flush();
+            
+            // Display text prompt
+            System.out.println("\n" + textPrompt);
 
             // Read key pressed
-            int c = terminal.reader().read();
-            switch (c) {
-                case 65 -> // Up arrow
-                    selected = (selected - 1 + numOfOptions) % numOfOptions;
-                case 66 -> // Down arrow
-                    selected = (selected + 1) % numOfOptions;
-                case 13 -> {
-                    // Enter
-                    if (hasBackOption && hasExitOption) {
-                        // Exit
-                        if (selected == numOfOptions) {
-                            clearScreen(terminal);
-                            return -1;
+            try {
+                int c = terminal.reader().read();
+                switch (c) {
+                    case 27 -> { // 1st byte of an arrow keypress: ESC
+                        terminal.reader().read(); // read 2nd byte of arrow keypress: 91 ([)
+                        c = terminal.reader().read();
+                        switch (c) {
+                            case 65 ->
+                                selected = (selected - 1 + this.numOfOptions) % this.numOfOptions;
+                            case 66 ->
+                                selected = (selected + 1) % this.numOfOptions;
                         }
-                        // Back
-                        else if (selected == numOfOptions - 1) {
-                            clearScreen(terminal);
-                            return -2;
+                    }
+                    case 13 -> { // Enter key pressed
+                        clearScreen();
+                        
+                        // "Back" or "Exit" selected?
+                        if (this.hasBackOption && this.hasExitOption) {
+                            // Exit
+                            if (selected == this.numOfOptions - 1) {
+                                confirmExit();
+                                continue; // If user returns here, it means they chose to cancel exiting the program.
+                            }
+                            // Back
+                            else if (selected == this.numOfOptions - 2) {
+                                return BACK_OPTION;
+                            }
+                        } 
+                        else if (this.hasBackOption && selected == this.numOfOptions - 1) {
+                            // Back
+                            return BACK_OPTION;
                         }
-                    } 
-                    else if (hasBackOption && selected == numOfOptions) {
-                        clearScreen(terminal);
-                        // Back
-                        return -2;
+                        else if (this.hasExitOption && selected == this.numOfOptions - 1) {
+                            // Exit
+                            confirmExit();
+                            continue; // If user returns here, it means they chose to cancel exiting the program.
+                        }
+                        
+                        // An option other than "Back" or "Exit" is selected, so return the index of selected option.
+                        return selected;
                     }
-                    else if (hasExitOption && selected == numOfOptions) {
-                        clearScreen(terminal);
-                        // Exit
-                        return -1;
+                    default -> {
+                        // Clear input buffer
+                        while (terminal.reader().ready()) {
+                            terminal.reader().read();
+                        }
                     }
-                    
-                    clearScreen(terminal);
-                    return selected;
+                        
                 }
+            } catch (IOException ex) { // Catch potential IOException thrown by Terminal.reader().read()
+//                Logger.getLogger(JLineMenu.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("IOException caught: " + ex.getMessage());
+                System.exit(1);
             }
+            
         }
         return -3; // if the program reaches here, something has gone terribly wrong
-    }
+    }  
+    
     
     /*
     Clear screen.
     Only works in a terminal (e.g. PowerShell, CMD). 
     Does NOT work in Netbeans' Output.
     */
-    public static void clearScreen(Terminal terminal) {  
+    public static void clearScreen() {  
         terminal.writer().print("\u001b[2J\u001b[H");
         terminal.writer().flush();  
     }  
+    
+    public static void printHeader(String header, int leftRightPadding) {
+        int headerLength = header.length();
+        
+        for (int i=0; i<(2*leftRightPadding + headerLength); i++) {
+            System.out.print("=");
+        }        
+        System.out.println();
+        
+        for (int i=0; i<(leftRightPadding); i++) {
+            System.out.print(" ");
+        }        
+        System.out.println(header);
+        
+        for (int i=0; i<(2*leftRightPadding + headerLength); i++) {
+            System.out.print("=");
+        }        
+        System.out.print("\n\n");
+    }
+    
+    public static void confirmExit() {
+        while (true) {
+            clearScreen();
+            System.out.print("Are you sure you want to exit this program? (y)es or (n)o: ");
+            String input = scanner.nextLine();
+            if ( input.equals("y") || input.equals("Y") ) {
+                System.out.println("Exiting the program...");
+                System.exit(0); // exit normally
+            } else if ( input.equals("n") || input.equals("N") ) {
+                return; // Do not exit and return to where confirmExit() was called 
+            }            
+        }        
+    }
+    
 }
-
-//package mypackage;
-
-//import org.jline.reader.LineReader;
-//import org.jline.reader.LineReaderBuilder;
-
-//import org.jline.terminal.Terminal;
-//import org.jline.terminal.TerminalBuilder;
-//import org.jline.utils.NonBlockingReader;
-//
-//public class JLineMenu {
-//    public static void main(String[] args) throws Exception {
-//        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
-////        System.out.println("hello from JLineMenu.java");
-////        Terminal terminal = TerminalBuilder.builder().system(true).build();
-//        Terminal terminal = TerminalBuilder.builder()
-//            .name("ansi")
-//            .system(true)
-//            .jansi(true)
-//            .build();
-////        NonBlockingReader reader = terminal.reader();
-////
-////        System.out.println("Press arrow keys to navigate. Press 'q' to quit.");
-////
-////        while (true) {
-////            int key = reader.read(); // Reads a single character instantly
-////            
-////            if (key == 'q') break;  // Quit on 'q'
-////
-////            switch (key) {
-////                case 27: // Escape sequence (Arrow keys start with this)
-////                    int next = reader.read();
-////                    if (next == 91) { // '[' key (part of arrow key sequence)
-////                        int arrowKey = reader.read();
-////                        switch (arrowKey) {
-////                            case 65 -> System.out.println("Up Arrow");
-////                            case 66 -> System.out.println("Down Arrow");
-////                            case 67 -> System.out.println("Right Arrow");
-////                            case 68 -> System.out.println("Left Arrow");
-////                        }
-////                    }
-////                    break;
-////                default:
-////                    System.out.println("You pressed: " + (char) key);
-////            }
-////        }
-////        reader.close();
-//    }
-//
-////    private static void printMenu() {
-////        System.out.println("\033[H\033[2J"); // Clear screen (ANSI)
-////        System.out.flush();
-////        System.out.println("Use Arrow Keys to move, Enter to select:");
-////        for (int i = 0; i < options.length; i++) {
-////            if (i == selectedIndex) {
-////                System.out.println(" > " + options[i]); // Highlight selected option
-////            } else {
-////                System.out.println("   " + options[i]);
-////            }
-////        }
-////    }
-////
-////    private static void waitForUser(LineReader reader) {
-////        System.out.println("Press any key to continue...");
-////        reader.readCharacter();
-////    }
-//}
