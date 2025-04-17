@@ -10,7 +10,7 @@ import java.util.List;
 /**
  *
  * @author wayne
- */
+
 public class Customer extends User{
     
     private List<Product> cartItems = new ArrayList<Product>();
@@ -49,3 +49,4 @@ public class Customer extends User{
         return wishList;
     }
 }
+ */

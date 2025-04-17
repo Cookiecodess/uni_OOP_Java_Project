@@ -7,7 +7,7 @@ package mypackage;
 /**
  *
  * @author wayne
- */
+
 public class Admin extends User{
     
     //addprodct
@@ -18,3 +18,4 @@ public class Admin extends User{
     }
     
 }
+ */
