@@ -62,6 +62,10 @@ public class Main {
                     payment();
                     continue;
                 }
+                case 3 -> {
+                    System.exit(0);
+                    break;
+                }
             }
         }
         
@@ -72,8 +76,8 @@ public class Main {
     public static void initAllMenus() {
         // initialize menus
         ArrayList<String> options = new ArrayList<>();
-        options.add("Option 1");        
-        options.add("Option 2");
+        options.add("Customer");        
+        options.add("Admin");
         options.add("Option 3");                
         mainMenu = new JLineMenu("Main menu", options, "Select an action to continue.", false, true);
         
@@ -81,13 +85,13 @@ public class Main {
         options.add("Option 1-1");        
         options.add("Option 1-2");
         options.add("Option 1-3"); 
-        customer = new JLineMenu("1", options, "Select an action to continue.", true, true);
+        customer = new JLineMenu("1", options, "Select an action to continue.", true, false);
         
         options.clear();
         options.add("Option 2-1");        
         options.add("Option 2-2");
         options.add("Option 2-3"); 
-        admin = new JLineMenu("2", options, "Select an action to continue.", true, true);
+        admin = new JLineMenu("2", options, "Select an action to continue.", true, false);
         
         options.clear();
         options.add("Option 3-1");        

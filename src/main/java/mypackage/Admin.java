@@ -8,6 +8,7 @@
 // *
 // * @author wayne
 // */
+// java -cp ".;C:\Users\wayne\.m2\repository\org\jline\jline-terminal\3.24.1\*" mypackage.Main
 //public class Admin extends User{
 //    
 //    //addprodct
