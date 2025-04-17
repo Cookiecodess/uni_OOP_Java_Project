@@ -9,6 +9,8 @@ package mypackage;
 // to change your directory to the project folder
 // (replace "<path>" with your path to OOP_Java_Project):
 //   cd "C:\<path>\OOP_Java_Project"
+//songlynn punya : cd "C:\Users\songl\source\repos\OOP_Java_Project"
+
 
 // Since our project uses a dependency called JLine (for detecting arrow key presses), 
 // we must use Maven to compile, as it automatically handles dependencies.
