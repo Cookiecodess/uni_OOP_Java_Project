@@ -45,7 +45,7 @@ public class TestMain {
     static JLineMenu menu1_3;
     
     public static void main(String[] args) {
-        initMenus();
+        initAllMenus();
         // start program
         while (true) {
             int selection = mainMenu.drawMenu();
@@ -77,7 +77,7 @@ public class TestMain {
                 return;
             }
             switch (selection) {
-                case 0 -> {
+                case 0 -> { 
                     menu1_1();
                     continue;
                 }
@@ -93,6 +93,7 @@ public class TestMain {
         }
     }
     
+    
     public static void menu1_1() {
         while (true) {
             int selection = menu1_1.drawMenu();
@@ -100,8 +101,7 @@ public class TestMain {
                 return;
             }
             System.out.println("You selected: " + selection);
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();            
+            JLineMenu.waitMsg();          
         }
     }
     
@@ -112,8 +112,7 @@ public class TestMain {
                 return;
             }
             System.out.println("You selected: " + selection);
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
+            JLineMenu.waitMsg(); 
         }
     }
     
@@ -124,8 +123,7 @@ public class TestMain {
                 return;
             }
             System.out.println("You selected: " + selection);
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
+            JLineMenu.waitMsg(); 
             
         }
     }
@@ -138,8 +136,7 @@ public class TestMain {
                 return;
             }
             System.out.println("You selected: " + selection);
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
+            JLineMenu.waitMsg(); 
             
         }
     }
@@ -151,13 +148,12 @@ public class TestMain {
                 return;
             }
             System.out.println("You selected: " + selection);
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
+            JLineMenu.waitMsg(); 
             
         }
     }
     
-    public static void initMenus() {
+    public static void initAllMenus() {
         // initialize menus
         ArrayList<String> options = new ArrayList<>();
         options.add("Option 1");        

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static mypackage.TestMain.scanner;
 
 // NOTE:
 // This interactive menu only works properly in a terminal
@@ -41,6 +42,8 @@ public class JLineMenu {
 //    static final String SAV_CUR = "\033[s"; // save cursor position
 //    static final String RST_CUR = "\033[u"; // restore cursor position
 //    static final String CLEAR_LINE_CUR_TIL_END = "\033[K"; // clear from cursor until end of line
+    public static final String HIDE_CUR = "\033[?25l";
+    public static final String SHOW_CUR = "\033[?25h";
     
     public static final int BACK_OPTION = -1;    
     public static final int LEFT_RIGHT_PADDING = 10;
@@ -109,6 +112,9 @@ public class JLineMenu {
     public int drawMenu() {
         int selected = 0;
         boolean running = true;
+        
+        // Hide cursor
+        System.out.println(HIDE_CUR);
 
         // Menu display loop
         while (running) {
@@ -157,20 +163,21 @@ public class JLineMenu {
                             }
                             // Back
                             else if (selected == this.numOfOptions - 2) {
+                                System.out.println(SHOW_CUR); // Show cursor
                                 return BACK_OPTION;
                             }
                         } 
-                        else if (this.hasBackOption && selected == this.numOfOptions - 1) {
-                            // Back
+                        else if (this.hasBackOption && selected == this.numOfOptions - 1) { // Back
+                            System.out.println(SHOW_CUR); // Show cursor
                             return BACK_OPTION;
                         }
-                        else if (this.hasExitOption && selected == this.numOfOptions - 1) {
-                            // Exit
+                        else if (this.hasExitOption && selected == this.numOfOptions - 1) { // Exit
                             confirmExit();
                             continue; // If user returns here, it means they chose to cancel exiting the program.
                         }
                         
                         // An option other than "Back" or "Exit" is selected, so return the index of selected option.
+                        System.out.println(SHOW_CUR); // Show cursor
                         return selected;
                     }
                     default -> {
@@ -190,6 +197,12 @@ public class JLineMenu {
         }
         return -3; // if the program reaches here, something has gone terribly wrong
     }  
+    
+    // Waits for user to press any key before continuing
+    public static void waitMsg() {
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
     
     
     /*
