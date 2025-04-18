@@ -64,6 +64,9 @@ public class TestMain {
                     menu3();
                     continue;
                 }
+                default -> {
+                    continue;
+                }
             }
         }
     }
@@ -89,6 +92,9 @@ public class TestMain {
                 }
                 case 2 -> {
                     menu1_3();
+                    continue;
+                }
+                default -> {
                     continue;
                 }
             }            
