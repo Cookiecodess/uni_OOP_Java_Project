@@ -12,6 +12,7 @@
     </properties>
     <name>OOP_Java_Project</name>
     <dependencies>
+       
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline</artifactId>
@@ -27,5 +28,13 @@
             <artifactId>jline-terminal-jna</artifactId>
             <version>3.24.1</version>
         </dependency>
+            <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>24.6.0</version> 
+        </dependency>
+
+
     </dependencies>
+    
 </project>
