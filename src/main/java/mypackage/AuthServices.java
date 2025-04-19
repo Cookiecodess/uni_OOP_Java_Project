@@ -5,6 +5,7 @@
 package mypackage;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -18,6 +19,12 @@ public class AuthServices {
     
     private static final String FILEPATH = "/credentials.csv";
     private static final File FILE = AuthServices.getFile();
+    private static ArrayList<String> usernames = new ArrayList<>();
+    
+    static{
+        setAllUsernames();
+    }
+    
     
     public static File getFile(){
         try{
@@ -34,7 +41,7 @@ public class AuthServices {
         String line;
         ArrayList<String> lines = new ArrayList<>();
         
-        try (BufferedReader br = new BufferedReader(new FileReader(FILEPATH))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
             while ((line = br.readLine()) != null) {
                 lines.add(line);
             }
@@ -56,12 +63,13 @@ public class AuthServices {
     // Login for Admin
     public static Admin login(String username, String password){
         String line;
+
         
         try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
             while ((line = br.readLine()) != null) {
                 // Split by comma
                 String[] values = line.split(",");
-                
+    
                 if(values[0].equals(username) && values[1].equals(password) && (values[9].equals("main") || values[9].equals("admin")) ){
                     return new Admin(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10]);
                 }else{
@@ -84,7 +92,6 @@ public class AuthServices {
             while ((line = br.readLine()) != null) {
                 // Split by comma
                 String[] values = line.split(",");
-                
                 if(values[0].equals(username) && values[1].equals(password) && values[9].equals("customer") ){
                     return new Customer(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10]);
                 }else{
@@ -131,4 +138,68 @@ public class AuthServices {
 
         return false;
     }
+    
+    public static ArrayList<String> getUsernames(){
+        return usernames;
+    }
+    
+    public static void setAllUsernames(){
+        usernames.clear();
+        String line;
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                // Split by comma
+                String[] values = line.split(",");
+                String username = values[0];
+                usernames.add(username);
+                
+      
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    
+    public static void changePassword(User x, String newPassword){
+        String line;
+        ArrayList<String> lines = new ArrayList<>();
+        
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+            
+            //finding the line to edit
+            for(int i=0; i<lines.size(); i++){
+                String currentLine = lines.get(i);
+                String[] splitLine = currentLine.split(",");
+                
+                if(x.getUsername().equals(splitLine[0])){
+                    splitLine[1] = newPassword;
+                    String updatedLine = String.join(",", splitLine);
+                    lines.set(i, updatedLine);
+                }
+                 
+            }
+            
+            
+            //writing back to the file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
+                for (String l : lines) {
+                    bw.write(l);
+                    bw.newLine();
+                }
+            }
+            
+        } 
+        
+        
+        catch (Exception e) {
+            ;
+        }
+    }
+
+
 }

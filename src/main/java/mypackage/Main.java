@@ -64,11 +64,18 @@ public class Main {
                     if(currentCust==null){
                         customer();
                     }
-                    customerDashboard();
+                    if(currentCust!=null){
+                        customerDashboard();
+                    }
                     continue;
                 }
                 case 1 -> {
-                    admin();
+                    if(currentAdmin==null){
+                        admin();
+                    }
+                    if(currentAdmin!=null){
+                        adminDashboard();
+                    }
                     continue;
                 }
                 case 2 -> {
@@ -106,15 +113,16 @@ public class Main {
         options.add("View Orders");
         options.add("Change Password");
         options.add("Log Out");
-        customerDb = new JLineMenu("Customer Dashboard", options, "Select an action to continue.", false, false);
+        customerDb = new JLineMenu("Customer Dashboard", options, "Select an action to continue.", true, false);
         
         
         options.clear();
         options.add("Add New Products");
         options.add("View Pending Orders");
         options.add("Change Password");
+        options.add("Add Other Admin");
         options.add("Log Out");
-        adminDb = new JLineMenu("Admin Dashboard", options, "Select an action to continue.", false, false);
+        adminDb = new JLineMenu("Admin Dashboard", options, "Select an action to continue.", true, false);
         
         
         options.clear();
@@ -156,7 +164,7 @@ public class Main {
                 }
                 
                 case 1 -> {
-                    //Sign up is selected
+                    register("customer");
                     break;
                 }                
                      
@@ -168,7 +176,15 @@ public class Main {
     }
 
     public static void admin() {
-        admin.drawMenu();
+        int Selection = admin.drawMenu();
+            switch(Selection) {
+                
+                case 0 -> {
+                    login("admin");
+                    break;
+                }           
+                     
+            }
     }
     
     public static void customerDashboard(){
@@ -184,6 +200,7 @@ public class Main {
             }
             
             case 2 -> {
+                changePass(currentCust);
                 break;
             }
             
@@ -197,13 +214,47 @@ public class Main {
         }
     }
     
+    public static void adminDashboard(){
+        int selection = adminDb.drawMenu();
+        switch(selection){
+            case 0 -> {
+                break;
+            }
+            
+            case 1 -> {
+                break;
+            }
+            
+            case 2 -> {
+                changePass(currentAdmin);
+                break;
+            }
+            
+            case 3 -> {
+                //register admin
+                register("admin");
+                break;
+            }
+            
+            case 4 -> {
+                currentAdmin=null;
+                break;
+            }
+            
+        }
+        
+    }
+    
     public static void login(String type){
         JLineMenu.clearScreen();
         while(true){       
-            System.out.print("Enter your UserName: ");
+            System.out.print("Enter your UserName (999 to go back): ");
             String username = scanner.next();
             scanner.nextLine(); // for cleaning buffer purposes
-
+            if(username.equals("999")){
+                break;
+            }
+            
             System.out.print("Enter your Password: ");
             String password = scanner.next();
             scanner.nextLine(); // for cleaning buffer purposes
@@ -219,6 +270,7 @@ public class Main {
                 else {
                     JLineMenu.clearScreen();
                     System.out.println("Invalid Credentials!");
+                    System.out.println();
                 }
             }
             else{
@@ -230,11 +282,211 @@ public class Main {
                 else {
                     JLineMenu.clearScreen();
                     System.out.println("Invalid Credentials!");
+                    System.out.println();
                 }
             }
             
         }
         
+    }
+    
+    public static void register(String type){
+        JLineMenu.clearScreen();
+        
+        ArrayList<String> usernames = AuthServices.getUsernames();
+        String username;
+        String password;
+        String name;
+        String email;
+        String phoneNumber;
+        String address;
+        String birthdate;
+        String gender;
+        
+       // Username
+        while (true) {
+            System.out.print("Enter a username: ");
+            username = scanner.next();
+            scanner.nextLine(); // flush
+            
+            if (!username.isEmpty() && !usernames.contains(username)) break;
+            
+            JLineMenu.clearScreen();
+            System.out.println("Username Taken!");
+        }
+        
+         JLineMenu.clearScreen();
+        
+        // Password
+        while (true) {
+            System.out.println("Enter a username: "+username);
+            
+            System.out.print("Enter a password: ");
+            password = scanner.next();
+            scanner.nextLine();
+            
+            System.out.print("Re-Enter your password: ");
+            String password2 = scanner.next();
+            scanner.nextLine();
+            
+            if (password.equals(password2)) break;
+            JLineMenu.clearScreen();
+            System.out.println("Password did not match!\n");
+            
+        }
+        
+        
+        JLineMenu.clearScreen();
+        // Name
+        while (true) {
+            System.out.println("Enter a username: "+username);
+            System.out.println("Enter a password: "+password);
+            
+            System.out.print("Enter your name: ");
+            name = scanner.nextLine();
+            if (!name.isEmpty()) break;
+            JLineMenu.clearScreen();
+            System.out.println("Name cannot be empty!\n");
+        }
+        
+        
+        JLineMenu.clearScreen();
+        // Email
+        while (true) {
+            System.out.println("Enter a username: "+username);
+            System.out.println("Enter a password: "+password);
+            System.out.println("Enter your name: "+name);
+            
+            System.out.print("Enter your email: ");
+            email = scanner.next();
+            scanner.nextLine();
+            if (email.contains("@")) break;
+            JLineMenu.clearScreen();
+            System.out.println("Invalid email format!\n");
+        }
+        
+        
+        JLineMenu.clearScreen();
+        // Phone number
+        while (true) {
+            System.out.println("Enter a username: "+username);
+            System.out.println("Enter a password: "+password);
+            System.out.println("Enter your name: "+name);
+            System.out.println("Enter your email: "+email);
+            
+            System.out.print("Enter your phone number: +60");
+            phoneNumber = scanner.next();
+            scanner.nextLine();
+            if (phoneNumber.matches("\\d{9,10}") && phoneNumber.charAt(0) == '1'){
+                phoneNumber = "60"+phoneNumber;
+                break; // accepts 9–11 digits
+            }
+            JLineMenu.clearScreen();
+            System.out.println("Invalid phone number!\n");
+        }
+        
+        
+        JLineMenu.clearScreen();
+        // Address
+        while (true) {
+            System.out.println("Enter a username: "+username);
+            System.out.println("Enter a password: "+password);
+            System.out.println("Enter your name: "+name);
+            System.out.println("Enter your email: "+email);
+            System.out.println("Enter your phone number: +"+phoneNumber);
+            
+            System.out.print("Enter your address: ");
+            address = scanner.nextLine();
+            if (!address.isEmpty()) break;
+            JLineMenu.clearScreen();
+            System.out.println("Address cannot be empty!\n");
+            
+        }
+        
+        JLineMenu.clearScreen();    
+        // Birth day
+        while (true) {
+            System.out.println("Enter a username: "+username);
+            System.out.println("Enter a password: "+password);
+            System.out.println("Enter your name: "+name);
+            System.out.println("Enter your email: "+email);
+            System.out.println("Enter your phone number: +"+phoneNumber);
+            System.out.println("Enter your address: "+address);
+            
+            System.out.print("Enter your birth day (dd-mm-yyyy): ");
+            birthdate = scanner.next();
+            scanner.nextLine();
+            if (birthdate.matches("^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(\\d{4})$")) break;
+            JLineMenu.clearScreen();
+            System.out.println("Invalid Date Format!\n");
+            
+        }
+        
+        JLineMenu.clearScreen();    
+        // Gender
+        while (true) {
+            System.out.println("Enter a username: "+username);
+            System.out.println("Enter a password: "+password);
+            System.out.println("Enter your name: "+name);
+            System.out.println("Enter your email: "+email);
+            System.out.println("Enter your phone number: +"+phoneNumber);
+            System.out.println("Enter your address: "+address);
+            System.out.println("Enter your birth day (dd-mm-yyyy): "+birthdate);
+            
+            System.out.print("Enter your gender (Male/Female): ");
+            gender = scanner.next();
+            scanner.nextLine();
+            if (gender.equals("Male") || gender.equals("Female")) break;
+            JLineMenu.clearScreen();
+            System.out.println("Please enter 'Male' or 'Female'!\n");
+            
+        }
+        
+        if(type.equals("customer")){
+            AuthServices.register(username,password,name,email,phoneNumber,address,birthdate,gender);
+        }
+        else{
+            AuthServices.registerAdmin(username,password,name,email,phoneNumber,address,birthdate,gender);
+        }
+           
+    }
+    
+    public static void changePass(User x){
+        JLineMenu.clearScreen();
+        String input;
+        
+        while(true){
+            System.out.print("Enter Your Current Password (999 to go back): ");
+            input = scanner.next();
+            scanner.nextLine();
+            
+            if(input.equals("999")){
+                return;
+            }
+            
+            if(input.equals(x.getPassword())) break;
+            JLineMenu.clearScreen();
+            System.out.println("Invalid Password!\n");
+            
+        }
+        
+        while(true){
+            System.out.print("Enter Your New Password: ");
+            input = scanner.next();
+            scanner.nextLine();
+            
+            System.out.print("Re-Enter Your New Password: ");
+            String input2 = scanner.next();
+            scanner.nextLine();
+            
+            if(input.equals(input2)) break;
+            JLineMenu.clearScreen();
+            System.out.println("Password does not match!\n");
+        }
+        
+        AuthServices.changePassword(x,input);
+        currentCust= null;
+        currentAdmin = null;
     }
     
     public static void payment() {
