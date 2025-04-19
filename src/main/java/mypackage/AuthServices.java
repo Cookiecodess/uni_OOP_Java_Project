@@ -1,0 +1,134 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package mypackage;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.io.File;
+
+/**
+ *
+ * @author wayne
+ */
+public class AuthServices {
+    
+    private static final String FILEPATH = "/credentials.csv";
+    private static final File FILE = AuthServices.getFile();
+    
+    public static File getFile(){
+        try{
+            return new File(AuthServices.class.getResource(FILEPATH).toURI());
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+        return null;
+    }
+    
+    public static int genUID(){
+        
+        String line;
+        ArrayList<String> lines = new ArrayList<>();
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILEPATH))) {
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (Exception e) {
+            ;
+        }
+        
+        //getting last line
+        String lastLine = lines.get(lines.size()-1);
+        int lastUID = Integer.parseInt(lastLine.split(",")[2]);
+        
+        return lastUID+1;
+    }
+    
+    
+    
+    
+   
+    // Login for Admin
+    public static Admin login(String username, String password){
+        String line;
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                // Split by comma
+                String[] values = line.split(",");
+                
+                if(values[0].equals(username) && values[1].equals(password) && (values[9].equals("main") || values[9].equals("admin")) ){
+                    return new Admin(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10]);
+                }else{
+                    continue;
+                }
+                
+      
+            }
+        } catch (Exception e) {
+            ;
+        }
+        
+        return null;
+    }
+    
+    public static Customer custlogin(String username, String password){
+        String line;
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                // Split by comma
+                String[] values = line.split(",");
+                
+                if(values[0].equals(username) && values[1].equals(password) && values[9].equals("customer") ){
+                    return new Customer(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10]);
+                }else{
+                    continue;
+                }
+                
+      
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        
+        return null;
+    }
+    
+    public static boolean register(String userName, String password, String name, String email, String phoneNumber, String address, String birthdate, String gender){
+        int UID = genUID();
+        String role = "customer";
+        String status = "active";
+        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + address + "," + birthdate + "," + gender + "," + role + "," + status;
+        
+        try (FileWriter fw = new FileWriter(FILE, true)) { // 'true' enables append mode
+            fw.write("\n" + newLine); // add newline before writing
+            return true;
+        } catch (Exception e) {
+            ;
+        }
+        return false;
+    }
+    
+    public static boolean registerAdmin(String userName, String password, String name, String email, String phoneNumber, String address, String birthdate, String gender){
+        int UID = genUID();
+        String role = "admin";
+        String status = "active";
+        
+        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + address + "," + birthdate + "," + gender + "," + role + "," + status;
+        
+        try (FileWriter fw = new FileWriter(FILE, true)) { // 'true' enables append mode
+            fw.write("\n" + newLine); // add newline before writing
+            return true;
+        } catch (Exception e) {
+            ;
+        }
+
+        return false;
+    }
+}
