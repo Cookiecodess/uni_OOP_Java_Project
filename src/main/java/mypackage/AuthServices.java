@@ -199,6 +199,126 @@ public class AuthServices {
         catch (Exception e) {
             ;
         }
+    }       
+ 
+    public static void changeName(User x, String newName){
+        String line;
+        ArrayList<String> lines = new ArrayList<>();
+        
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+            
+            //finding the line to edit
+            for(int i=0; i<lines.size(); i++){
+                String currentLine = lines.get(i);
+                String[] splitLine = currentLine.split(",");
+                
+                if(x.getUsername().equals(splitLine[0])){
+                    splitLine[3] = newName;
+                    String updatedLine = String.join(",", splitLine);
+                    lines.set(i, updatedLine);
+                }
+                 
+            }
+            
+            
+            //writing back to the file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
+                for (String l : lines) {
+                    bw.write(l);
+                    bw.newLine();
+                }
+            }
+            
+        } 
+        
+        
+        catch (Exception e) {
+            ;
+        }
+    }
+     
+    public static void changeAddress(User x, String newAddress){
+        String line;
+        ArrayList<String> lines = new ArrayList<>();
+        
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+            
+            //finding the line to edit
+            for(int i=0; i<lines.size(); i++){
+                String currentLine = lines.get(i);
+                String[] splitLine = currentLine.split(",");
+                
+                if(x.getUsername().equals(splitLine[0])){
+                    splitLine[6] = newAddress;
+                    String updatedLine = String.join(",", splitLine);
+                    lines.set(i, updatedLine);
+                }
+                 
+            }
+            
+            
+            //writing back to the file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
+                for (String l : lines) {
+                    bw.write(l);
+                    bw.newLine();
+                }
+            }
+            
+        } 
+        
+        
+        catch (Exception e) {
+            ;
+        }
+    }
+    
+    public static void changePhone(User x, String newPhone){
+        String line;
+        ArrayList<String> lines = new ArrayList<>();
+        
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+            
+            //finding the line to edit
+            for(int i=0; i<lines.size(); i++){
+                String currentLine = lines.get(i);
+                String[] splitLine = currentLine.split(",");
+                
+                if(x.getUsername().equals(splitLine[0])){
+                    splitLine[5] = newPhone;
+                    String updatedLine = String.join(",", splitLine);
+                    lines.set(i, updatedLine);
+                }
+                 
+            }
+            
+            
+            //writing back to the file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
+                for (String l : lines) {
+                    bw.write(l);
+                    bw.newLine();
+                }
+            }
+            
+        } 
+        
+        
+        catch (Exception e) {
+            ;
+        }
     }
 
 

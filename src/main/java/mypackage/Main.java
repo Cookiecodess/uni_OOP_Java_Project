@@ -46,6 +46,7 @@ public class Main {
     static JLineMenu admin;
     static JLineMenu customerDb;
     static JLineMenu adminDb;
+    static JLineMenu changeDetails;
     static JLineMenu menu3;
     static JLineMenu menu1_1;
     static JLineMenu bankSelection;
@@ -111,7 +112,7 @@ public class Main {
         options.clear();
         options.add("View Products");
         options.add("View Orders");
-        options.add("Change Password");
+        options.add("Change Account Details");
         options.add("Log Out");
         customerDb = new JLineMenu("Customer Dashboard", options, "Select an action to continue.", true, false);
         
@@ -119,10 +120,20 @@ public class Main {
         options.clear();
         options.add("Add New Products");
         options.add("View Pending Orders");
-        options.add("Change Password");
+        options.add("Change Account Details");
         options.add("Add Other Admin");
         options.add("Log Out");
         adminDb = new JLineMenu("Admin Dashboard", options, "Select an action to continue.", true, false);
+        
+        
+        
+        options.clear();
+        options.add("Change Name");
+        options.add("Change Address");
+        options.add("Change Password");
+        options.add("Change Phone Number");
+        changeDetails = new JLineMenu("Update Particulars", options, "Select an action to continue.", true, false);
+        
         
         
         options.clear();
@@ -200,7 +211,7 @@ public class Main {
             }
             
             case 2 -> {
-                changePass(currentCust);
+                updateInfo("customer");
                 break;
             }
             
@@ -226,7 +237,7 @@ public class Main {
             }
             
             case 2 -> {
-                changePass(currentAdmin);
+                updateInfo("admin");
                 break;
             }
             
@@ -451,6 +462,37 @@ public class Main {
            
     }
     
+    public static void updateInfo(String type){
+        User currentUser = currentAdmin;
+        if(type.equals("customer")) currentUser = currentCust;
+        
+        JLineMenu.clearScreen();
+        int selection = changeDetails.drawMenu();
+        switch(selection){
+            case 0 -> {
+                //change name
+                changeName(currentUser);
+                break;
+            }
+            case 1 -> {
+                //change address
+                changeAddress(currentUser);
+                break;
+            }
+            case 2 -> {
+                //change password
+                changePass(currentUser);
+                break;
+            }
+            case 3 -> {
+                //change phone
+                changePhone(currentUser);
+                break;
+            }
+            
+        }
+    }
+    
     public static void changePass(User x){
         JLineMenu.clearScreen();
         String input;
@@ -485,6 +527,82 @@ public class Main {
         }
         
         AuthServices.changePassword(x,input);
+        currentCust= null;
+        currentAdmin = null;
+    }
+    
+    public static void changeName(User x){
+        JLineMenu.clearScreen();
+        String input;
+        
+        while(true){
+            System.out.print("Enter Your New Name (999 to go back): ");
+            input = scanner.nextLine();
+            
+            if(input.equals("999")){
+                return;
+            }
+            
+            if(!input.isEmpty()) break;
+            JLineMenu.clearScreen();
+            System.out.println("Name Cannot Be Empty!\n");
+            
+        }
+        
+        
+        AuthServices.changeName(x,input);
+        currentCust= null;
+        currentAdmin = null;
+    }
+    
+    public static void changeAddress(User x){
+        JLineMenu.clearScreen();
+        String input;
+        
+        while(true){
+            System.out.print("Enter Your New Address (999 to go back): ");
+            input = scanner.nextLine();
+            
+            if(input.equals("999")){
+                return;
+            }
+            
+            if(!input.isEmpty()) break;
+            JLineMenu.clearScreen();
+            System.out.println("Address Cannot Be Empty!\n");
+            
+        }
+        
+        
+        AuthServices.changeAddress(x,input);
+        currentCust= null;
+        currentAdmin = null;
+    }
+    
+    public static void changePhone(User x){
+        JLineMenu.clearScreen();
+        String input;
+        
+        while(true){
+            System.out.print("Enter Your New Phone (999 to go back): +60");
+            input = scanner.next();
+            scanner.nextLine();
+            
+            if(input.equals("999")){
+                return;
+            }
+            
+            if(input.matches("\\d{9,10}") && input.charAt(0) == '1'){
+                input = "60" + input;
+                break;
+            }
+            JLineMenu.clearScreen();
+            System.out.println("Invalid Phone format!\n");
+            
+        }
+        
+        
+        AuthServices.changePhone(x,input);
         currentCust= null;
         currentAdmin = null;
     }
