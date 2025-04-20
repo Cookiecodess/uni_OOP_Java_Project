@@ -39,6 +39,10 @@ public class Customer extends User{
         return cartItems;
     }
     
+    public void addOrder(Order x){
+        orderHistory.add(x);
+    }
+    
     public List<Order> getAllOrders(){
         return orderHistory;
     }

@@ -15,11 +15,21 @@ public class Admin extends User{
     public Admin(String userName, String password, int UID, String name, String email, String phoneNumber, String address, String birthdate, String gender, String role,String status){
         super(userName, password, UID, name, email, phoneNumber, address, birthdate, gender, role, status);
     }
+    
     //addprodct
     public void addProduct(Product x){
-        if(isAdmin()){
-//            Inventory.getAllProducts().add(x);
-        } 
+        //Inventory.add(x);
+    }
+    
+    
+    //remove products
+    public void removeProduct(Product x){
+        //Inventory.remove(x);
+    }
+    
+    //suspend and unsuspend user
+    public void suspendCust(int uid, boolean suspended){
+        AuthServices.suspend(uid, suspended);
     }
     
 }

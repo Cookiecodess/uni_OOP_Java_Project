@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.io.File;
 
 /**
@@ -184,12 +185,14 @@ public class AuthServices {
                  
             }
             
-            
+            int counter=0;
             //writing back to the file
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
                 for (String l : lines) {
-                    bw.write(l);
-                    bw.newLine();
+                    if(counter==0) bw.write(l);
+                    else bw.write("\n"+l);
+                    counter++;
+                    
                 }
             }
             
@@ -224,12 +227,13 @@ public class AuthServices {
                  
             }
             
-            
+            int counter=0;
             //writing back to the file
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
                 for (String l : lines) {
-                    bw.write(l);
-                    bw.newLine();
+                    if(counter==0) bw.write(l);
+                    else bw.write("\n"+l);
+                    counter++;
                 }
             }
             
@@ -240,7 +244,48 @@ public class AuthServices {
             ;
         }
     }
-     
+    
+    public static void changeEmail(User x, String newEmail){
+        String line;
+        ArrayList<String> lines = new ArrayList<>();
+        
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+            
+            //finding the line to edit
+            for(int i=0; i<lines.size(); i++){
+                String currentLine = lines.get(i);
+                String[] splitLine = currentLine.split(",");
+                
+                if(x.getUsername().equals(splitLine[0])){
+                    splitLine[4] = newEmail;
+                    String updatedLine = String.join(",", splitLine);
+                    lines.set(i, updatedLine);
+                }
+                 
+            }
+            
+            int counter=0;
+            //writing back to the file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
+                for (String l : lines) {
+                    if(counter==0) bw.write(l);
+                    else bw.write("\n"+l);
+                    counter++;
+                }
+            }
+            
+        } 
+        
+        
+        catch (Exception e) {
+            ;
+        }
+    }
+    
     public static void changeAddress(User x, String newAddress){
         String line;
         ArrayList<String> lines = new ArrayList<>();
@@ -264,12 +309,13 @@ public class AuthServices {
                  
             }
             
-            
+            int counter=0;
             //writing back to the file
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
                 for (String l : lines) {
-                    bw.write(l);
-                    bw.newLine();
+                    if(counter==0) bw.write(l);
+                    else bw.write("\n"+l);
+                    counter++;
                 }
             }
             
@@ -304,12 +350,13 @@ public class AuthServices {
                  
             }
             
-            
+            int counter=0;
             //writing back to the file
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
                 for (String l : lines) {
-                    bw.write(l);
-                    bw.newLine();
+                    if(counter==0) bw.write(l);
+                    else bw.write("\n"+l);
+                    counter++;
                 }
             }
             
@@ -321,5 +368,73 @@ public class AuthServices {
         }
     }
 
-
+    public static void suspend(int uid, boolean suspended){
+        String line;
+        ArrayList<String> lines = new ArrayList<>();
+        
+        String id = String.valueOf(uid);
+        String status = "active";
+        if(suspended) status = "suspended";
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+            
+            //finding the line to edit
+            for(int i=0; i<lines.size(); i++){
+                String currentLine = lines.get(i);
+                String[] splitLine = currentLine.split(",");
+                
+                //if empty line then we skip
+                if(currentLine.length() == 0){
+                    continue;
+                }
+                
+                if(id.equals(splitLine[2])){
+                    splitLine[10] = status;
+                    String updatedLine = String.join(",", splitLine);
+                    lines.set(i, updatedLine);
+                }
+                 
+            }
+            
+            int counter = 0;
+            //writing back to the file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE))) {
+                for (String l : lines) {
+                    if(counter==0) bw.write(l);
+                    else bw.write("\n"+l);
+                    counter++;
+                }
+            }
+            
+        } 
+        
+        
+        catch (Exception e) {
+            ;
+        }
+    }
+    
+    public static String[] getUserDetails(int uid){
+        
+        String line;
+        
+        try(BufferedReader br = new BufferedReader(new FileReader(FILE))){
+            while((line = br.readLine()) != null){
+                if(line.length() == 0){
+                    continue;
+                }
+                String[] lineSplit = line.split(",");
+                if(lineSplit[2].equals(String.valueOf(uid))) return lineSplit;
+            }
+        }
+        catch(Exception e){
+            ;
+        }
+        
+        return null;
+    }
+    
 }

@@ -122,6 +122,8 @@ public class Main {
         options.add("View Pending Orders");
         options.add("Change Account Details");
         options.add("Add Other Admin");
+        options.add("Suspend Customer");
+        options.add("Un-Suspend Customer");
         options.add("Log Out");
         adminDb = new JLineMenu("Admin Dashboard", options, "Select an action to continue.", true, false);
         
@@ -132,6 +134,7 @@ public class Main {
         options.add("Change Address");
         options.add("Change Password");
         options.add("Change Phone Number");
+        options.add("Change Email");
         changeDetails = new JLineMenu("Update Particulars", options, "Select an action to continue.", true, false);
         
         
@@ -199,60 +202,79 @@ public class Main {
     }
     
     public static void customerDashboard(){
-        int selection = customerDb.drawMenu();
-        
-        switch(selection){
-            case 0 -> {
-                break;
-            }
+        while(true){
+            int selection = customerDb.drawMenu();
             
-            case 1 -> {
-                break;
-            }
-            
-            case 2 -> {
-                updateInfo("customer");
-                break;
-            }
-            
-            case 3 -> {
+            if(selection == -1) break;
+            if(selection == 3){
                 currentCust=null;
                 break;
             }
             
-            
+            switch(selection){
+                case 0 -> {
+                    break;
+                }
 
+                case 1 -> {
+                    break;
+                }
+
+                case 2 -> {
+                    updateInfo("customer");
+                    break;
+                }
+
+            }
         }
+        
     }
     
     public static void adminDashboard(){
-        int selection = adminDb.drawMenu();
-        switch(selection){
-            case 0 -> {
-                break;
-            }
-            
-            case 1 -> {
-                break;
-            }
-            
-            case 2 -> {
-                updateInfo("admin");
-                break;
-            }
-            
-            case 3 -> {
-                //register admin
-                register("admin");
-                break;
-            }
-            
-            case 4 -> {
+        while(true){
+            int selection = adminDb.drawMenu();
+            if(selection == -1) break;
+            if(selection == 6){
                 currentAdmin=null;
                 break;
             }
             
+            
+            switch(selection){
+                case 0 -> {
+                    break;
+                }
+
+                case 1 -> {
+                    break;
+                }
+
+                case 2 -> {
+                    updateInfo("admin");
+                    break;
+                }
+
+                case 3 -> {
+                    //register admin
+                    register("admin");
+                    break;
+                }
+
+                case 4 -> {
+                    //suspend customer
+                    suspend(true);
+                    break;
+                }
+
+                case 5 -> {
+                    //unsuspend customer
+                    suspend(false);
+                    break;
+                }
+
+            }
         }
+        
         
     }
     
@@ -313,6 +335,13 @@ public class Main {
         String address;
         String birthdate;
         String gender;
+        
+        if(type.equals("admin") && !currentAdmin.isMain()){
+            System.out.println("Access Denied!");
+            System.out.print("Press Enter To Go Back....");
+            scanner.nextLine();
+            return;
+        }
         
        // Username
         while (true) {
@@ -462,6 +491,63 @@ public class Main {
            
     }
     
+    public static void suspend(boolean suspended){
+        JLineMenu.clearScreen();
+        String[] details;
+        int UID;
+        String action = "suspend";
+        if(!suspended) action = "unsuspend";
+        
+        while(true){
+                System.out.print("Enter a UID to " + action + " (-999 to exit): ");
+                try{
+                    UID = scanner.nextInt();
+                    scanner.nextLine();
+                    if(UID == -999) break;
+                }
+                catch (Exception e){
+                    JLineMenu.clearScreen();
+                    scanner.nextLine();
+                    System.out.println("Invalid UID! \n");
+                    continue;
+                }
+                
+
+                //checking if the uid exists
+                if((details = AuthServices.getUserDetails(UID)) != null && (!details[9].equals("admin") && !details[9].equals("main"))){
+                    JLineMenu.clearScreen();
+                    System.out.println("-----------USER INFORMATION-----------");
+                    System.out.println("Username: " + details[0]);
+                    System.out.println("Name: " + details[3]);
+                    System.out.println("UID: " + details[2]);
+                    System.out.println("Role: " + details[9]);
+                    System.out.println("Status: " + details[10]);
+                    System.out.print("Are you sure you want to " + action + "? Y(es) N(o): ");
+                    char selection = scanner.next().charAt(0);
+
+                    scanner.nextLine();
+
+                    switch(selection){
+                        case 'y':
+                        case 'Y':
+                            AuthServices.suspend(UID, suspended);
+                            JLineMenu.clearScreen();
+                            System.out.println("Status Updated!\n");
+                            break;
+                        default:
+                            JLineMenu.clearScreen();
+                            break;
+                    }
+
+                }
+                else{
+                    JLineMenu.clearScreen();
+                    System.out.println("User Does not Exist!\n");
+                }
+        }
+        
+    }
+    
     public static void updateInfo(String type){
         User currentUser = currentAdmin;
         if(type.equals("customer")) currentUser = currentCust;
@@ -487,6 +573,12 @@ public class Main {
             case 3 -> {
                 //change phone
                 changePhone(currentUser);
+                break;
+            }
+            
+            case 4 -> {
+                //change emial
+                changeEmail(currentUser);
                 break;
             }
             
@@ -527,8 +619,6 @@ public class Main {
         }
         
         AuthServices.changePassword(x,input);
-        currentCust= null;
-        currentAdmin = null;
     }
     
     public static void changeName(User x){
@@ -551,8 +641,6 @@ public class Main {
         
         
         AuthServices.changeName(x,input);
-        currentCust= null;
-        currentAdmin = null;
     }
     
     public static void changeAddress(User x){
@@ -575,8 +663,6 @@ public class Main {
         
         
         AuthServices.changeAddress(x,input);
-        currentCust= null;
-        currentAdmin = null;
     }
     
     public static void changePhone(User x){
@@ -603,8 +689,28 @@ public class Main {
         
         
         AuthServices.changePhone(x,input);
-        currentCust= null;
-        currentAdmin = null;
+    }
+    
+    public static void changeEmail(User x){
+        JLineMenu.clearScreen();
+        String input;
+        
+        while(true){
+            System.out.print("Enter Your New Email (999 to go back): ");
+            input = scanner.nextLine();
+            
+            if(input.equals("999")){
+                return;
+            }
+            
+            if(input.contains("@")) break;
+            JLineMenu.clearScreen();
+            System.out.println("Invalid email format!\n");
+            
+        }
+        
+        
+        AuthServices.changeEmail(x,input);
     }
     
     public static void payment() {
