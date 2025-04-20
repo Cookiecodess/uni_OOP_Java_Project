@@ -4,11 +4,6 @@
 package mypackage;
 
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.Scanner;
-import java.util.ArrayList;
 // NOTE:
 // To compile and run, first type this in your terminal
 // to change your directory to the project folder
@@ -32,6 +27,7 @@ import java.util.ArrayList;
 //          Caused by: java.lang.NoClassDefFoundError: org/jline/terminal/Terminal
 //     )
 import java.util.Scanner;
+import java.util.ArrayList;
 
 
 /**
