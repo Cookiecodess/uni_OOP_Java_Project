@@ -127,6 +127,9 @@ public class Main {
     }
 
     public static void payment() {
+        Order a=new Order();
+        qrCodePayment qr=new qrCodePayment(10.00,a);
+        OnlineBankingPayment ob=new OnlineBankingPayment(10.00,a);
         while (true) {
             int selection = payment.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
@@ -135,15 +138,16 @@ public class Main {
 
             switch (selection) {
                 case 0 -> {
-                    onlineBanking();
+                    //ob.process();cannot directly call process since havent input user input
                     continue;
                 }
                 case 1 -> {
-                    cardPayment();
+                    
+                     qr.process();
                     continue;
                 }
                 case 2 -> {
-                    touchNGo();
+                   
                     continue;
                 }
                 default -> {
@@ -154,16 +158,5 @@ public class Main {
         }
     }
 
-    public static void onlineBanking() {
-
-    }
-
-    public static void cardPayment() {
-
-    }
-
-    public static void touchNGo() {
-
-    }
 
 }

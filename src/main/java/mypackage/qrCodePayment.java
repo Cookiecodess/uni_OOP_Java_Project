@@ -30,7 +30,7 @@ public class qrCodePayment extends Payment{
     
 
     }
-    
+    JLineMenu.waitMsg();
     
     
     
