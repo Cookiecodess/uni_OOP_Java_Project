@@ -43,7 +43,7 @@ public class Main {
     static JLineMenu customerDb;
     static JLineMenu adminDb;
     static JLineMenu changeDetails;
-    static JLineMenu menu3;
+    static JLineMenu quitOrContinue;
     static JLineMenu menu1_1;
     static JLineMenu bankSelection;
     static JLineMenu payment;
@@ -139,20 +139,26 @@ public class Main {
         options.add("Option 3-1");
         options.add("Option 3-2");
         options.add("Option 3-3");
-        menu3 = new JLineMenu("3", options, "Select an action to continue.", true, true);
+        //menu3 = new JLineMenu("3", options, "Select an action to continue.", true, true);
 
         options.clear();
-        options.add("Option 1-1-1");
-        options.add("Option 1-1-2");
-        options.add("Option 1-1-3");
-        menu1_1 = new JLineMenu("1-1", options, "Select an action to continue.", true, true);
+        options.add("Try Again");
+        quitOrContinue = new JLineMenu("Continue?", options, "Select an action to continue.", true, true);
 
+        options.clear();
+        options.add("Hong Leong Bank");
+        options.add("Alliance Bank");
+        options.add("Public Bank");
+        options.add("CIMB Bank");
+        options.add("Maybank");
+        
+        bankSelection = new JLineMenu("Bank", options, "Select an action to continue.", true, true);
 
         options.clear();
         options.add("Online Banking");
         options.add("Touch and Go");
         options.add("Card Payment");
-        payment = new JLineMenu("1-3", options, "Select an action to continue.", true, true);
+        payment = new JLineMenu("PaymentMethod", options, "Select an action to continue.", true, true);
 
     }
     
@@ -706,9 +712,9 @@ public class Main {
     
     public static void payment() {
         Order a=new Order();
-        qrCodePayment qr=new qrCodePayment(10.00,a);
-        OnlineBankingPayment ob=new OnlineBankingPayment(10.00,a);
-        while (true) {
+
+        boolean valid=true;
+        while (valid) {
             int selection = payment.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                 return;
@@ -716,12 +722,12 @@ public class Main {
 
             switch (selection) {
                 case 0 -> {
-                    ob.process();//cannot directly call process since havent input user input
+                    valid=onlineBankingPaymentProcess(a);
                     continue;
                 }
                 case 1 -> {
-                    
-                     qr.process();
+                    valid=qrCodePayment(a);
+                     
                     continue;
                 }
                 case 2 -> {
@@ -736,5 +742,87 @@ public class Main {
         }
     }
 
+    public static boolean onlineBankingPaymentProcess(Order a){
+    OnlineBankingPayment ob=new OnlineBankingPayment(10.00,a);
+    boolean shouldExit = false;
+    while (!shouldExit) {
+            int selection = bankSelection.drawMenu();
+            if (selection == JLineMenu.BACK_OPTION) {
+                return false;
+            }
 
+   
+    while(!shouldExit){
+      JLineMenu.printHeader("Online Banking",20);
+          
+        System.out.print("Enter your bank username : ");
+    String bkname=scanner.nextLine();
+    
+    System.out.print("Enter your bank password : ");
+    String bkpass=scanner.nextLine();
+        boolean valid=ob.validateOBPayment(bkname,bkpass);
+        if(!valid){ //is equals to valid == false
+            System.out.println(JLineMenu.RED+"Sorry your bank username or password are invalid"+JLineMenu.RESET);
+            JLineMenu.waitMsg();
+            int continueOrnot= quitOrContinue.drawMenu();     
+    
+            switch (continueOrnot){
+           case 1 -> {
+            return false;        
+                }
+        
+            }
+        }else if(valid){
+            System.out.println(JLineMenu.GREEN+"Successful!"+JLineMenu.RESET);
+            JLineMenu.waitMsg();
+            JLineMenu.clearScreen();
+            JLineMenu.printHeader("Receipt",20);
+        ob.generateReceipt();
+        shouldExit = true;
+        }
+    }
+       
+    }
+    return false;
+} 
+    
+ public static boolean qrCodePayment(Order a){
+        qrCodePayment qr=new qrCodePayment(10.00,a);
+        String confirmMSG="CONFIRM";
+        
+        boolean shouldExit = false;
+            while (!shouldExit) {
+
+                JLineMenu.printHeader("QR code Payment",45);
+          qr.generateQR();      
+         System.out.print("Enter 'CONFIRM' the payment  : ");
+            String confirminput=scanner.nextLine();
+            if(confirmMSG.compareTo(confirminput)==0)
+            {
+                    System.out.println(JLineMenu.GREEN+"Successful!"+JLineMenu.RESET);
+              JLineMenu.waitMsg();
+            JLineMenu.clearScreen();
+                            JLineMenu.printHeader("Receipt",25);
+        qr.generateReceipt();
+        shouldExit = true;
+            }
+            else{
+            System.out.println(JLineMenu.RED+"Sorry, please try again..."+JLineMenu.RESET);
+            JLineMenu.waitMsg();
+            int continueOrnot= quitOrContinue.drawMenu();     
+    
+            switch (continueOrnot){
+           case 1 -> {
+            return false;        
+                }
+        
+            }
+  
+  
+            }
+            }
+    return false;
+} 
+    
+    
 }

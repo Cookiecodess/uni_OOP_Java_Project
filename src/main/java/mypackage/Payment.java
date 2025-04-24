@@ -28,13 +28,12 @@ public abstract class Payment{
     
     public void generateReceipt(){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");//to set the format of the date and time
-        System.out.println("=========== Receipt ============");
-         System.out.println("Order ID\t: "+order.getOrderId);
-         System.out.println("Payment Method\t: "+paymentMethod);
-        System.out.println("Amount\t: RM "+ String.format("%.2f", amount));
-         System.out.println("Date\t: "+dateTime.format(formatter));
-         System.out.println("Order ID\t: "+order.getOrderId);
-         System.out.println("===============================");
+         System.out.println("Order ID\t: "+order.getOrderId());
+         System.out.println("Payment Method\t: "+getPaymentMethod());
+        System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", getAmount())+JLineMenu.RESET);
+         System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
+         System.out.println("Order ID\t: "+order.getOrderId());
+         System.out.println("=========================================================");
          JLineMenu.waitMsg();
    
     };

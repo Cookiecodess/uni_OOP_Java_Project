@@ -12,10 +12,10 @@ public class qrCodePayment extends Payment{
     
     
             public qrCodePayment(double amount, Order order) {
-               super("Card", amount, order);
+               super("QR code Payment", amount, order);
     }
     
-    public boolean process(){
+    public boolean generateQR(){
         try {
       File myObj = new File("qrcode.txt");
             try (Scanner qrOutput = new Scanner(myObj)) {
@@ -29,7 +29,7 @@ public class qrCodePayment extends Payment{
     
 
     }
-    JLineMenu.waitMsg();
+
     
     
     
