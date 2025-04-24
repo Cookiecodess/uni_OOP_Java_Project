@@ -34,7 +34,7 @@ import java.util.Scanner;
 
 /**
  *
- * @author User
+ * @author cookie
  */
 public class TestMain {
     static Scanner scanner = new Scanner(System.in);

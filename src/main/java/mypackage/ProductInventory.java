@@ -14,7 +14,9 @@ import java.util.ArrayList;
  */
 public class ProductInventory {
 
+    // Maps ProductID to Product. Speeds up searching by productID.
     private HashMap<Integer, Product> productsMap = new HashMap<>();
+    private ArrayList<ProductCategory> categories = new ArrayList<>();
 
     // Create ProductCategory and Product objects, then store all Product objects in the productsMap hashmap (keys are the ids)
     public void init() {
@@ -43,6 +45,12 @@ public class ProductInventory {
                 "Storage & Protection",
                 "Protective cases and desk mats for storing and styling your setup."
         );
+        
+        this.categories.add(keyboards);
+        this.categories.add(switches);
+        this.categories.add(keycaps);
+        this.categories.add(accessories);
+        this.categories.add(storage);
 
         // Create Product objects
         // Keyboard category
@@ -282,13 +290,37 @@ public class ProductInventory {
         return prod;
     }
     
-    public ArrayList<Product> getProductArray() {
+    // Use this when returning a product selected by customer from the menu
+    // DO NOT USE getProductById BECAUSE the productId MIGHT NOT MATCH the index in the ArrayList!!!
+    public Product getProductByIndex(int index) {
+        return this.getAllProducts().get(index);
+    }
+    
+    public ArrayList<ProductCategory> getAllCategories() {
+        return this.categories;
+    }
+    
+    public ArrayList<String> getAllCategoryNames() {
+        
+    }
+    
+    public ArrayList<Product> getAllProducts() {
         return new ArrayList<Product>(productsMap.values());
+    } 
+    
+    public ArrayList<String> getProductNames() {
+        ArrayList<String> productNames = new ArrayList<>();
+        for (Product p: this.getAllProducts()) {
+            productNames.add(p.getName());
+        }
+        return productNames;
     }
     
     public int getProductCount() {
         return productsMap.size();
     }
+    
+    
 
 
 }

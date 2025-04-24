@@ -4,6 +4,8 @@
  */
 package mypackage;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author cookie
@@ -16,6 +18,8 @@ public class Product {
     private ProductCategory category;
     private String color;
     private String description;
+//    private ArrayList<ProductReview> reviews; // wait for teammate to write Review class
+    private boolean isDiscontinued;
     
     private static int nextId = 0; // initialize id with 0
     
@@ -37,6 +41,45 @@ public class Product {
         this.stock -= amount;
     }
     
+    /*
+    public ArrayList<ProductReview> getAllReviews() {
+        return this.reviews;
+    }
+    */
+    
+    /*
+    public void addReview(Customer cust, double rating, String reviewText) {
+        this.reviews.add(new ProductReview(cust, rating, reviewText));
+    }
+    */
+    
+    /*
+    public double getAvgRating() {
+        double sumOfRatings = 0;
+        double totalReviews = reviews.size();
+        for (ProductReview r: reviews) {
+            sumOfRatings += r.getRating();
+        }
+        return sumOfRatings / totalReviews;
+    }
+    */
+    
+    /**
+     * 
+     * @return true if this Product is discontinued, false if not
+     */
+    public boolean isDiscontinued() {
+        return this.isDiscontinued;
+    }
+    
+    /**
+     * Discontinue a Product.
+     */
+    public void discontinue() {
+        this.isDiscontinued = true;
+    }
+    
+    // Getters and setters
     public int getId() {
         return id;
     }

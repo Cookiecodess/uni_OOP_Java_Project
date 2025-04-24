@@ -16,6 +16,10 @@ public class ProductCategory {
         this.name = name;
         this.description = description;
     }
+    
+    public ProductCategory(String name) {
+        this(name, "");
+    }
 
     public String getName() {
         return name;
@@ -26,6 +30,9 @@ public class ProductCategory {
     }
 
     public String getDescription() {
+        if (description.isBlank()) {
+            return "No description.";
+        }
         return description;
     }
 
