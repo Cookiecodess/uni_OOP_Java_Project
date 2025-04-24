@@ -14,16 +14,15 @@ public class qrCodePayment extends Payment{
             public qrCodePayment(double amount, Order order) {
                super("Card", amount, order);
     }
-    @Override
+    
     public boolean process(){
         try {
       File myObj = new File("qrcode.txt");
-      Scanner qrOutput = new Scanner(myObj);  
-      while (qrOutput.hasNextLine()) {
-        String data = qrOutput.nextLine();
-        System.out.println(data);
-      }
-      qrOutput.close();
+            try (Scanner qrOutput = new Scanner(myObj)) {
+                while (qrOutput.hasNextLine()) {
+                    String data = qrOutput.nextLine();
+                    System.out.println(data);
+                }     }
     } catch (FileNotFoundException e) {
       System.out.println("An error occurred.");
       e.printStackTrace();

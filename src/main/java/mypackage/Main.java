@@ -9,7 +9,7 @@ package mypackage;
 // to change your directory to the project folder
 // (replace "<path>" with your path to OOP_Java_Project):
 //   cd "C:\<path>\OOP_Java_Project"
-
+//songlynn punya : cd "C:\Users\songl\source\repos\OOP_Java_Project"
 // Since our project uses a dependency called JLine (for detecting arrow key presses), 
 // we must use Maven to compile, as it automatically handles dependencies.
 // You'll need to install Maven on your computer, then add it to your PATH.
@@ -147,11 +147,6 @@ public class Main {
         options.add("Option 1-1-3");
         menu1_1 = new JLineMenu("1-1", options, "Select an action to continue.", true, true);
 
-        options.clear();
-        options.add("Option 1-2-1");
-        options.add("Option 1-2-2");
-        options.add("Option 1-2-3");
-        bankSelection = new JLineMenu("1-2", options, "Select an action to continue.", true, true);
 
         options.clear();
         options.add("Online Banking");
@@ -721,7 +716,7 @@ public class Main {
 
             switch (selection) {
                 case 0 -> {
-                    //ob.process();cannot directly call process since havent input user input
+                    ob.process();//cannot directly call process since havent input user input
                     continue;
                 }
                 case 1 -> {

@@ -11,7 +11,8 @@ import java.time.format.DateTimeFormatter;
  * @author songl
  */
 
-public abstract class Payment implements Payable{    //since payment is an "idea" dont have a specific method to implement
+//public abstract class Payment implements Payable{    //since payment is an "idea" dont have a specific method to implement
+public abstract class Payment{  
         private String paymentMethod; 
         
         private double amount;
@@ -67,6 +68,7 @@ public abstract class Payment implements Payable{    //since payment is an "idea
         public LocalDateTime getDateTime() {
         return dateTime;
     }
+        
 }
 
 
