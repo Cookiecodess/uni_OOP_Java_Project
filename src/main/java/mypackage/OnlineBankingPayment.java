@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class OnlineBankingPayment extends Payment implements Payable{
      private static final String USERNAME = "OnlineBanking";
      private static final String PASSWORD = "OnlineBankuserPassword1";
-     JLineMenu bankSelection;
+
      public  OnlineBankingPayment(double amount, Order order) {
        super("Online Banking", amount, order);
        
@@ -23,14 +23,12 @@ public class OnlineBankingPayment extends Payment implements Payable{
      @Override
            public boolean process(){
                Scanner scanner=new Scanner(System.in);
-               String[] bankList = {"Hong Leong Bank", "Alliance Bank", "Public Bank", "CIMB Bank", "Maybank"};
-                             
+                      
                while (true) {
-            int selection = bankSelection.drawMenu();
+            int selection = Main.bankSelection.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
-               
-                JLineMenu.clearScreen();
-                JLineMenu.printHeader( bankList[selection-1], 5);
+
+                //System.out.print("You are using "+bankList[selection-1]);
                 System.out.print("Enter User ID: ");
                 String inputUsername = scanner.nextLine();  //declare and get the userid
                  System.out.print("Enter Password: ");

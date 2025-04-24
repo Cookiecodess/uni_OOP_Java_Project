@@ -5,13 +5,12 @@
 package mypackage;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  *
  * @author wayne
  */
 public class User {
-    //current database
-    private static List<User> usersList = new ArrayList<User>();
     
     private int UID;
     private String name;
@@ -21,17 +20,12 @@ public class User {
     private String birthDate;
     private String gender;
     private String status;
-    private User thisUser; // assign User object to thisUser when log in
-                           // so we can easily update the info in the List as well
+    
     //for security
     private String userName;
     private String password;
     private String role;
-    private boolean isLoggedIn;
     
-    public User(){
-        this("","",0,"","","","","","","","");
-    }
     
     public User(String userName, String password, int UID, String name, String email, String phoneNumber, String address, String birthdate, String gender, String role,String status){
         this.userName = userName;
@@ -47,64 +41,26 @@ public class User {
         this.status = status;
     }
     
-    //initializing the List with some admin users first
-    static {
-        usersList.add(new User("admin","admin123",1,"John Apple Seed","john@admin.com","60126289399","Jalan Tunku Abdul Rahman","01-10-2003","Male","admin","active"));
-    }
+ 
    
-    public void login(String username, String password){
-        
-        for(User x : usersList){
-            if(username.equals(x.userName) && password.equals(x.password)){
-                //matched... 
-                thisUser = x;
-                this.isLoggedIn = x.isLoggedIn = true;
-                return;
-                /*
-                this.userName =  x.getUsername();
-                this.password = x.getPassword();
-                this.UID = x.getUID();
-                this.name = x.getName();
-                this.email = x.getEmail();
-                this.phoneNumber = x.getPhone();
-                this.address = x.getAddress();
-                this.birthDate = x.getBirthday();
-                this.gender = x.getGender();
-                this.role = x.isAdmin() ? "admin" : "customer";
-                this.status = x.getStatus();*/
-            }
-         }
-        //not match
-    }
-    
-    //add user to the Users list
-    public static void addUser(User x){
-        usersList.add(x);
-    }
-    
-    
-    //=====================generate UID for customer registration===============================\\
-    public static int genUID(){
-        return usersList.getLast().UID + 1;
-    }
     
     //=====================getter and setter for name===============================\\
     public String getName(){
-        return thisUser.name;
+        return this.name;
     }
     
     public void setName(String x){
-        if(isLoggedIn) thisUser.name = x;
+        this.name = x;
     }
     
     
     //=====================getter and setter for email===============================\\
     public String getEmail(){
-        return thisUser.email;
+        return this.email;
     }
     
     public void setEmail(String x){
-        if(isLoggedIn) thisUser.email = x;
+        this.email = x;
     }
     
     
@@ -112,22 +68,22 @@ public class User {
     
     //=====================getter and setter for phonenumber===============================\\
     public String getPhone(){
-        return thisUser.phoneNumber;
+        return this.phoneNumber;
     }
     
     public void setPhone(String x){
-        if(isLoggedIn) thisUser.phoneNumber = x;
+        this.phoneNumber = x;
     }
     
     
     
     //=====================getter and setter for address===============================\\
     public String getAddress(){
-        return thisUser.address;
+        return this.address;
     }
     
     public void setAddress(String x){
-        if(isLoggedIn) thisUser.address = x;
+         this.address = x;
     }
     
     
@@ -135,87 +91,80 @@ public class User {
     
     //=====================getter and setter for gender===============================\\
     public String getGender(){
-        return thisUser.gender;
+        return this.gender;
     }
     
     public void setGender(String x){
-        if(isLoggedIn) thisUser.gender = x;
+         this.gender = x;
     }
     
     
     //=====================getter and setter for birthdate===============================\\
     public String getBirthday(){
-        return thisUser.birthDate;
+        return this.birthDate;
     }
     
     public void setBirthday(String x){
-        if(isLoggedIn) thisUser.birthDate = x;
+         this.birthDate = x;
     }
     
     //=====================getter for username===============================\\
+    public void setUsername(String x){
+        this.userName = x;
+    }
+    
     public String getUsername(){
-        return thisUser.userName;
+        return this.userName;
     }
     
  
     
     //=====================getter and setter for password===============================\\
     public String getPassword(){
-        return thisUser.password;
+        return this.password;
     }
     
     public void setPassword(String x){
-        if(isLoggedIn) thisUser.password = x;
+        this.password = x;
     }
     
     
     //=====================getter for role===============================\\
     public boolean isAdmin(){
-        return (thisUser.role.equalsIgnoreCase("admin"));
+        return (this.role.equalsIgnoreCase("admin") || this.role.equalsIgnoreCase("main"));
+    }
+    
+    public boolean isMain(){
+        return this.role.equalsIgnoreCase("main");
+    }
+    
+    public String getRole(){
+        return this.role;
+    }
+    public void setRole(String role){
+        this.role = role;
     }
     
     
     
     //=====================getter for uid===============================\\
     public int getUID(){
-        return thisUser.UID;
+        return this.UID;
+    }
+    
+    public void setUID(int uid){
+        this.UID = uid;
     }
     
     //====================get status======================\\
     public String getStatus(){
-        return thisUser.status;
+        return this.status;
     }
     
-    //only admin can access
-    protected void suspend(int UID){
-        if(isAdmin()){
-            
-            for(User x: usersList){
-                x.thisUser = x;
-                if(x.getUID() == UID) x.status = "suspended";
-
-            }
-        }
-        
+    public void setStatus(String stat){
+        this.status = stat;
     }
     
-    protected void activate(int UID){
-        if(isAdmin()){
-            for(User x: usersList){
-                x.thisUser = x;
-                if(x.getUID() == UID) x.status = "active";
-            }
-        }
-    }
-    
-    protected void delete(int UID){
-        if(isAdmin()){
-            for(User x: usersList){
-                x.thisUser = x;
-                if(x.getUID() == UID) usersList.remove(x);
-            }
-        }
-    }
 }
 
 
