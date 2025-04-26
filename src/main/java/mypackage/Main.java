@@ -53,11 +53,7 @@ public class Main {
     static Admin currentAdmin  = null;
 
 
-    public static void main(String[] args) {
-//        int c = terminal.reader().read();
-//        System.out.println(c);
-//        System.exit(0);
-        
+    public static void main(String[] args) {        
         initAllMenus();
         // start program
         while (true) {

@@ -115,6 +115,7 @@ public class JLineMenu {
     private boolean hasBackOption;    
     private boolean hasExitOption;
     
+    int firstItemIdx = 0;
     int selected = 0; // want to access in subclass
     private boolean running = true;
     
@@ -139,7 +140,7 @@ public class JLineMenu {
     }
     
     public void drawOptions() {
-        for (int i = 0; i < numOfOptions; i++) {
+        for (int i = firstItemIdx; i < numOfOptions; i++) {
             if (i == selected) {
                 // Highlight selected item
                 terminal.writer().println("\u001b[7m> " + this.options.get(i) + "\u001b[0m");
@@ -190,13 +191,17 @@ public class JLineMenu {
                 int c = terminal.reader().read();
                 switch (c) {
                     case 27 -> { // 1st byte of an arrow keypress: ESC
-                        terminal.reader().read(); // read 2nd byte of arrow keypress: 91 ([)
+                        terminal.reader().read(); // read 2nd byte of arrow keypress: 91 ([) or 79
                         c = terminal.reader().read();
                         switch (c) {
                             case 65 ->
                                 moveCursorUp();
                             case 66 ->
                                 moveCursorDown();
+                            case 67 ->
+                                onRight();
+                            case 68 ->
+                                onLeft();
                         }
                     }
                     case 13 -> { // Enter key pressed
