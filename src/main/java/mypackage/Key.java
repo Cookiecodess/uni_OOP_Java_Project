@@ -6,8 +6,8 @@ package mypackage;
 
 /**
  *
- * @author User
+ * @author cookie
  */
-public enum NewEnum {
-    
+public enum Key {
+    UP, DOWN, LEFT, RIGHT, ENTER;
 }

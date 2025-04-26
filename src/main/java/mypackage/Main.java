@@ -26,8 +26,10 @@ package mypackage;
 //          Error: Unable to initialize main class mypackage.JLineMenu
 //          Caused by: java.lang.NoClassDefFoundError: org/jline/terminal/Terminal
 //     )
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
+import static mypackage.JLineMenu.terminal;
 
 
 /**
@@ -52,6 +54,10 @@ public class Main {
 
 
     public static void main(String[] args) {
+//        int c = terminal.reader().read();
+//        System.out.println(c);
+//        System.exit(0);
+        
         initAllMenus();
         // start program
         while (true) {
@@ -765,13 +771,10 @@ public class Main {
             System.out.println(JLineMenu.RED+"Sorry your bank username or password are invalid"+JLineMenu.RESET);
             JLineMenu.waitMsg();
             int continueOrnot= quitOrContinue.drawMenu();     
-    
-            switch (continueOrnot){
-           case 1 -> {
-            return false;        
-                }
-        
+            if (continueOrnot == JLineMenu.BACK_OPTION) {
+                return false;
             }
+
         }else if(valid){
             System.out.println(JLineMenu.GREEN+"Successful!"+JLineMenu.RESET);
             JLineMenu.waitMsg();
@@ -810,13 +813,10 @@ public class Main {
             System.out.println(JLineMenu.RED+"Sorry, please try again..."+JLineMenu.RESET);
             JLineMenu.waitMsg();
             int continueOrnot= quitOrContinue.drawMenu();     
-    
-            switch (continueOrnot){
-           case 1 -> {
-            return false;        
-                }
-        
+            if (continueOrnot == JLineMenu.BACK_OPTION) {
+                return false;
             }
+
   
   
             }

@@ -72,15 +72,16 @@ public class JLineMenu {
     public static final String BG_CYAN = "\u001B[46m";
     public static final String BG_WHITE = "\u001B[47m";
 
-
-
-    
-    
-    public static final int BACK_OPTION = -1;    
-    public static final int LEFT_RIGHT_PADDING = 10;
-    
-    private static Terminal terminal;
+    static Terminal terminal;
     private static Scanner scanner;
+    
+
+
+    
+    // Global constants for all menus
+    public static final int BACK_OPTION = -1;    
+    public static final int LEFT_RIGHT_PADDING = 10; // the number of ='s at either side of the header
+    public static final int MENU_WIDTH = 40; // max width of menu
     
     // A static block is executed ONCE when this class is loaded.
     static {
@@ -108,12 +109,15 @@ public class JLineMenu {
     
     // Instance variables
     private String textHeader;
-    private ArrayList<String> options;
-    private int numOfOptions;
+    ArrayList<String> options;
+    int numOfOptions; // want to access in subclass
     private String textPrompt;
     private boolean hasBackOption;    
     private boolean hasExitOption;
-
+    
+    int selected = 0; // want to access in subclass
+    private boolean running = true;
+    
     // Public constructor of a JLineMenu object
     public JLineMenu(String textHeader, ArrayList<String> options, String textPrompt, boolean hasBackOption, boolean hasExitOption) {
 
@@ -134,6 +138,26 @@ public class JLineMenu {
         this.numOfOptions = this.options.size();
     }
     
+    public void drawOptions() {
+        for (int i = 0; i < numOfOptions; i++) {
+            if (i == selected) {
+                // Highlight selected item
+                terminal.writer().println("\u001b[7m> " + this.options.get(i) + "\u001b[0m");
+            } else {
+                terminal.writer().println("  " + this.options.get(i));
+            }
+        }
+    }
+    
+    public void moveCursorUp() {
+        selected = (selected - 1 + this.numOfOptions) % this.numOfOptions;
+    }
+    public void moveCursorDown() {
+        selected = (selected + 1) % this.numOfOptions;
+    }
+    public void onLeft() {}; // default do nothing
+    public void onRight() {}; // default do nothing
+    
     /**
      * Draws a menu that's navigable with arrow keys!
      *     Returns JLineMenu.BACK_OPTION (an int) if "Back" is selected.
@@ -141,8 +165,8 @@ public class JLineMenu {
      *     When an options that's neither "Back" nor "Exit", is selected, returns the index of selected option.
      */
     public int drawMenu() {
-        int selected = 0;
-        boolean running = true;
+//        int selected = 0;
+//        boolean running = true;
         
         // Hide cursor
         System.out.println(HIDE_CUR);
@@ -156,14 +180,7 @@ public class JLineMenu {
             printHeader(textHeader, LEFT_RIGHT_PADDING);
 
             // Display menu with highlighting
-            for (int i = 0; i < this.numOfOptions; i++) {
-                if (i == selected) {
-                    // Highlight selected item
-                    terminal.writer().println("\u001b[7m> " + this.options.get(i) + "\u001b[0m");
-                } else {
-                    terminal.writer().println("  " + this.options.get(i));
-                }
-            }
+            drawOptions();
             
             // Display text prompt
             System.out.println("\n" + textPrompt);
@@ -177,9 +194,9 @@ public class JLineMenu {
                         c = terminal.reader().read();
                         switch (c) {
                             case 65 ->
-                                selected = (selected - 1 + this.numOfOptions) % this.numOfOptions;
+                                moveCursorUp();
                             case 66 ->
-                                selected = (selected + 1) % this.numOfOptions;
+                                moveCursorDown();
                         }
                     }
                     case 13 -> { // Enter key pressed
@@ -228,6 +245,7 @@ public class JLineMenu {
         }
         return -3; // if the program reaches here, something has gone terribly wrong
     }  
+    
     
     // Waits for user to press any key before continuing
     public static void waitMsg() {
@@ -281,6 +299,11 @@ public class JLineMenu {
                 return; // Do not exit and return to where confirmExit() was called 
             }            
         }        
+    }
+    
+    // Getters and setters
+    public void setOptions(ArrayList<String> options) {
+        this.options = options;
     }
     
 }
