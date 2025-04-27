@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter;
  * @author songl
  */
 
-//public abstract class Payment implements Payable{    //since payment is an "idea" dont have a specific method to implement
-public abstract class Payment{  
+public abstract class Payment implements Payable{    //since payment is an "idea" dont have a specific method to implement
+//public abstract class Payment{  
         private String paymentMethod; 
         
         private double amount;
@@ -24,19 +24,7 @@ public abstract class Payment{
         this.amount=amount;
         this.paymentMethod=paymentMethod;
     }
-    
-    
-    public void generateReceipt(){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");//to set the format of the date and time
-         System.out.println("Order ID\t: "+order.getOrderId());
-         System.out.println("Payment Method\t: "+getPaymentMethod());
-        System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", getAmount())+JLineMenu.RESET);
-         System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
-         System.out.println("Order ID\t: "+order.getOrderId());
-         System.out.println("=========================================================");
-         JLineMenu.waitMsg();
-   
-    };
+
 
     public String getPaymentMethod() {
         return paymentMethod;
@@ -67,7 +55,16 @@ public abstract class Payment{
         public LocalDateTime getDateTime() {
         return dateTime;
     }
-        
+        @Override
+      public abstract boolean validation();  
+       
+      public abstract void generateQR();
+       @Override
+      public abstract String failMessage();  
+      
+          
+    @Override
+    public abstract void generateReceipt(Order order);
 }
 
 

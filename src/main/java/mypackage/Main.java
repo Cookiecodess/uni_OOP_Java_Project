@@ -733,7 +733,7 @@ public class Main {
                     continue;
                 }
                 case 2 -> {
-                   
+                   valid=cardPaymentProcess(a);
                     continue;
                 }
                 default -> {
@@ -743,81 +743,103 @@ public class Main {
             
         }
     }
-
-    public static boolean onlineBankingPaymentProcess(Order a){
-    OnlineBankingPayment ob=new OnlineBankingPayment(10.00,a);
-    boolean shouldExit = false;
-    while (!shouldExit) {
+    
+    
+    
+      public static boolean onlineBankingPaymentProcess(Order a){
+Payment paymentO;
+    String bankName;
+    while (true) {
             int selection = bankSelection.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                 return false;
             }
 
-   
-    while(!shouldExit){
-      JLineMenu.printHeader("Online Banking",20);
-          
-        System.out.print("Enter your bank username : ");
-    String bkname=scanner.nextLine();
-    
-    System.out.print("Enter your bank password : ");
-    String bkpass=scanner.nextLine();
-        boolean valid=ob.validateOBPayment(bkname,bkpass);
-        if(!valid){ //is equals to valid == false
-            System.out.println(JLineMenu.RED+"Sorry your bank username or password are invalid"+JLineMenu.RESET);
-            JLineMenu.waitMsg();
-            int continueOrnot= quitOrContinue.drawMenu();     
-            if (continueOrnot == JLineMenu.BACK_OPTION) {
-                return false;
+               switch (selection) {
+                
+                 case 0 -> bankName = "Hong Leong Bank";
+            case 1 -> bankName = "Alliance Bank";
+            case 3 -> bankName = "Public Bank";
+            case 4 -> bankName = "CIMB Bank";
+            case 5 -> bankName = "Maybank";
+            default -> {
+                continue;
             }
+                
+                
+            }
+               
+        paymentO = new OnlineBankingPayment(10.00,a,bankName);
+            return processPayment(paymentO,a);
+    }
 
-        }else if(valid){
-            System.out.println(JLineMenu.GREEN+"Successful!"+JLineMenu.RESET);
-            JLineMenu.waitMsg();
-            JLineMenu.clearScreen();
-            JLineMenu.printHeader("Receipt",20);
-        ob.generateReceipt();
-        shouldExit = true;
-        }
-    }
-       
-    }
-    return false;
 } 
     
- public static boolean qrCodePayment(Order a){
-        qrCodePayment qr=new qrCodePayment(10.00,a);
-        String confirmMSG="CONFIRM";
-        
+    
+     private static boolean processPayment(Payment paymentO,Order a) {
         boolean shouldExit = false;
-            while (!shouldExit) {
-
-                JLineMenu.printHeader("QR code Payment",45);
-          qr.generateQR();      
-         System.out.print("Enter 'CONFIRM' the payment  : ");
-            String confirminput=scanner.nextLine();
-            if(confirmMSG.compareTo(confirminput)==0)
-            {
-                    System.out.println(JLineMenu.GREEN+"Successful!"+JLineMenu.RESET);
-              JLineMenu.waitMsg();
-            JLineMenu.clearScreen();
-                            JLineMenu.printHeader("Receipt",25);
-        qr.generateReceipt();
-        shouldExit = true;
+        while (!shouldExit) {
+            if (paymentO.validation()) {
+                System.out.println(JLineMenu.GREEN + "Successful!" + JLineMenu.RESET);
+                JLineMenu.waitMsg();
+                JLineMenu.clearScreen();
+                JLineMenu.printHeader("Receipt", 20);
+                paymentO.generateReceipt(a);
+                shouldExit = true;
+            } else {
+                System.out.println(JLineMenu.RED + paymentO.failMessage() + JLineMenu.RESET);
+                JLineMenu.waitMsg();
+                int continueOrNot = quitOrContinue.drawMenu();
+                if (continueOrNot == JLineMenu.BACK_OPTION) {
+                    return false;
+                }
             }
-            else{
-            System.out.println(JLineMenu.RED+"Sorry, please try again..."+JLineMenu.RESET);
-            JLineMenu.waitMsg();
-            int continueOrnot= quitOrContinue.drawMenu();     
-            if (continueOrnot == JLineMenu.BACK_OPTION) {
+        }
+        return true;
+    
+}
+    
+    
+    
+ public static boolean qrCodePayment(Order a){
+        Payment paymentO=new qrCodePayment(10.00,a);
+               JLineMenu.printHeader("QR code Payment",45);
+          paymentO.generateQR();      
+         
+        return processPayment(paymentO,a);
+   
+} 
+ 
+ 
+ public static boolean cardPaymentProcess(Order a){
+
+    Payment paymentO;
+    String bankName;
+    while (true) {
+            int selection = bankSelection.drawMenu();
+            if (selection == JLineMenu.BACK_OPTION) {
                 return false;
             }
 
-  
-  
+               switch (selection) {
+                
+                 case 0 -> bankName = "Hong Leong Bank";
+            case 1 -> bankName = "Alliance Bank";
+            case 3 -> bankName = "Public Bank";
+            case 4 -> bankName = "CIMB Bank";
+            case 5 -> bankName = "Maybank";
+            default -> {
+                continue;
             }
+                
+                
             }
-    return false;
+               
+        paymentO = new CardPayment(10.00,a,bankName);
+            return processPayment(paymentO,a);
+    }
+    
+    
 } 
     
     
