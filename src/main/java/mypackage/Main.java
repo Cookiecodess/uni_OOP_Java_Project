@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import static mypackage.JLineMenu.terminal;
-
-
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 /**
  *
  * @author User
@@ -49,6 +49,7 @@ public class Main {
     static JLineMenu menu1_1;
     static JLineMenu bankSelection;
     static JLineMenu payment;
+    static JLineMenu reportSelection;
     static Customer currentCust = null;
     static Admin currentAdmin  = null;
 
@@ -122,6 +123,7 @@ public class Main {
         options.add("Add Other Admin");
         options.add("Suspend Customer");
         options.add("Un-Suspend Customer");
+         options.add("View Report");
         options.add("Log Out");
         adminDb = new JLineMenu("Admin Dashboard", options, "Select an action to continue.", true, false);
         
@@ -138,10 +140,11 @@ public class Main {
         
         
         options.clear();
-        options.add("Option 3-1");
-        options.add("Option 3-2");
-        options.add("Option 3-3");
-        //menu3 = new JLineMenu("3", options, "Select an action to continue.", true, true);
+        options.add("Daily Report");
+        options.add("Monthly Report");
+        options.add("Yearly Report");
+        options.add("Customize Report");
+        reportSelection = new JLineMenu("Report", options, "Select a report type.", true, true);
 
         options.clear();
         options.add("Try Again");
@@ -268,6 +271,10 @@ public class Main {
                 case 5 -> {
                     //unsuspend customer
                     suspend(false);
+                    break;
+                }
+                                case 6 -> {
+                    //report();
                     break;
                 }
 
@@ -842,5 +849,79 @@ Payment paymentO;
     
 } 
     
-    
+ 
+// 
+//  public static void reportPage(List<Order> orderList, List<Product> productList){
+//   
+//        DateChecker dateChecker = new DateChecker();
+//      
+//    while(true){
+//        int selection = payment.drawMenu();
+//            if (selection == JLineMenu.BACK_OPTION) {
+//                return;
+//            }
+//         
+//        LocalDate userDate;
+//        switch (selection) {
+//                case 0 -> {
+//            // Daily Report
+//             userDate = getUserDateInput("Please enter the date (YYYY-MM-DD):");
+//             dateChecker.setDailyReport(userDate);
+//        }  case 1 -> {
+//            // Monthly Report
+//           userDate = getUserDateInput("Please enter the month (YYYY-MM-DD):");
+//           
+//            dateChecker.setMonthlyReport(userDate);
+//        } case 2 -> {
+//            // Yearly Report
+//           userDate = getUserDateInput("Please enter the year (YYYY):");
+//            
+//            dateChecker.setYearlyReport(userDate);
+//        }  case 3 -> {
+//            // Customize Report
+//
+//            LocalDate startDate = getUserDateInput("Please enter the START date (YYYY-MM-DD):");
+//            LocalDate endDate = getUserDateInput("Please enter the END date (YYYY-MM-DD):");
+//            dateChecker.setCustomizeReport(startDate, endDate);
+//        }
+//         default -> {
+//                continue;
+//            }
+//        }
+//        
+//        // get the date domain
+//        LocalDate startDate = dateChecker.getStartDate();
+//        LocalDate endDate = dateChecker.getEndDate();
+//
+//        // 生成销售报告
+//        Report report = new Report();
+//        report.generateSalesReport(orderList, productList, startDate, endDate);
+//
+//                int continueOrNot = quitOrContinue.drawMenu();
+//                if (continueOrNot == JLineMenu.BACK_OPTION) {
+//                    return;
+//                }
+//        scanner.close();
+//        }
+// 
+//  }
+// public static LocalDate getUserDateInput(String prompt) {
+//        LocalDate userDate = null;
+//        boolean validInput = false;
+//        Scanner scan = new Scanner(System.in);
+//        // continue loop until valid format
+//        while (!validInput) {
+//            System.out.println(prompt);
+//            String input = scan.next();
+//
+//            try {
+//                userDate = LocalDate.parse(input); //get the date
+//                validInput = true; // if no exception means is valid format
+//            } catch (DateTimeParseException e) {
+//                System.out.println("Invalid Format！Please try again");
+//            }
+//        }
+//        
+//        return userDate; // return valid date
+//    }
 }
