@@ -8,8 +8,11 @@ package mypackage;
 
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
 
 import java.util.Scanner;
+import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -74,7 +77,7 @@ public class JLineMenu {
 
     static Terminal terminal;
     private static Scanner scanner;
-    
+    public static LineReader reader;
 
 
     
@@ -92,6 +95,11 @@ public class JLineMenu {
                         .jna(true)
                         .jansi(false)  // Avoid Jansi conflict
                         .build();
+            
+            reader = LineReaderBuilder.builder()
+                    .terminal(terminal)
+                    .build();
+            
         } catch (IOException e) {
             System.err.println("\nFailed to initialize terminal: " + e.getMessage() + "\n");
             System.exit(1); // exits with error
@@ -116,14 +124,14 @@ public class JLineMenu {
     private boolean hasExitOption;
     
     int firstItemIdx = 0;
-    int selected = 0; // want to access in subclass
+    int currentSelection = 0; // want to access in subclass
     private boolean running = true;
     
     // Public constructor of a JLineMenu object
-    public JLineMenu(String textHeader, ArrayList<String> options, String textPrompt, boolean hasBackOption, boolean hasExitOption) {
+    public JLineMenu(String textHeader, List<String> options, String textPrompt, boolean hasBackOption, boolean hasExitOption) {
 
         this.textHeader = textHeader;
-        this.options = (ArrayList<String>) options.clone(); // Make a copy of the options ArrayList, so we don't modify the original ArrayList 
+        this.options = new ArrayList<>(options); 
         this.textPrompt = textPrompt;
         this.hasBackOption = hasBackOption;       
         this.hasExitOption = hasExitOption;
@@ -141,8 +149,8 @@ public class JLineMenu {
     
     public void drawOptions() {
         for (int i = firstItemIdx; i < numOfOptions; i++) {
-            if (i == selected) {
-                // Highlight selected item
+            if (i == currentSelection) {
+                // Highlight currentSelection item
                 terminal.writer().println("\u001b[7m> " + this.options.get(i) + "\u001b[0m");
             } else {
                 terminal.writer().println("  " + this.options.get(i));
@@ -151,13 +159,13 @@ public class JLineMenu {
     }
     
     public void moveCursorUp() {
-        selected = (selected - 1 + this.numOfOptions) % this.numOfOptions;
+        currentSelection = (currentSelection - 1 + this.numOfOptions) % this.numOfOptions;
     }
     public void moveCursorDown() {
-        selected = (selected + 1) % this.numOfOptions;
+        currentSelection = (currentSelection + 1) % this.numOfOptions;
     }
     public void onLeft() {}; // default do nothing
-    public void onRight() {}; // default do nothing
+    public void onRight() {}; // default do nothing// default do nothing
     
     /**
      * Draws a menu that's navigable with arrow keys!
@@ -165,13 +173,18 @@ public class JLineMenu {
      *     Selecting "Exit" is handled by another static method in this class: confirmExit().
      *     When an options that's neither "Back" nor "Exit", is selected, returns the index of selected option.
      */
-    public int drawMenu() {
+    
+    public int drawMenu(){
+        return drawMenu("");
+    }
+    
+    public int drawMenu(String msg) {
 //        int selected = 0;
 //        boolean running = true;
         
         // Hide cursor
         System.out.println(HIDE_CUR);
-
+        
         // Menu display loop
         while (running) {
             // Clear screen
@@ -179,6 +192,10 @@ public class JLineMenu {
             
             // Print header
             printHeader(textHeader, LEFT_RIGHT_PADDING);
+            
+            //print message after header
+            if(msg.length() > 0) System.out.println(msg+"\n");
+            
 
             // Display menu with highlighting
             drawOptions();
@@ -207,31 +224,31 @@ public class JLineMenu {
                     case 13 -> { // Enter key pressed
                         clearScreen();
                         
-                        // "Back" or "Exit" selected?
+                        // "Back" or "Exit" currentSelection?
                         if (this.hasBackOption && this.hasExitOption) {
                             // Exit
-                            if (selected == this.numOfOptions - 1) {
+                            if (currentSelection == this.numOfOptions - 1) {
                                 confirmExit();
                                 continue; // If user returns here, it means they chose to cancel exiting the program.
                             }
                             // Back
-                            else if (selected == this.numOfOptions - 2) {
+                            else if (currentSelection == this.numOfOptions - 2) {
                                 System.out.println(SHOW_CUR); // Show cursor
                                 return BACK_OPTION;
                             }
                         } 
-                        else if (this.hasBackOption && selected == this.numOfOptions - 1) { // Back
+                        else if (this.hasBackOption && currentSelection == this.numOfOptions - 1) { // Back
                             System.out.println(SHOW_CUR); // Show cursor
                             return BACK_OPTION;
                         }
-                        else if (this.hasExitOption && selected == this.numOfOptions - 1) { // Exit
+                        else if (this.hasExitOption && currentSelection == this.numOfOptions - 1) { // Exit
                             confirmExit();
                             continue; // If user returns here, it means they chose to cancel exiting the program.
                         }
                         
-                        // An option other than "Back" or "Exit" is selected, so return the index of selected option.
+                        // An option other than "Back" or "Exit" is currentSelection, so return the index of currentSelection option.
                         System.out.println(SHOW_CUR); // Show cursor
-                        return selected;
+                        return currentSelection;
                     }
                     default -> {
                         // Clear input buffer
@@ -310,14 +327,29 @@ public class JLineMenu {
     public void setOptions(ArrayList<String> options) {
         this.options = options;
     }
+    
+    public int getCurrentSelection() {
+        return this.currentSelection;
+    }
+    public void setCurrentSelection(int currSel) {
+        this.currentSelection = currSel;
+    }
+    
+    public int getNumOfOptions() {
+        return this.numOfOptions;
+    }
+    public void setNumOfOptions(int numOfOptions) {
+        this.numOfOptions = numOfOptions;
+    }
+    
     public static void sound(){
     
-    try{
-             Runtime.getRuntime().exec("powershell -c [console]::beep(1000,500)");//HZ& SECOND
-             
-             }catch(IOException e){
-             e.printStackTrace();
-             }
-    
-    }
+        try{
+                 Runtime.getRuntime().exec("powershell -c [console]::beep(1000,500)");//HZ& SECOND
+                 
+                 }catch(IOException e){
+                 e.printStackTrace();
+                 }
+        
+        }
 }
