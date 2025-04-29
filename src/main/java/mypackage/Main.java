@@ -1014,11 +1014,18 @@ static JLineMenu saveReceipt;
             if (selection == OOMenu.BACK_OPTION_INT) {
                 return;
             }
-            listProducts(inventory.getCategoryByIndex(selection)); // list products that belong to the selected category
+
+            // If user selected a product, proceed to add to cart
+            Product selectedProduct = listProducts(inventory.getCategoryByIndex(selection)); // list products that belong to the selected category
+
+            if (selectedProduct == null) continue; // User selected "back" -- redraw this menu.
+
+            // add to cart method here
+            //addToCart(selectedProduct) or something
         }
     }
     
-    public static void listProducts(ProductCategory category) {
+    public static Product listProducts(ProductCategory category) {
         List<Product> products = inventory.getProductsByCategoryName(category.getName());
         List<MenuItem> menuItems = new ArrayList<>(products);
 
@@ -1026,13 +1033,13 @@ static JLineMenu saveReceipt;
         String header = "Products: " + category.getName();
         OOMenu productMenu = new OOMenu(header, menuItems, "Use the UP and DOWN keys to navigate the menu and view product details.\nHit ENTER to ADD TO CART.", true, false);
         
-        while (true) {
-            int selection = productMenu.drawMenu();
-            
-            if (selection == JLineMenu.BACK_OPTION) return;
-            
-            System.out.println(products.get(selection).getName());
-            JLineMenu.waitMsg();
-        }
+        // while (true) {
+        int selection = productMenu.drawMenu(); // drawMenu() returns either BACK_OPTION_INT or a positive integer which is an index of products
+
+        if (selection == OOMenu.BACK_OPTION_INT) 
+            return null;
+
+        return products.get(selection);
+        // }
     }
 }
