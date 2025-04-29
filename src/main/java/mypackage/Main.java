@@ -45,7 +45,7 @@ public class Main {
     static JLineMenu admin;
     static JLineMenu customerDb;
     static JLineMenu productMainMenu;
-    static JLineMenu productCategoryMenu;
+    static OOMenu productCategoryMenu;
 //    static JLineMenu productListMenu;
     static JLineMenu adminDb;
     static JLineMenu changeDetails;
@@ -132,7 +132,9 @@ static JLineMenu saveReceipt;
         options.add("All Products");
         productMainMenu = new JLineMenu("View Products", options, "Select an action to continue.", true, false);
         
-        productCategoryMenu = new JLineMenu("Browse by Category", inventory.getAllCategoryNames(), "Select a product category.", true, false);
+        // productCategoryMenu = new JLineMenu("Browse by Category", inventory.getAllCategoryNames(), "Select a product category.", true, false);
+        List<MenuItem> menuItems = new ArrayList<>(inventory.getAllCategories());
+        productCategoryMenu = new OOMenu("Browse by Category", menuItems, "Select a product category.", true, false);
         
 
         options.clear();
@@ -1004,7 +1006,7 @@ static JLineMenu saveReceipt;
     public static void productCategoryMenu() {
         while (true) {
             int selection = productCategoryMenu.drawMenu();
-            if (selection == JLineMenu.BACK_OPTION) {
+            if (selection == OOMenu.BACK_OPTION_INT) {
                 return;
             }
             listProducts(inventory.getCategoryByIndex(selection)); // list products that belong to the selected category
@@ -1022,7 +1024,7 @@ static JLineMenu saveReceipt;
         while (true) {
             int selection = productMenu.drawMenu();
             
-            if (selection == JLineMenu.BACK_OPTION) break;
+            if (selection == JLineMenu.BACK_OPTION) return;
             
             System.out.println(products.get(selection).getName());
             JLineMenu.waitMsg();

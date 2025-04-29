@@ -8,7 +8,7 @@ package mypackage;
  *
  * @author cookie
  */
-public class ProductCategory {
+public class ProductCategory implements MenuItem {
     private String name;
     private String description;
 
@@ -40,6 +40,14 @@ public class ProductCategory {
         this.description = description;
     }
 
-    
+    // methods for MenuItem interface
+    @Override
+    public String getItemLabel() {
+        return this.name;
+    }
+    @Override
+    public void printInfo() {
+        System.out.println("Description: "+this.description);
+    }
     
 }

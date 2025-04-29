@@ -145,7 +145,11 @@ public class Product implements MenuItem{
 
     @Override
     public void printInfo() {
-        System.out.println(this.description);
+        System.out.println("Description: \t\t"+this.description);
+        System.out.println("Unit Price: \t\tRM "+this.price);
+        System.out.println("Stock available: \t"+this.stock);
+        System.out.println("Category: \t\t"+this.category.getName());
+        System.out.println("Color: \t\t\t"+this.color);
     }
     
 }

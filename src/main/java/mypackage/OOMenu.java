@@ -283,15 +283,17 @@ public class OOMenu {
             // Display menu with highlighting
             drawOptions();
 
+            // divider (==========)
+            printDivider("=");            
+            // print info/description related to the currently selected item of the menu
+            printAdditionalInfo();
+            printDivider("=");
+
             // Display text prompt
             System.out.println("\n" + textPrompt);
 
-            // divider (==========)
-            System.out.println();
-            printDivider("=");
 
-            // print info/description related to the currently selected item of the menu
-            printAdditionalInfo();
+            
 
             // // Print bottom content if available
             // if (this.bottomContent != null) {
