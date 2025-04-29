@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *
  * @author cookie
  */
-public class Product {    
+public class Product implements MenuItem{    
     private int id;    
     private String name;
     private double price;
@@ -135,6 +135,17 @@ public class Product {
     @Override
     public String toString() {
         return "Product{" + "id=" + id + ", name=" + name + ", price=" + price + ", stock=" + stock + ", category=" + category + ", color=" + color + ", description=" + description + '}';
+    }
+
+    // MenuOption methods
+    @Override
+    public String getItemLabel() {
+        return this.name;
+    }
+
+    @Override
+    public void printInfo() {
+        System.out.println(this.description);
     }
     
 }

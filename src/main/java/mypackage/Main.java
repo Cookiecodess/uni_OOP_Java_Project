@@ -1012,10 +1012,12 @@ static JLineMenu saveReceipt;
     }
     
     public static void listProducts(ProductCategory category) {
-        ArrayList<Product> products = new ArrayList<>(inventory.getProductsByCategoryName(category.getName()));
-        List<String> productNames = PropertyExtractor.extractProperty(products, "name");
+        List<Product> products = inventory.getProductsByCategoryName(category.getName());
+        List<MenuItem> menuItems = new ArrayList<>(products);
+
+        // List<String> productNames = PropertyExtractor.extractProperty(products, "name");
         String header = "Products: " + category.getName();
-        JLineMenu productMenu = new JLineMenu(header, productNames, "Select a product for more details.", true, false);
+        OOMenu productMenu = new OOMenu(header, menuItems, "Use the UP and DOWN keys to navigate the menu and view product details.\nHit ENTER to ADD TO CART.", true, false);
         
         while (true) {
             int selection = productMenu.drawMenu();

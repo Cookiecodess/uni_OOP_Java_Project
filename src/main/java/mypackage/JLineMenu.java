@@ -75,7 +75,7 @@ public class JLineMenu {
     public static final String BG_CYAN = "\u001B[46m";
     public static final String BG_WHITE = "\u001B[47m";
 
-    static Terminal terminal;
+    public static Terminal terminal;
     private static Scanner scanner;
     public static LineReader reader;
 
@@ -120,6 +120,7 @@ public class JLineMenu {
     ArrayList<String> options;
     int numOfOptions; // want to access in subclass
     private String textPrompt;
+    // private MenuBottomContent bottomContent;
     private boolean hasBackOption;    
     private boolean hasExitOption;
     
@@ -128,11 +129,12 @@ public class JLineMenu {
     private boolean running = true;
     
     // Public constructor of a JLineMenu object
-    public JLineMenu(String textHeader, List<String> options, String textPrompt, boolean hasBackOption, boolean hasExitOption) {
+    public JLineMenu(String textHeader, List<String> options, String textPrompt,  boolean hasBackOption, boolean hasExitOption) {
 
         this.textHeader = textHeader;
         this.options = new ArrayList<>(options); 
         this.textPrompt = textPrompt;
+        // this.bottomContent = bottomContent;
         this.hasBackOption = hasBackOption;       
         this.hasExitOption = hasExitOption;
         
@@ -165,7 +167,7 @@ public class JLineMenu {
         currentSelection = (currentSelection + 1) % this.numOfOptions;
     }
     public void onLeft() {}; // default do nothing
-    public void onRight() {}; // default do nothing// default do nothing
+    public void onRight() {}; // default do nothing
     
     /**
      * Draws a menu that's navigable with arrow keys!
@@ -202,6 +204,12 @@ public class JLineMenu {
             
             // Display text prompt
             System.out.println("\n" + textPrompt);
+
+            // // Print bottom content if available
+            // if (this.bottomContent != null) {
+            //     System.out.println("==========================");
+            //     this.bottomContent.display();
+            // }
 
             // Read key pressed
             try {
