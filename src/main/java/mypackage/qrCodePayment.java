@@ -7,7 +7,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.time.format.DateTimeFormatter;
-
+import java.io.FileWriter;
+import java.io.IOException;
 public class qrCodePayment extends Payment{
          private static final String CONFIRM_MSG="CONFIRM";
     
@@ -53,10 +54,44 @@ public boolean validation() {
          System.out.println("Payment Method\t: "+getPaymentMethod());
         System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", getAmount())+JLineMenu.RESET);
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
-         System.out.println("=============================================");
+         System.out.println("===============================================");
          JLineMenu.waitMsg();
    
     };
 
 
+@Override
+   public void generatePrintableReceipt(Order order){
+   
+
+ 
+try {
+            // create file
+            File receiptFile = new File("Receipt.txt");
+            if (receiptFile.createNewFile()) {
+               //success create
+            }
+
+    try ( // write to file
+            FileWriter writeReceipt = new FileWriter("Receipt.txt")) 
+    {
+                writeReceipt.write("============================================\n");
+        writeReceipt.write("\t\tRECEIPT\n");
+        writeReceipt.write("============================================\n");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");//to set the format of the date and time
+        writeReceipt.write("Order ID\t: "+order.getOrderId()+"\n");
+        writeReceipt.write("Payment Method\t: "+getPaymentMethod()+"\n");
+        writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", getAmount())+"\n");
+        writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
+    }
+            
+            System.out.println(JLineMenu.GREEN+"The receipt is generate successfully!"+JLineMenu.RESET);
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+   
+   
+   };
 }

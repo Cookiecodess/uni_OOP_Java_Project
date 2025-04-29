@@ -8,6 +8,8 @@ package mypackage;
 
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
 
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -74,7 +76,7 @@ public class JLineMenu {
 
     static Terminal terminal;
     private static Scanner scanner;
-    
+    public static LineReader reader;
 
 
     
@@ -92,6 +94,11 @@ public class JLineMenu {
                         .jna(true)
                         .jansi(false)  // Avoid Jansi conflict
                         .build();
+            
+            reader = LineReaderBuilder.builder()
+                    .terminal(terminal)
+                    .build();
+            
         } catch (IOException e) {
             System.err.println("\nFailed to initialize terminal: " + e.getMessage() + "\n");
             System.exit(1); // exits with error
@@ -165,13 +172,18 @@ public class JLineMenu {
      *     Selecting "Exit" is handled by another static method in this class: confirmExit().
      *     When an options that's neither "Back" nor "Exit", is selected, returns the index of selected option.
      */
-    public int drawMenu() {
+    
+    public int drawMenu(){
+        return drawMenu("");
+    }
+    
+    public int drawMenu(String msg) {
 //        int selected = 0;
 //        boolean running = true;
         
         // Hide cursor
         System.out.println(HIDE_CUR);
-
+        
         // Menu display loop
         while (running) {
             // Clear screen
@@ -179,6 +191,10 @@ public class JLineMenu {
             
             // Print header
             printHeader(textHeader, LEFT_RIGHT_PADDING);
+            
+            //print message after header
+            if(msg.length() > 0) System.out.println(msg+"\n");
+            
 
             // Display menu with highlighting
             drawOptions();
@@ -310,5 +326,14 @@ public class JLineMenu {
     public void setOptions(ArrayList<String> options) {
         this.options = options;
     }
+    public static void sound(){
     
+    try{
+             Runtime.getRuntime().exec("powershell -c [console]::beep(1000,500)");//HZ& SECOND
+             
+             }catch(IOException e){
+             e.printStackTrace();
+             }
+    
+    }
 }

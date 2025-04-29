@@ -65,6 +65,11 @@ public abstract class Payment implements Payable{    //since payment is an "idea
           
     @Override
     public abstract void generateReceipt(Order order);
+
+@Override
+   public abstract void generatePrintableReceipt(Order order);
+
+
 }
 
 
