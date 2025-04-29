@@ -406,7 +406,7 @@ static JLineMenu saveReceipt;
         // Name
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
 
             System.out.print("Enter your name: ");
             name = scanner.nextLine();
@@ -421,13 +421,13 @@ static JLineMenu saveReceipt;
         // Email
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
 
             System.out.print("Enter your email: ");
             email = scanner.next();
             scanner.nextLine();
-            if (email.contains("@")) {
+            if (email.contains("@") && email.contains(".")) {
                 break;
             }
             JLineMenu.clearScreen();
@@ -438,7 +438,7 @@ static JLineMenu saveReceipt;
         // Phone number
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
 
@@ -457,7 +457,7 @@ static JLineMenu saveReceipt;
         // Address
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -476,7 +476,7 @@ static JLineMenu saveReceipt;
         // Birth day
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -497,7 +497,7 @@ static JLineMenu saveReceipt;
         // Gender
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -666,6 +666,7 @@ static JLineMenu saveReceipt;
         String input;
 
         while (true) {
+            System.out.println("Your Current Name: " + x.getName());
             System.out.print("Enter Your New Name (999 to go back): ");
             input = scanner.nextLine();
 
@@ -689,6 +690,7 @@ static JLineMenu saveReceipt;
         String input;
 
         while (true) {
+            System.out.println("Your Current Address: " + x.getAddress());
             System.out.print("Enter Your New Address (999 to go back): ");
             input = scanner.nextLine();
 
@@ -712,6 +714,7 @@ static JLineMenu saveReceipt;
         String input;
 
         while (true) {
+            System.out.println("Your Current Phone: +" + x.getPhone());
             System.out.print("Enter Your New Phone (999 to go back): +60");
             input = scanner.next();
             scanner.nextLine();
@@ -737,6 +740,7 @@ static JLineMenu saveReceipt;
         String input;
 
         while (true) {
+            System.out.println("Your Current Email: " + x.getEmail());
             System.out.print("Enter Your New Email (999 to go back): ");
             input = scanner.nextLine();
 
@@ -744,7 +748,7 @@ static JLineMenu saveReceipt;
                 return;
             }
 
-            if (input.contains("@")) {
+            if (input.contains("@") &&  input.contains(".")) {
                 break;
             }
             JLineMenu.clearScreen();

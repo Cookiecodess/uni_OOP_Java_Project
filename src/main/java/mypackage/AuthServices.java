@@ -194,6 +194,7 @@ public class AuthServices {
                     counter++;
                     
                 }
+                x.setPassword(newPassword);
             }
             
         } 
@@ -235,6 +236,7 @@ public class AuthServices {
                     else bw.write("\n"+l);
                     counter++;
                 }
+                x.setName(newName);
             }
             
         } 
@@ -276,6 +278,7 @@ public class AuthServices {
                     else bw.write("\n"+l);
                     counter++;
                 }
+                x.setEmail(newEmail);
             }
             
         } 
@@ -317,6 +320,7 @@ public class AuthServices {
                     else bw.write("\n"+l);
                     counter++;
                 }
+                x.setAddress(newAddress);
             }
             
         } 
@@ -358,6 +362,7 @@ public class AuthServices {
                     else bw.write("\n"+l);
                     counter++;
                 }
+                x.setPhone(newPhone);
             }
             
         } 
