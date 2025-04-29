@@ -41,11 +41,10 @@ public class ProductCategory implements MenuItem {
     }
 
     // methods for MenuItem interface
-    @Override
     public String getItemLabel() {
         return this.name;
     }
-    @Override
+    
     public void printInfo() {
         System.out.println("Description: "+this.description);
     }

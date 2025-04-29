@@ -38,6 +38,8 @@ public class OOMenu {
     public static final String CYAN = "\u001B[36m";
     public static final String WHITE = "\u001B[37m";
 
+    public static final String DISABLED_COLOR = "\u001b[38;5;245m"; // for disabled options
+
     // background color
     public static final String BG_BLACK = "\u001B[40m";
     public static final String BG_RED = "\u001B[41m";
@@ -182,7 +184,7 @@ public class OOMenu {
     private boolean hasExitOption;
 
     int firstItemIdx = 0;
-    int currentSelection = 0; // want to access in subclass
+    int currentSelection; // want to access in subclass
     private boolean running = true;
 
     // Public constructor of a JLineMenu object
@@ -210,6 +212,15 @@ public class OOMenu {
         }
 
         this.numOfOptions = this.options.size();
+
+        // If first option is disabled, move down until reach a non-disabled (i.e. selectable) option.
+        if (this.options.get(0).isDisabled()) {
+            this.moveCursorDown();
+        }
+        else {
+            // In normal circumstances, initialize currentSelection to 0 (highlight first option)
+            this.currentSelection = 0;
+        }
     }
 
     public void drawOptions() {
@@ -217,6 +228,8 @@ public class OOMenu {
             if (i == currentSelection) {
                 // Highlight currentSelection item
                 terminal.writer().println("\u001b[7m> " + this.options.get(i).getItemLabel() + "\u001b[0m");
+            } else if (this.options.get(i).isDisabled()) {
+                terminal.writer().println(DISABLED_COLOR + "  " + this.options.get(i).getItemLabel() + RESET);
             } else {
                 terminal.writer().println("  " + this.options.get(i).getItemLabel());
             }
@@ -236,11 +249,15 @@ public class OOMenu {
     }
 
     public void moveCursorUp() {
-        currentSelection = (currentSelection - 1 + this.numOfOptions) % this.numOfOptions;
+        do {
+            currentSelection = (currentSelection - 1 + this.numOfOptions) % this.numOfOptions;
+        } while (this.options.get(currentSelection).isDisabled());
     }
 
     public void moveCursorDown() {
-        currentSelection = (currentSelection + 1) % this.numOfOptions;
+        do {
+            currentSelection = (currentSelection + 1) % this.numOfOptions;
+        } while (this.options.get(currentSelection).isDisabled());
     }
 
     public void onLeft() {

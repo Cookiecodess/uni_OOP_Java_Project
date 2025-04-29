@@ -141,19 +141,21 @@ public class Product implements MenuItem{
         return "Product{" + "id=" + id + ", name=" + name + ", price=" + price + ", stock=" + stock + ", category=" + category + ", color=" + color + ", description=" + description + '}';
     }
 
-    // MenuOption methods
-    @Override
+    // METHODS FOR MenuItem INTERFACE ========================================
     public String getItemLabel() {
         return this.name;
     }
 
-    @Override
     public void printInfo() {
         System.out.println("Description: \t\t"+this.description);
         System.out.println("Unit Price: \t\tRM "+this.price);
         System.out.println("Stock available: \t"+this.stock);
         System.out.println("Category: \t\t"+this.category.getName());
         System.out.println("Color: \t\t\t"+this.color);
+    }
+
+    public boolean isDisabled() {
+        return this.stock == 0 || this.isDiscontinued;
     }
     
 }
