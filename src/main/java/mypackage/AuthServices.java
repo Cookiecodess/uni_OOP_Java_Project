@@ -72,7 +72,7 @@ public class AuthServices {
                 String[] values = line.split(",");
     
                 if(values[0].equals(username) && values[1].equals(password) && (values[9].equals("main") || values[9].equals("admin")) ){
-                    return new Admin(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10]);
+                    return new Admin(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],formatAddress(values[6], false),values[7],values[8],values[9],values[10]);
                 }else{
                     continue;
                 }
@@ -94,7 +94,7 @@ public class AuthServices {
                 // Split by comma
                 String[] values = line.split(",");
                 if(values[0].equals(username) && values[1].equals(password) && values[9].equals("customer") ){
-                    return new Customer(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10]);
+                    return new Customer(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],formatAddress(values[6], false),values[7],values[8],values[9],values[10]);
                 }else{
                     continue;
                 }
@@ -112,7 +112,7 @@ public class AuthServices {
         int UID = genUID();
         String role = "customer";
         String status = "active";
-        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + address + "," + birthdate + "," + gender + "," + role + "," + status;
+        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + formatAddress(address, true) + "," + birthdate + "," + gender + "," + role + "," + status;
         
         try (FileWriter fw = new FileWriter(FILE, true)) { // 'true' enables append mode
             fw.write("\n" + newLine); // add newline before writing
@@ -128,7 +128,7 @@ public class AuthServices {
         String role = "admin";
         String status = "active";
         
-        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + address + "," + birthdate + "," + gender + "," + role + "," + status;
+        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + formatAddress(address, true) + "," + birthdate + "," + gender + "," + role + "," + status;
         
         try (FileWriter fw = new FileWriter(FILE, true)) { // 'true' enables append mode
             fw.write("\n" + newLine); // add newline before writing
@@ -194,6 +194,7 @@ public class AuthServices {
                     counter++;
                     
                 }
+                x.setPassword(newPassword);
             }
             
         } 
@@ -235,6 +236,7 @@ public class AuthServices {
                     else bw.write("\n"+l);
                     counter++;
                 }
+                x.setName(newName);
             }
             
         } 
@@ -276,6 +278,7 @@ public class AuthServices {
                     else bw.write("\n"+l);
                     counter++;
                 }
+                x.setEmail(newEmail);
             }
             
         } 
@@ -302,7 +305,7 @@ public class AuthServices {
                 String[] splitLine = currentLine.split(",");
                 
                 if(x.getUsername().equals(splitLine[0])){
-                    splitLine[6] = newAddress;
+                    splitLine[6] = formatAddress(newAddress, true);
                     String updatedLine = String.join(",", splitLine);
                     lines.set(i, updatedLine);
                 }
@@ -317,6 +320,7 @@ public class AuthServices {
                     else bw.write("\n"+l);
                     counter++;
                 }
+                x.setAddress(newAddress);
             }
             
         } 
@@ -358,6 +362,7 @@ public class AuthServices {
                     else bw.write("\n"+l);
                     counter++;
                 }
+                x.setPhone(newPhone);
             }
             
         } 
@@ -427,6 +432,7 @@ public class AuthServices {
                     continue;
                 }
                 String[] lineSplit = line.split(",");
+                lineSplit[6] = formatAddress(lineSplit[6], false);
                 if(lineSplit[2].equals(String.valueOf(uid))) return lineSplit;
             }
         }
@@ -435,6 +441,23 @@ public class AuthServices {
         }
         
         return null;
+    }
+    
+    public static String formatAddress(String address, boolean mode){
+        
+        if(mode){
+            // if true we format
+            //replace the , in address with ;
+            return address.replace(",", ";");
+        }
+        
+        else{
+            //if false we unformat
+            //replace the ; in address with ,
+            return address.replace(";", ",");
+        }
+        
+        
     }
     
 }
