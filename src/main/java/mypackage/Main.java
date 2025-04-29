@@ -211,7 +211,7 @@ static JLineMenu saveReceipt;
     
     public static void customerDashboard(){
         while(true){
-            int selection = customerDb.drawMenu();
+            int selection = customerDb.drawMenu("Welcome Back, " + JLineMenu.MAGENTA + currentCust.getName() + JLineMenu.WHITE + "!");
             
             if(selection == -1) break;
             if(selection == 3){
@@ -300,9 +300,10 @@ static JLineMenu saveReceipt;
                 break;
             }
             
-            System.out.print("Enter your Password: ");
-            String password = scanner.next();
-            scanner.nextLine(); // for cleaning buffer purposes
+            System.out.print("Enter your Password:" + JLineMenu.GREEN);
+            String password = JLineMenu.reader.readLine(" ", '*');
+            System.out.print(JLineMenu.WHITE);
+
 
             //validating
             if(type.equals("customer")){
@@ -373,13 +374,14 @@ static JLineMenu saveReceipt;
         while (true) {
             System.out.println("Enter a username: "+username);
             
-            System.out.print("Enter a password: ");
-            password = scanner.next();
-            scanner.nextLine();
             
-            System.out.print("Re-Enter your password: ");
-            String password2 = scanner.next();
-            scanner.nextLine();
+            System.out.print("Enter a password:" + JLineMenu.GREEN);
+            password = JLineMenu.reader.readLine(" ", '*');
+            System.out.print(JLineMenu.WHITE);
+            
+            System.out.print("Re-Enter your password:" + JLineMenu.GREEN);
+            String password2 = JLineMenu.reader.readLine(" ", '*');
+            System.out.print(JLineMenu.WHITE);
             
             if (password.equals(password2)) break;
             JLineMenu.clearScreen();
@@ -503,6 +505,7 @@ static JLineMenu saveReceipt;
            
     }
     
+    
     public static void suspend(boolean suspended){
         JLineMenu.clearScreen();
         String[] details;
@@ -617,13 +620,15 @@ static JLineMenu saveReceipt;
         }
         
         while(true){
-            System.out.print("Enter Your New Password: ");
-            input = scanner.next();
-            scanner.nextLine();
             
-            System.out.print("Re-Enter Your New Password: ");
-            String input2 = scanner.next();
-            scanner.nextLine();
+            System.out.print("Enter Your New Password:" + JLineMenu.GREEN);
+            input = JLineMenu.reader.readLine(" ", '*');
+            System.out.print(JLineMenu.WHITE);
+            
+            
+            System.out.print("Re-Enter Your New Password:" + JLineMenu.GREEN);
+            String input2 = JLineMenu.reader.readLine(" ", '*');
+            System.out.print(JLineMenu.WHITE);
             
             if(input.equals(input2)) break;
             JLineMenu.clearScreen();
