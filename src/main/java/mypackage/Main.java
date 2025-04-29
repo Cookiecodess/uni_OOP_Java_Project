@@ -53,7 +53,7 @@ public class Main {
     static Customer currentCust = null;
     static Admin currentAdmin  = null;
 
-
+static JLineMenu saveReceipt;
     public static void main(String[] args) {        
         initAllMenus();
         // start program
@@ -165,6 +165,12 @@ public class Main {
         options.add("Card Payment");
         payment = new JLineMenu("PaymentMethod", options, "Select an action to continue.", true, true);
 
+         options.clear();
+        options.add("Print Receipt");
+       
+        saveReceipt = new JLineMenu("Print Receipt?", options, "Do you want to save your receipt.", true, true);
+
+        
     }
     
 
@@ -787,11 +793,30 @@ Payment paymentO;
         boolean shouldExit = false;
         while (!shouldExit) {
             if (paymentO.validation()) {
+                JLineMenu.sound();
                 System.out.println(JLineMenu.GREEN + "Successful!" + JLineMenu.RESET);
                 JLineMenu.waitMsg();
                 JLineMenu.clearScreen();
                 JLineMenu.printHeader("Receipt", 20);
                 paymentO.generateReceipt(a);
+                
+                
+                int selection = saveReceipt.drawMenu();
+            if (selection == JLineMenu.BACK_OPTION) {
+                 
+            }else{
+             paymentO.generatePrintableReceipt(a);
+              JLineMenu.sound();
+             JLineMenu.waitMsg();
+            }
+                
+                shouldExit = true;
+                
+                
+                
+                
+                
+               
                 shouldExit = true;
             } else {
                 System.out.println(JLineMenu.RED + paymentO.failMessage() + JLineMenu.RESET);

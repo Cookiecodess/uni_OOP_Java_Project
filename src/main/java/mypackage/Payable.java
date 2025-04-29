@@ -15,4 +15,5 @@ public interface  Payable { //to provide unified operating specifications, so th
    // String getMethod(); // return "Card" or "TNG" or "OnlineBanking"
     String failMessage();
     void generateReceipt(Order order);
+    void generatePrintableReceipt(Order order);
 }

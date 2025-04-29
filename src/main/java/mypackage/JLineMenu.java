@@ -310,5 +310,14 @@ public class JLineMenu {
     public void setOptions(ArrayList<String> options) {
         this.options = options;
     }
+    public static void sound(){
     
+    try{
+             Runtime.getRuntime().exec("powershell -c [console]::beep(1000,500)");//HZ& SECOND
+             
+             }catch(IOException e){
+             e.printStackTrace();
+             }
+    
+    }
 }

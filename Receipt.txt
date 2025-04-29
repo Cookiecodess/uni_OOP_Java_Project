@@ -1,0 +1,8 @@
+============================================
+		RECEIPT
+============================================
+Order ID	: null
+Payment Method	: Online Banking
+Bank		: Hong Leong Bank
+Amount		: RM 10.00
+Date		: 2025-04-29 09:34:48
