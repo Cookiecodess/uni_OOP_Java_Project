@@ -75,7 +75,9 @@ static JLineMenu saveReceipt;
         
         inventory = new ProductInventory();
         inventory.init();
+        //deduct stock based on cart and orders
         loadStockFromCart();
+        loadStockFromOrders();
         // initialize all menus
         initAllMenus();
         
@@ -1328,6 +1330,7 @@ static JLineMenu saveReceipt;
         }
     }
     
+    //deduct item stock based on cart
     private static void loadStockFromCart() {
         Map<Integer, Map<Integer, Integer>> allCarts = CartStorage.loadAllCarts();
 
@@ -1340,6 +1343,29 @@ static JLineMenu saveReceipt;
                 }
             });
         });
+    }
+    
+    //deduct item stock based on orders made
+    private static void loadStockFromOrders() {
+        try {
+            // Get all orders (regardless of status)
+            List<Order> allOrders = OrderStorage.loadOrdersForAll();
+
+            for (Order order : allOrders) {
+                // Only deduct stock for non-cancelled orders
+                if (!order.getStatus().equalsIgnoreCase("Cancelled")) {
+                    for (OrderItem item : order.getItems()) {
+                        Product p = inventory.getProductById(item.getProduct().getId());
+                        if (p != null) {
+                            p.minusStock(item.getQuantity());
+                        }
+                    }
+                }
+                // For cancelled orders, stock remains unchanged
+            }
+        } catch (IOException e) {
+            System.out.println("Warning: Could not update stock from orders - " + e.getMessage());
+        }
     }
     
     //Print The Place Order Menu
