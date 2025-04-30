@@ -1149,6 +1149,8 @@ static JLineMenu saveReceipt;
 
             // add to cart method here
             //addToCart(selectedProduct) or something
+            //I hath arrived; i shall giveth addToCartFlow(selectedProduct)
+            addToCartFlow(selectedProduct);
         }
     }
     
@@ -1193,12 +1195,7 @@ static JLineMenu saveReceipt;
                 // Check Range 1 - 10
                 int quantity = Integer.parseInt(input);
                 if (quantity < 1 || quantity > 10) {
-                    System.out.println("Invalid Input, Please try again.");
-                    continue;
-                }
-                
-                if (!product.minusStock(quantity)) {
-                    System.out.printf("Not enough stock! Only %d available.\n", product.getStock());
+                    System.out.println("Invalid Range, Please try again.");
                     continue;
                 }
                 
@@ -1208,11 +1205,23 @@ static JLineMenu saveReceipt;
                 continue;
                 }
                 
-                // Add to cart
-                currentCust.addToCart(product, quantity);
-                System.out.println(product.getName() + " x" + quantity + " added to cart!");
-                JLineMenu.waitMsg();
-                return;
+                //Check Stock
+                if (!product.minusStock(quantity)) {
+                    System.out.printf("Not enough stock! Only %d available.\n", product.getStock());
+                    continue;
+                }
+               
+                // Add to cart, return quantity if something goes wrong
+                try {
+                    currentCust.addToCart(product, quantity);
+                    System.out.println(product.getName() + " x" + quantity + " added to cart!");
+                    JLineMenu.waitMsg();
+                    return;
+                } catch (Exception e) {
+                    product.addStock(quantity); // ROLLBACK
+                    System.out.println("Failed to add to cart. Please try again.");
+                    continue;
+                }
 
             } catch (NumberFormatException e) {
                 System.out.println("Invalid Input, Please try again.");
