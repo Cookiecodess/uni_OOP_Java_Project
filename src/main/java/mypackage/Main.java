@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 import static mypackage.JLineMenu.terminal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -1007,6 +1008,7 @@ static JLineMenu saveReceipt;
                     continue;
                 }
                 case 1 -> {
+                    listProducts(null); // pass in null to list ALL products regardless of category
                     continue;
                 }
                 default -> {
@@ -1154,23 +1156,38 @@ static JLineMenu saveReceipt;
         }
     }
     
-    
+    /** Prints a selection menu for products.
+     * 
+     * @param category A ProductCategory, limits the products listed. If this is `null`, ALL products regardless of category are listed.
+     * @return A Product object, or null (if user selects "Back" instead of a product).
+     */
     public static Product listProducts(ProductCategory category) {
-        List<Product> products = inventory.getProductsByCategoryName(category.getName());
+        List<Product> products;
+        String header;
+
+        if (category == null) {
+            // if null is passed in as argument, that means we gonna list out ALL products regardless of category
+            products = inventory.getAllProducts();
+            products.sort(Comparator.comparing(Product::getName)); // Sort alphabetically by name
+            header = "All Products";
+        } else {
+            products = inventory.getProductsByCategoryName(category.getName());
+            header = "Products: " + category.getName();
+        }
+        // Cast the products to a list of MenuItems so we can pass it into the OOMenu constructor
         List<MenuItem> menuItems = new ArrayList<>(products);
 
-        // List<String> productNames = PropertyExtractor.extractProperty(products, "name");
-        String header = "Products: " + category.getName();
+        // Create the menu
         OOMenu productMenu = new OOMenu(header, menuItems, "Use the UP and DOWN keys to navigate the menu and view product details.\nHit ENTER to ADD TO CART.", true, false);
         
-        // while (true) {
+        // Draw menu and get selected index
         int selection = productMenu.drawMenu(); // drawMenu() returns either BACK_OPTION_INT or a positive integer which is an index of products
-
         if (selection == OOMenu.BACK_OPTION_INT) 
+            // return null if the user selects "Back"
             return null;
 
+        // Return selected Product if the user has selected one
         return products.get(selection);
-        // }
     }
 
     
