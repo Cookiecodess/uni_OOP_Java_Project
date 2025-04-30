@@ -35,6 +35,7 @@ import static mypackage.JLineMenu.terminal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -289,7 +290,8 @@ static JLineMenu saveReceipt;
                 }
 
                 case 1 -> {
-                    break;
+                    //Call to View ALL orders made by customers. So far code is running ok, but further testing needs to be done.
+                    adminViewAllOrders();
                 }
 
                 case 2 -> {
@@ -1495,5 +1497,150 @@ static JLineMenu saveReceipt;
         System.out.println("-------------------------------------");
         JLineMenu.waitMsg();
     }
+    
+    
+    //Section: Admin View Orders Menu
+    //String for description
+    private static String formatOrderDetails(Order order) {
+        String[] userDetails = AuthServices.getUserDetails(order.getUserId());
+        StringBuilder sb = new StringBuilder();
+
+        // Header Info
+        sb.append("Customer: ").append(userDetails[3]).append("\n");
+        sb.append("Date: ").append(order.getFormattedOrderDate()).append("\n");
+        sb.append("Status: ").append(order.getStatus()).append("\n");
+        sb.append("Payment: ").append(order.getPaymentMethod()).append("\n\n");
+
+        // Items Table
+        sb.append(String.format("%-8s %-30s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
+        sb.append("--------------------------------------------------\n");
+
+        order.getItems().forEach(item -> {
+            sb.append(String.format("%-8d %-30s %-10d RM%-8.2f%n",
+                item.getProduct().getId(),
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getSubtotal()));
+        });
+
+        // Footer Totals
+        sb.append("\n-------------------------------------\n");
+        sb.append("GRAND TOTAL: RM").append(String.format("%.2f", order.getGrandTotal()));
+
+        return sb.toString();
+    }
+    
+    public static void adminViewAllOrders() {
+        String currentSort = "Date(^)";
+        boolean[] sortFlags = {true, true}; // [0] = dateAscending, [1] = nameAscending
+
+        while (true) {
+            try {
+                // Load and sort orders
+                List<Order> orders = OrderStorage.loadOrdersForAll();
+                
+                //Apply Sorting using final array (idfk what this is honestly)
+                if (currentSort.startsWith("Date")) {
+                    orders.sort(sortFlags[0] ? 
+                        Comparator.comparing(Order::getOrderDate) :
+                        Comparator.comparing(Order::getOrderDate).reversed());
+                } else {
+                    orders.sort((o1, o2) -> {
+                        String name1 = AuthServices.getUserDetails(o1.getUserId())[3];
+                        String name2 = AuthServices.getUserDetails(o2.getUserId())[3];
+                        return sortFlags[1] ? 
+                            name1.compareTo(name2) : name2.compareTo(name1);
+                    });
+                }
+
+                // Build menu
+                ArrayList<String> options = new ArrayList<>();
+                orders.forEach(order -> {
+                    String userName = AuthServices.getUserDetails(order.getUserId())[3];
+                    options.add(String.format("Order #%s (%s, %s) - %s", 
+                        order.getOrderId().substring(0,6),
+                        userName,
+                        order.getFormattedOrderDate(),
+                        order.getStatus()));
+                });
+
+                // Add sort options
+                options.add("Sort: Date" + (currentSort.startsWith("Date") ? 
+                    (sortFlags[0] ? "(^)" : "(v)") : ""));
+                options.add("Sort: Customer" + (currentSort.startsWith("Customer") ? 
+                    (sortFlags[1] ? "(^)" : "(v)") : ""));
+
+                JLineMenu menu = new JLineMenu("All Orders", options, 
+                    "Total Orders: " + orders.size(), true, false);
+
+                int selection = menu.drawMenu();
+
+                // Handle selection
+                if (selection == JLineMenu.BACK_OPTION) return;
+
+                if (selection == options.size() - 2) { // Date sort
+                    sortFlags[0] = !sortFlags[0];
+                    currentSort = "Date" + (sortFlags[0] ? "(^)" : "(v)");
+                } 
+                else if (selection == options.size() - 1) { // Name sort
+                    sortFlags[1] = !sortFlags[1];
+                    currentSort = "Customer" + (sortFlags[1] ? "(^)" : "(v)");
+                }
+                else {
+                    adminManageOrder(orders.get(selection));
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+                JLineMenu.waitMsg();
+            }
+        }
+    }
+    
+    //Selects an order, gives selection: Update Status which calls updateOrderStatus, and the description is the Order Details, Header is order ID.
+    private static void adminManageOrder(Order order) throws IOException {
+        while (true) {
+            // Create menu with order details as description
+            ArrayList<String> options = new ArrayList<>();
+            options.add("Update Status");
+
+            JLineMenu menu = new JLineMenu("Order " + order.getOrderId(), 
+                options, 
+                formatOrderDetails(order), 
+                true, false);
+
+            int choice = menu.drawMenu();
+
+            if (choice == JLineMenu.BACK_OPTION) return;
+            if (choice == 0) updateOrderStatus(order);
+        }
+    }
+    
+    
+    //Updates Order Status: Selections: Pending, Shipping, Completed, Cancelled. Theres no Validation if you select the same Status.
+    private static void updateOrderStatus(Order order) throws IOException {
+        String[] statusOptions = {"Pending", "Shipping", "Completed", "Cancelled"};
+
+        while (true) {
+            JLineMenu statusMenu = new JLineMenu("Update Status", 
+                Arrays.asList(statusOptions), 
+                "Current Status: " + order.getStatus(), 
+                true, false);
+
+            int selection = statusMenu.drawMenu();
+
+            if (selection == JLineMenu.BACK_OPTION) return;
+
+            String newStatus = statusOptions[selection];
+            if (!order.getStatus().equals(newStatus)) {
+                order.setStatus(newStatus);
+                OrderStorage.updateOrderStatus(order);
+                System.out.println("Status updated to: " + newStatus);
+                JLineMenu.waitMsg();
+                return; // Back to order view
+            }
+        }
+    }
+    
+    //End of Section: Admin View Orders Menu
 }
 

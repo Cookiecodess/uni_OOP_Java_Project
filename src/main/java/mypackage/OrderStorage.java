@@ -126,4 +126,32 @@ public class OrderStorage {
         orders.addAll(orderMap.values());
         return orders;
     }
+    
+    //Call this method to update Order Status of an order
+    public static void updateOrderStatus(Order order) throws IOException {
+        List<String> lines = new ArrayList<>();
+        boolean found = false;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith(order.getOrderId())) {
+                    String[] parts = line.split(",");
+                    parts[6] = order.getStatus(); // Update status field
+                    line = String.join(",", parts);
+                    found = true;
+                }
+                lines.add(line);
+            }
+        }
+
+        if (found) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+                for (String l : lines) {
+                    writer.write(l);
+                    writer.newLine();
+                }
+            }
+        }
+    }
 }
