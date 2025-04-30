@@ -45,7 +45,7 @@ public class Main {
     static JLineMenu admin;
     static JLineMenu customerDb;
     static JLineMenu productMainMenu;
-    static JLineMenu productCategoryMenu;
+    static OOMenu productCategoryMenu;
 //    static JLineMenu productListMenu;
     static JLineMenu adminDb;
     static JLineMenu changeDetails;
@@ -133,7 +133,9 @@ static JLineMenu saveReceipt;
         options.add("All Products");
         productMainMenu = new JLineMenu("View Products", options, "Select an action to continue.", true, false);
         
-        productCategoryMenu = new JLineMenu("Browse by Category", inventory.getAllCategoryNames(), "Select a product category.", true, false);
+        // productCategoryMenu = new JLineMenu("Browse by Category", inventory.getAllCategoryNames(), "Select a product category.", true, false);
+        List<MenuItem> menuItems = new ArrayList<>(inventory.getAllCategories());
+        productCategoryMenu = new OOMenu("Browse by Category", menuItems, "Select a product category.", true, false);
         
 
         options.clear();
@@ -414,7 +416,7 @@ static JLineMenu saveReceipt;
         // Name
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
 
             System.out.print("Enter your name: ");
             name = scanner.nextLine();
@@ -429,13 +431,13 @@ static JLineMenu saveReceipt;
         // Email
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
 
             System.out.print("Enter your email: ");
             email = scanner.next();
             scanner.nextLine();
-            if (email.contains("@")) {
+            if (email.contains("@") && email.contains(".")) {
                 break;
             }
             JLineMenu.clearScreen();
@@ -446,7 +448,7 @@ static JLineMenu saveReceipt;
         // Phone number
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
 
@@ -465,7 +467,7 @@ static JLineMenu saveReceipt;
         // Address
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -484,7 +486,7 @@ static JLineMenu saveReceipt;
         // Birth day
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -505,7 +507,7 @@ static JLineMenu saveReceipt;
         // Gender
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + password);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -674,6 +676,7 @@ static JLineMenu saveReceipt;
         String input;
 
         while (true) {
+            System.out.println("Your Current Name: " + x.getName());
             System.out.print("Enter Your New Name (999 to go back): ");
             input = scanner.nextLine();
 
@@ -697,6 +700,7 @@ static JLineMenu saveReceipt;
         String input;
 
         while (true) {
+            System.out.println("Your Current Address: " + x.getAddress());
             System.out.print("Enter Your New Address (999 to go back): ");
             input = scanner.nextLine();
 
@@ -720,6 +724,7 @@ static JLineMenu saveReceipt;
         String input;
 
         while (true) {
+            System.out.println("Your Current Phone: +" + x.getPhone());
             System.out.print("Enter Your New Phone (999 to go back): +60");
             input = scanner.next();
             scanner.nextLine();
@@ -745,6 +750,7 @@ static JLineMenu saveReceipt;
         String input;
 
         while (true) {
+            System.out.println("Your Current Email: " + x.getEmail());
             System.out.print("Enter Your New Email (999 to go back): ");
             input = scanner.nextLine();
 
@@ -752,7 +758,7 @@ static JLineMenu saveReceipt;
                 return;
             }
 
-            if (input.contains("@")) {
+            if (input.contains("@") &&  input.contains(".")) {
                 break;
             }
             JLineMenu.clearScreen();
@@ -968,6 +974,7 @@ static JLineMenu saveReceipt;
 //        }
 // 
 //  }
+ ////check the date is valid format or not
 // public static LocalDate getUserDateInput(String prompt) {
 //        LocalDate userDate = null;
 //        boolean validInput = false;
@@ -1131,19 +1138,29 @@ static JLineMenu saveReceipt;
     public static void productCategoryMenu() {
         while (true) {
             int selection = productCategoryMenu.drawMenu();
-            if (selection == JLineMenu.BACK_OPTION) {
+            if (selection == OOMenu.BACK_OPTION_INT) {
                 return;
             }
-            listProducts(inventory.getCategoryByIndex(selection)); // list products that belong to the selected category
+
+            // If user selected a product, proceed to add to cart
+            Product selectedProduct = listProducts(inventory.getCategoryByIndex(selection)); // list products that belong to the selected category
+
+            if (selectedProduct == null) continue; // User selected "back" -- redraw this menu.
+
+            // add to cart method here
+            //addToCart(selectedProduct) or something
         }
     }
     
-    public static void listProducts(ProductCategory category) {
-        ArrayList<Product> products = new ArrayList<>(inventory.getProductsByCategoryName(category.getName()));
-        List<String> productNames = PropertyExtractor.extractProperty(products, "name");
+    public static Product listProducts(ProductCategory category) {
+        List<Product> products = inventory.getProductsByCategoryName(category.getName());
+        List<MenuItem> menuItems = new ArrayList<>(products);
+
+        // List<String> productNames = PropertyExtractor.extractProperty(products, "name");
         String header = "Products: " + category.getName();
-        JLineMenu productMenu = new JLineMenu(header, productNames, "Select a product for more details.", true, false);
+        OOMenu productMenu = new OOMenu(header, menuItems, "Use the UP and DOWN keys to navigate the menu and view product details.\nHit ENTER to ADD TO CART.", true, false);
         
+<<<<<<< HEAD
         while (true) {
             int selection = productMenu.drawMenu();
             
@@ -1209,6 +1226,16 @@ static JLineMenu saveReceipt;
                 System.out.println("Invalid Input, Please try again.");
             }
         }
+=======
+        // while (true) {
+        int selection = productMenu.drawMenu(); // drawMenu() returns either BACK_OPTION_INT or a positive integer which is an index of products
+
+        if (selection == OOMenu.BACK_OPTION_INT) 
+            return null;
+
+        return products.get(selection);
+        // }
+>>>>>>> 546b0d22c3a2651b6b7ae9ed32087e00b6de9529
     }
 }
 

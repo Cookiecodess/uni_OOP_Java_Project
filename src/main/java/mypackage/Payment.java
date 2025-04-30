@@ -55,10 +55,15 @@ public abstract class Payment implements Payable{    //since payment is an "idea
         public LocalDateTime getDateTime() {
         return dateTime;
     }
+      
+         public abstract void generateQR();
+        
+         
+         
         @Override
       public abstract boolean validation();  
        
-      public abstract void generateQR();
+     
        @Override
       public abstract String failMessage();  
       

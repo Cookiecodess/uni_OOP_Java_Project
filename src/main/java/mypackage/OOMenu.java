@@ -14,33 +14,9 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import static mypackage.TestMain.scanner;
 
-// NOTE:
-// This interactive menu only works properly in a terminal
-// like CMD or PowerShell. It does NOT work in Netbeans' Output.
-// 
-// Since this file depends on certain dependencies, 
-// use Maven to compile, as it automatically handles dependencies.
-// You'll need to install Maven on your computer, then add it to your PATH.
-//
-// Then, to compile, type this in your terminal (cannot use the javac command, must use mvn):
-//   mvn compile
-//
-// To run JLineMenu.java, (BUT you may actually want to run Main.java instead...? If so, read the note at the top of Main.java)
-// type:
-//   mvn exec:java -D"exec.mainClass"="mypackage.JLineMenu" -D"exec.classpathScope"=runtime -D"exec.fork"=true
-//     (Note: I don't completely understand how or why this command works yet)
-//     (I also don't understand why this doesn't work:
-//          java -cp target/classes mypackage.JLineMenu
-//      it throws this error:
-//          Error: Unable to initialize main class mypackage.JLineMenu
-//          Caused by: java.lang.NoClassDefFoundError: org/jline/terminal/Terminal
-//     )
-
-public class JLineMenu {
+//=============== Object-Oriented Menu ======================
+public class OOMenu {
     // static final String SAV_CUR = "\033[s"; // save cursor position
     // static final String RST_CUR = "\033[u"; // restore cursor position
     // static final String CLEAR_LINE_CUR_TIL_END = "\033[K"; // clear from cursor
@@ -62,6 +38,8 @@ public class JLineMenu {
     public static final String CYAN = "\u001B[36m";
     public static final String WHITE = "\u001B[37m";
 
+    public static final String DISABLED_COLOR = "\u001b[38;5;245m"; // for disabled options
+
     // background color
     public static final String BG_BLACK = "\u001B[40m";
     public static final String BG_RED = "\u001B[41m";
@@ -72,50 +50,133 @@ public class JLineMenu {
     public static final String BG_CYAN = "\u001B[46m";
     public static final String BG_WHITE = "\u001B[47m";
 
-    public static Terminal terminal; // put public because OOMenu uses this (cannot initialize Terminal twice in a
-                                     // program!)
+    static Terminal terminal = JLineMenu.terminal;
     private static Scanner scanner;
-    public static LineReader reader; // put public because OOMenu uses this (cannot initialize LineReader twice in a
-                                     // program!)
+    public static LineReader reader = JLineMenu.reader;
+
+    // For "Back" and "Exit"
+    static class GlobalMenuOption implements MenuItem {
+        private String label;
+        private String description;
+
+        public GlobalMenuOption(String label, String description) {
+            this.label = label;
+            this.description = description;
+        }
+
+        @Override
+        public String getItemLabel() {
+            return this.label;
+        }
+        @Override
+        public void printInfo() {
+            System.out.println(description);
+        }
+    }
+
+    static final GlobalMenuOption BACK = new GlobalMenuOption("Back", "Go back to the previous page.");
+    static final GlobalMenuOption EXIT = new GlobalMenuOption("Exit", "Exit this program");
 
     // Global constants for all menus
-    public static final int BACK_OPTION = -1;
+    public static final int BACK_OPTION_INT = -1;
     public static final int LEFT_RIGHT_PADDING = 10; // the number of ='s at either side of the header
     public static final int MENU_WIDTH = 40; // max width of menu
 
     // A static block is executed ONCE when this class is loaded.
-    static {
-        // Initialize terminal
-        try {
-            terminal = TerminalBuilder.builder()
-                    .system(true)
-                    .jna(true)
-                    .jansi(false) // Avoid Jansi conflict
-                    .build();
+    // static {
+    //     // Initialize terminal
+    //     try {
+    //         terminal = TerminalBuilder.builder()
+    //                 .system(true)
+    //                 .jna(true)
+    //                 .jansi(false) // Avoid Jansi conflict
+    //                 .build();
 
-            reader = LineReaderBuilder.builder()
-                    .terminal(terminal)
-                    .build();
+    //         reader = LineReaderBuilder.builder()
+    //                 .terminal(terminal)
+    //                 .build();
 
-        } catch (IOException e) {
-            System.err.println("\nFailed to initialize terminal: " + e.getMessage() + "\n");
-            System.exit(1); // exits with error
-        }
+    //     } catch (IOException e) {
+    //         System.err.println("\nFailed to initialize terminal: " + e.getMessage() + "\n");
+    //         System.exit(1); // exits with error
+    //     }
 
-        // Initialize scanner
-        scanner = new Scanner(System.in);
-    }
+    //     // Initialize scanner
+    //     scanner = new Scanner(System.in);
+    // }
 
     // For testing this class's functionality
     public static void main(String[] args) throws IOException {
-        System.out.println("Hello from JLineMenu.main");
-        terminal.close(); // this line may throw an IOException, that's why the main method needs a throws
+        clearScreen();
+        printHeader("bello", LEFT_RIGHT_PADDING);
+
+        System.out.println("Hello from OOMenu.main");
+        terminal.writer().println("\u001b[7m> " + "yo! testing" + "\u001b[0m");
+
+        ProductInventory inventory = new ProductInventory();
+        inventory.init();
+
+        List<Product> products = inventory.getProductsByCategoryName("Keyboards");
+        List<MenuItem> menuItems = new ArrayList<>(products);
+
+        // List<String> productNames = PropertyExtractor.extractProperty(products, "name");
+        String header = "Products: Keyboards";
+        OOMenu productMenu = new OOMenu(header, menuItems, "Select a product for more details.", true, false);
+        
+        // System.out.println(productMenu.d);
+        productMenu.printAdditionalInfo();
+
+        productMenu.currentSelection = 0;
+        while (true) {
+            clearScreen();
+    
+            // Print header
+            printHeader(header, LEFT_RIGHT_PADDING);
+    
+            // print message after header
+            // if (msg.length() > 0)
+            //     System.out.println(msg + "\n");
+    
+            // Display menu with highlighting
+            productMenu.drawOptions();
+    
+            // Display text prompt
+            System.out.println("\n" + "testing...");
+    
+            // divider (==========)
+            productMenu.printDivider("=");
+    
+            // print info/description related to the currently selected item of the menu
+            productMenu.printAdditionalInfo();
+
+            int c = terminal.reader().read();
+            switch (c) {
+                case 27 -> { // 1st byte of an arrow keypress: ESC
+                    terminal.reader().read(); // read 2nd byte of arrow keypress: 91 ([) or 79
+                    c = terminal.reader().read();
+                    switch (c) {
+                        case 65 ->
+                            productMenu.moveCursorUp();
+                        case 66 ->
+                            productMenu.moveCursorDown();
+                        // case 67 ->
+                        //     System.out.println("right");
+                        // case 68 ->
+                        //     System.out.println("left");
+                    }
+                }
+            }
+        }
+
+
+        // terminal.close(); // this line may throw an IOException, that's why the main method needs a throws
                           // clause ("throws IOException")
     }
 
     // Instance variables
     private String textHeader;
-    ArrayList<String> options;
+    List<MenuItem> options;
+    // List<String> optionLabels;
     int numOfOptions; // want to access in subclass
     private String textPrompt;
     // private MenuBottomContent bottomContent;
@@ -123,48 +184,80 @@ public class JLineMenu {
     private boolean hasExitOption;
 
     int firstItemIdx = 0;
-    int currentSelection = 0; // want to access in subclass
+    int currentSelection; // want to access in subclass
     private boolean running = true;
 
     // Public constructor of a JLineMenu object
-    public JLineMenu(String textHeader, List<String> options, String textPrompt, boolean hasBackOption,
+    public OOMenu(String textHeader, List<MenuItem> options, String textPrompt, boolean hasBackOption,
             boolean hasExitOption) {
 
         this.textHeader = textHeader;
-        this.options = new ArrayList<>(options);
+        this.options = options;
+        // this.optionLabels = new ArrayList<>();
         this.textPrompt = textPrompt;
         // this.bottomContent = bottomContent;
         this.hasBackOption = hasBackOption;
         this.hasExitOption = hasExitOption;
 
+        // for (MenuItem option : options) {
+        //     this.optionLabels.add(option.getItemLabel());
+        // }
+
         // Append "Back" and/or "Exit" to the menuOptions ArrayList
         if (hasBackOption) {
-            this.options.add("Back");
+            this.options.add(BACK);
         }
         if (hasExitOption) {
-            this.options.add("Exit");
+            this.options.add(EXIT);
         }
 
         this.numOfOptions = this.options.size();
+
+        // If first option is disabled, move down until reach a non-disabled (i.e. selectable) option.
+        if (this.options.get(0).isDisabled()) {
+            this.moveCursorDown();
+        }
+        else {
+            // In normal circumstances, initialize currentSelection to 0 (highlight first option)
+            this.currentSelection = 0;
+        }
     }
 
     public void drawOptions() {
         for (int i = firstItemIdx; i < numOfOptions; i++) {
             if (i == currentSelection) {
                 // Highlight currentSelection item
-                terminal.writer().println("\u001b[7m> " + this.options.get(i) + "\u001b[0m");
+                terminal.writer().println("\u001b[7m> " + this.options.get(i).getItemLabel() + "\u001b[0m");
+            } else if (this.options.get(i).isDisabled()) {
+                terminal.writer().println(DISABLED_COLOR + "  " + this.options.get(i).getItemLabel() + RESET);
             } else {
-                terminal.writer().println("  " + this.options.get(i));
+                terminal.writer().println("  " + this.options.get(i).getItemLabel());
             }
         }
     }
 
+    public void printAdditionalInfo() {
+        this.options.get(currentSelection).printInfo();
+    }
+
+    public void printDivider(String character) {
+        // System.out.println();
+        for (int i = 0; i < MENU_WIDTH; i++) {
+            System.out.print(character);
+        }
+        System.out.println();
+    }
+
     public void moveCursorUp() {
-        currentSelection = (currentSelection - 1 + this.numOfOptions) % this.numOfOptions;
+        do {
+            currentSelection = (currentSelection - 1 + this.numOfOptions) % this.numOfOptions;
+        } while (this.options.get(currentSelection).isDisabled());
     }
 
     public void moveCursorDown() {
-        currentSelection = (currentSelection + 1) % this.numOfOptions;
+        do {
+            currentSelection = (currentSelection + 1) % this.numOfOptions;
+        } while (this.options.get(currentSelection).isDisabled());
     }
 
     public void onLeft() {
@@ -176,12 +269,11 @@ public class JLineMenu {
     /**
      * Draws a menu that's navigable with arrow keys!
      * Returns JLineMenu.BACK_OPTION (an int) if "Back" is selected.
-     * Selecting "Exit" is handled by another static method in this class:
+     * Selection of "Exit" is handled by another static method in this class:
      * confirmExit().
      * When an options that's neither "Back" nor "Exit", is selected, returns the
      * index of selected option.
      */
-
     public int drawMenu() {
         return drawMenu("");
     }
@@ -208,8 +300,17 @@ public class JLineMenu {
             // Display menu with highlighting
             drawOptions();
 
+            // divider (==========)
+            printDivider("=");            
+            // print info/description related to the currently selected item of the menu
+            printAdditionalInfo();
+            printDivider("=");
+
             // Display text prompt
             System.out.println("\n" + textPrompt);
+
+
+            
 
             // // Print bottom content if available
             // if (this.bottomContent != null) {
@@ -248,11 +349,11 @@ public class JLineMenu {
                             // Back
                             else if (currentSelection == this.numOfOptions - 2) {
                                 System.out.println(SHOW_CUR); // Show cursor
-                                return BACK_OPTION;
+                                return BACK_OPTION_INT;
                             }
                         } else if (this.hasBackOption && currentSelection == this.numOfOptions - 1) { // Back
                             System.out.println(SHOW_CUR); // Show cursor
-                            return BACK_OPTION;
+                            return BACK_OPTION_INT;
                         } else if (this.hasExitOption && currentSelection == this.numOfOptions - 1) { // Exit
                             confirmExit();
                             continue; // If user returns here, it means they chose to cancel exiting the program.
@@ -335,7 +436,7 @@ public class JLineMenu {
     }
 
     // Getters and setters
-    public void setOptions(ArrayList<String> options) {
+    public void setOptions(List<MenuItem> options) {
         this.options = options;
     }
 
