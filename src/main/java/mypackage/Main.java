@@ -1014,7 +1014,10 @@ static JLineMenu saveReceipt;
                     continue;
                 }
                 case 1 -> {
-                    listProducts(null); // pass in null to list ALL products regardless of category
+                    Product selectedProduct = listProducts(null);
+                       if (selectedProduct != null) {
+                       addToCartFlow(selectedProduct);
+                   }
                     continue;
                 }
                 default -> {
