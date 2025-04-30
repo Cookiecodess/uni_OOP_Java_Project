@@ -234,7 +234,7 @@ static JLineMenu saveReceipt;
     
     public static void customerDashboard(){
         while(true){
-            int selection = customerDb.drawMenu("Welcome Back, " + JLineMenu.MAGENTA + currentCust.getName() + JLineMenu.WHITE + "!");
+            int selection = customerDb.drawMenu("Welcome Back, " + JLineMenu.MAGENTA + currentCust.getName() + JLineMenu.RESET + "!");
             
             if(selection == -1) break;
             if(selection == 4){
@@ -331,7 +331,7 @@ static JLineMenu saveReceipt;
             
             System.out.print("Enter your Password:" + JLineMenu.GREEN);
             String password = JLineMenu.reader.readLine(" ", '*');
-            System.out.print(JLineMenu.WHITE);
+            System.out.print(JLineMenu.RESET);
 
 
             //validating
@@ -406,11 +406,11 @@ static JLineMenu saveReceipt;
             
             System.out.print("Enter a password:" + JLineMenu.GREEN);
             password = JLineMenu.reader.readLine(" ", '*');
-            System.out.print(JLineMenu.WHITE);
+            System.out.print(JLineMenu.RESET);
             
             System.out.print("Re-Enter your password:" + JLineMenu.GREEN);
             String password2 = JLineMenu.reader.readLine(" ", '*');
-            System.out.print(JLineMenu.WHITE);
+            System.out.print(JLineMenu.RESET);
             
             if (password.equals(password2)) break;
             JLineMenu.clearScreen();
@@ -422,7 +422,7 @@ static JLineMenu saveReceipt;
         // Name
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
 
             System.out.print("Enter your name: ");
             name = scanner.nextLine();
@@ -437,7 +437,7 @@ static JLineMenu saveReceipt;
         // Email
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
 
             System.out.print("Enter your email: ");
@@ -454,7 +454,7 @@ static JLineMenu saveReceipt;
         // Phone number
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
 
@@ -473,7 +473,7 @@ static JLineMenu saveReceipt;
         // Address
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -492,7 +492,7 @@ static JLineMenu saveReceipt;
         // Birth day
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -513,7 +513,7 @@ static JLineMenu saveReceipt;
         // Gender
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.WHITE);
+            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -662,12 +662,12 @@ static JLineMenu saveReceipt;
             
             System.out.print("Enter Your New Password:" + JLineMenu.GREEN);
             input = JLineMenu.reader.readLine(" ", '*');
-            System.out.print(JLineMenu.WHITE);
+            System.out.print(JLineMenu.RESET);
             
             
             System.out.print("Re-Enter Your New Password:" + JLineMenu.GREEN);
             String input2 = JLineMenu.reader.readLine(" ", '*');
-            System.out.print(JLineMenu.WHITE);
+            System.out.print(JLineMenu.RESET);
             
             if(input.equals(input2)) break;
             JLineMenu.clearScreen();
@@ -775,14 +775,14 @@ static JLineMenu saveReceipt;
         AuthServices.changeEmail(x, input);
     }
 
-    public static void payment() {
+    public static boolean payment() {
         Order a = new Order();
 
-        boolean valid = true;
-        while (valid) {
+        boolean valid = false;
+        while (!valid) {    //=true then 
             int selection = payment.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
-                return;
+                return false;
             }
 
             switch (selection) {
@@ -805,6 +805,7 @@ static JLineMenu saveReceipt;
             }
 
         }
+        return valid;
     }
 
     public static boolean onlineBankingPaymentProcess(Order a) {
@@ -1157,6 +1158,7 @@ static JLineMenu saveReceipt;
             // add to cart method here
             //addToCart(selectedProduct) or something
             //I hath arrived; i shall giveth addToCartFlow(selectedProduct)
+            //Oh, how could i, a mere mortal, receive a gift of such generosity without being crushed under the weight of my guilt?
             addToCartFlow(selectedProduct);
         }
     }
