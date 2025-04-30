@@ -1152,6 +1152,7 @@ static JLineMenu saveReceipt;
         }
     }
     
+    
     public static Product listProducts(ProductCategory category) {
         List<Product> products = inventory.getProductsByCategoryName(category.getName());
         List<MenuItem> menuItems = new ArrayList<>(products);
@@ -1160,25 +1161,16 @@ static JLineMenu saveReceipt;
         String header = "Products: " + category.getName();
         OOMenu productMenu = new OOMenu(header, menuItems, "Use the UP and DOWN keys to navigate the menu and view product details.\nHit ENTER to ADD TO CART.", true, false);
         
-<<<<<<< HEAD
-        while (true) {
-            int selection = productMenu.drawMenu();
-            
-            if (selection == JLineMenu.BACK_OPTION) break;
-            
-            ArrayList<String> options = new ArrayList<>();
-            options.add("Add to Cart");
+        // while (true) {
+        int selection = productMenu.drawMenu(); // drawMenu() returns either BACK_OPTION_INT or a positive integer which is an index of products
 
-            Product selectedProduct = products.get(selection);
-            JLineMenu actionMenu = new JLineMenu(selectedProduct.getName(), options, 
-                selectedProduct.getDescription(), true, false);
+        if (selection == OOMenu.BACK_OPTION_INT) 
+            return null;
 
-            int action = actionMenu.drawMenu();
-            if (action == 0) { // Add to Cart
-            addToCartFlow(selectedProduct);
-        }
+        return products.get(selection);
+        // }
     }
-} 
+
     
 
     //When Selecting an Item in Products, Call addToCartFlow to validate, if true, call currentCust.addToCart() in Customer.java
@@ -1226,16 +1218,6 @@ static JLineMenu saveReceipt;
                 System.out.println("Invalid Input, Please try again.");
             }
         }
-=======
-        // while (true) {
-        int selection = productMenu.drawMenu(); // drawMenu() returns either BACK_OPTION_INT or a positive integer which is an index of products
-
-        if (selection == OOMenu.BACK_OPTION_INT) 
-            return null;
-
-        return products.get(selection);
-        // }
->>>>>>> 546b0d22c3a2651b6b7ae9ed32087e00b6de9529
     }
 }
 
