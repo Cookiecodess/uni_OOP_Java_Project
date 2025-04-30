@@ -1158,6 +1158,7 @@ static JLineMenu saveReceipt;
             // add to cart method here
             //addToCart(selectedProduct) or something
             //I hath arrived; i shall giveth addToCartFlow(selectedProduct)
+            //Oh, how could i, a mere mortal, receive a gift of such generosity without being crushed under the weight of my guilt?
             addToCartFlow(selectedProduct);
         }
     }
