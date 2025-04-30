@@ -276,10 +276,9 @@ static JLineMenu saveReceipt;
     public static void adminDashboard() {
         while (true) {
             int selection = adminDb.drawMenu();
-            if (selection == -1) {
-                break;
-            }
-            if (selection == 6) {
+            if (selection == -1)break;
+
+            if (selection == 7) {
                 currentAdmin = null;
                 break;
             }
@@ -383,7 +382,7 @@ static JLineMenu saveReceipt;
         String gender;
 
         if (type.equals("admin") && !currentAdmin.isMain()) {
-            System.out.println("Access Denied!");
+            System.out.println(JLineMenu.RED+"Access Denied!"+JLineMenu.WHITE);
             System.out.print("Press Enter To Go Back....");
             scanner.nextLine();
             return;
@@ -395,12 +394,19 @@ static JLineMenu saveReceipt;
             username = scanner.next();
             scanner.nextLine(); // flush
 
-            if (!username.isEmpty() && !usernames.contains(username)) {
+            if (!username.isEmpty() && !usernames.contains(username) && !username.matches(".*[^a-zA-Z0-9].*")) {
                 break;
             }
+            else if(username.matches(".*[^a-zA-Z0-9].*")){
+                JLineMenu.clearScreen();
+                System.out.println("Username Cannot Have Symbols!");
+            }
+            else {
+                JLineMenu.clearScreen();
+                System.out.println("Username Taken!");
+            }
 
-            JLineMenu.clearScreen();
-            System.out.println("Username Taken!");
+            
         }
 
         JLineMenu.clearScreen();
@@ -418,9 +424,18 @@ static JLineMenu saveReceipt;
             String password2 = JLineMenu.reader.readLine(" ", '*');
             System.out.print(JLineMenu.RESET);
             
-            if (password.equals(password2)) break;
-            JLineMenu.clearScreen();
-            System.out.println("Password did not match!\n");
+            if(password.contains(",") || password.contains(" ")){
+                   JLineMenu.clearScreen();
+                   System.out.println("Password Cannot Have Comma or Space!\n");
+            }
+            else if(!password.equals(password2)){
+                    JLineMenu.clearScreen();
+                    System.out.println("Password did not match!\n");
+            }
+            else {
+                break;
+            }
+            
 
         }
 
@@ -432,11 +447,18 @@ static JLineMenu saveReceipt;
 
             System.out.print("Enter your name: ");
             name = scanner.nextLine();
-            if (!name.isEmpty()) {
+            if (!name.isEmpty() && !name.matches(".*[^a-zA-Z0-9].*")) {
                 break;
             }
-            JLineMenu.clearScreen();
-            System.out.println("Name cannot be empty!\n");
+            else if(name.matches(".*[^a-zA-Z0-9].*")){
+                JLineMenu.clearScreen();
+                System.out.println("Name Cannot Have Symbols!\n");
+            }
+            else{
+                JLineMenu.clearScreen();
+                System.out.println("Name cannot be empty!\n");
+            }
+            
         }
 
         JLineMenu.clearScreen();
@@ -449,7 +471,7 @@ static JLineMenu saveReceipt;
             System.out.print("Enter your email: ");
             email = scanner.next();
             scanner.nextLine();
-            if (email.contains("@") && email.contains(".")) {
+            if (email.contains("@") && email.contains(".") && !email.contains(",")) {
                 break;
             }
             JLineMenu.clearScreen();
@@ -675,9 +697,17 @@ static JLineMenu saveReceipt;
             String input2 = JLineMenu.reader.readLine(" ", '*');
             System.out.print(JLineMenu.RESET);
             
-            if(input.equals(input2)) break;
-            JLineMenu.clearScreen();
-            System.out.println("Password does not match!\n");
+            if(input.contains(",") || input.contains(" ")){
+                   JLineMenu.clearScreen();
+                   System.out.println("Password Cannot Have Comma or Space!\n");
+            }
+            else if(!input.equals(input2)){
+                    JLineMenu.clearScreen();
+                    System.out.println("Password did not match!\n");
+            }
+            else {
+                break;
+            }
         }
 
         AuthServices.changePassword(x, input);
@@ -696,11 +726,17 @@ static JLineMenu saveReceipt;
                 return;
             }
 
-            if (!input.isEmpty()) {
+            if (!input.isEmpty() && !input.matches(".*[^a-zA-Z0-9].*")) {
                 break;
             }
-            JLineMenu.clearScreen();
-            System.out.println("Name Cannot Be Empty!\n");
+            else if(input.matches(".*[^a-zA-Z0-9].*")){
+                JLineMenu.clearScreen();
+                System.out.println("Name Cannot Have Symbols!\n");
+            }
+            else{
+                JLineMenu.clearScreen();
+                System.out.println("Name cannot be empty!\n");
+            }
 
         }
 
@@ -770,7 +806,7 @@ static JLineMenu saveReceipt;
                 return;
             }
 
-            if (input.contains("@") &&  input.contains(".")) {
+            if (input.contains("@") &&  input.contains(".") && !input.contains(",")) {
                 break;
             }
             JLineMenu.clearScreen();
