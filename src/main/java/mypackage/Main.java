@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import static mypackage.JLineMenu.terminal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
 
@@ -59,6 +60,9 @@ public class Main {
     static JLineMenu reportSelection;
     static Customer currentCust = null;
     static Admin currentAdmin = null;
+    //Here, these 2 is used to store Payment Method with/without Bank Name. 
+    private static String lastPaymentMethod;
+    private static String lastBankName;
     
     static ProductInventory inventory;
     static {
@@ -254,7 +258,7 @@ static JLineMenu saveReceipt;
                 
                 //View Order
                 case 2 -> {
-                    break;
+                    viewOrders();
                 }
 
                 case 3 -> {
@@ -776,27 +780,32 @@ static JLineMenu saveReceipt;
     }
 
     public static boolean payment() {
-        Order a = new Order();
-
+        Order dummyOrder = new Order(currentCust.getUID());
+        currentCust.getCartItems().forEach((p,q) -> dummyOrder.addItem(p,q));
+        
         boolean valid = false;
         while (!valid) {    //=true then 
             int selection = payment.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                 return false;
             }
-
+            
+            
+            // here, depending on what we chose, save the payment method
             switch (selection) {
                 case 0 -> {
-                    valid = onlineBankingPaymentProcess(a);
+                    valid = onlineBankingPaymentProcess(dummyOrder);
+                    if (valid) lastPaymentMethod = "Online Banking";
                     continue;
                 }
                 case 1 -> {
-                    valid = qrCodePayment(a);
-
+                    valid = qrCodePayment(dummyOrder);
+                    if (valid) lastPaymentMethod = "Touch and Go";
                     continue;
                 }
                 case 2 -> {
-                    valid = cardPaymentProcess(a);
+                    valid = cardPaymentProcess(dummyOrder);
+                    if (valid) lastPaymentMethod = "Card Payment";
                     continue;
                 }
                 default -> {
@@ -808,6 +817,15 @@ static JLineMenu saveReceipt;
         return valid;
     }
 
+    //here, we call this method to combine payment method and bank name, and is used to save it into orders.csv
+    public static String getFormattedPaymentMethod() {
+        if (lastPaymentMethod.equals("Touch and Go")) {
+            return "Touch and Go";
+        } else {
+            return String.format("%s - %s", lastPaymentMethod, lastBankName);
+        }
+    }
+    
     public static boolean onlineBankingPaymentProcess(Order a) {
         Payment paymentO;
         String bankName;
@@ -834,7 +852,12 @@ static JLineMenu saveReceipt;
                 }
 
             }
-
+            
+            //save payment method and bank name
+            if (true) {
+                lastPaymentMethod = "Online Banking";
+                lastBankName = bankName;
+            }
             paymentO = new OnlineBankingPayment(10.00, a, bankName);
             return processPayment(paymentO, a);
         }
@@ -887,7 +910,13 @@ static JLineMenu saveReceipt;
         Payment paymentO = new qrCodePayment(10.00, a);
         JLineMenu.printHeader("QR code Payment", 45);
         paymentO.generateQR();
-
+        
+        //save payment method, bank name = "" (none)
+        if (true) {
+            lastPaymentMethod = "Touch and Go";
+            lastBankName = ""; // No bank name for TnG
+        }
+        
         return processPayment(paymentO, a);
 
     }
@@ -919,7 +948,12 @@ static JLineMenu saveReceipt;
                 }
 
             }
-
+            
+            //save payment method and bank name
+            if (true) {
+                lastPaymentMethod = "Card Payment";
+                lastBankName = bankName;
+            }
             paymentO = new CardPayment(10.00, a, bankName);
             return processPayment(paymentO, a);
         }
@@ -1057,8 +1091,8 @@ static JLineMenu saveReceipt;
                 selection == options.size() - 1) return; // Back
 
             if (!options.isEmpty() && selection == options.size() - 2) {
-                System.out.print("Placeing ORder Placeholder");
-                //placeOrderFlow(); // Place Order
+                System.out.print("Placeing Order Placeholder");
+                placeOrderFlow(); // NEWLY ADDED TO PLACE ORDER! 
                 continue;
             }
 
@@ -1268,6 +1302,136 @@ static JLineMenu saveReceipt;
                 }
             });
         });
+    }
+    
+    //Print The Place Order Menu
+    public static void placeOrderFlow() {
+        if (currentCust.getCartItems().isEmpty()) {
+            System.out.println("Your cart is empty!");
+            JLineMenu.waitMsg();
+            return;
+        }
+
+        Order order = new Order(currentCust.getUID());
+        currentCust.getCartItems().forEach((product, quantity) -> {
+            order.addItem(product, quantity);
+        });
+        
+        ArrayList<String> options = new ArrayList<>();
+        options.add("Proceed to Payment");
+        String summary = buildOrderSummaryString(order);
+        JLineMenu orderMenu = new JLineMenu("Order Summary", options, summary, true, false);
+        int selection = orderMenu.drawMenu();
+        if (selection == 0) { // Proceed to Payment
+            processPayment(order);
+        }
+    }
+    
+    //Build Order Summary String to display the calculations and Grand Total of Order
+    private static String buildOrderSummaryString(Order order) {
+        StringBuilder sb = new StringBuilder();
+
+        // Header
+        sb.append(String.format("%-8s %-30s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
+        sb.append("--------------------------------------------------\n");
+
+        // Items
+        for (OrderItem item : order.getItems()) {
+            sb.append(String.format("%-8d %-30s %-10d RM%-8.2f%n",
+                item.getProduct().getId(),
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getSubtotal()));
+        }
+
+        // Totals
+        sb.append("\nSubtotal: \tRM ").append(String.format("%.2f", order.getSubtotal())).append("\n");
+        sb.append("Delivery Fee: \tRM 20.00\n");
+        sb.append("SST (6%): \tRM ").append(String.format("%.2f", order.getTax())).append("\n");
+        sb.append("-------------------------------------\n");
+        sb.append("GRAND TOTAL: \tRM ").append(String.format("%.2f", order.getGrandTotal())).append("\n");
+        sb.append("-------------------------------------\n");
+
+        return sb.toString();
+    }
+    
+    //if payment() returns true, we :
+    //1) set all the thingamagiks into order class
+    //2) clear & save cart
+    //3) PAYMENT SUCCESSFUL! FRICGGIN FINALLY JESUS CHRIST ALMIGHTY
+    private static void processPayment(Order order) {
+        if (payment()) {
+            try {
+                order.setPaymentMethod(getFormattedPaymentMethod());
+                order.setStatus("Pending");
+                OrderStorage.saveOrder(order);
+                currentCust.getCartItems().clear();
+                currentCust.saveCart();
+                System.out.println("Payment Successful! Order placed.");
+                JLineMenu.waitMsg();
+            } catch (IOException e) {
+                System.out.println("Error saving order: " + e.getMessage());
+                JLineMenu.waitMsg();
+            }
+        }
+    }
+  
+    //Customer view their made orders.
+    public static void viewOrders() {
+        try {
+            List<Order> userOrders = OrderStorage.loadOrdersForUser(currentCust.getUID());
+
+            if (userOrders.isEmpty()) {
+                JLineMenu.clearScreen();
+                System.out.println("No orders made yet.");
+                JLineMenu.waitMsg();
+                return;
+            }
+
+            ArrayList<String> options = new ArrayList<>();
+            for (int i = 0; i < userOrders.size(); i++) {
+                Order order = userOrders.get(i);
+                options.add(String.format("Order #%d - %s (RM %.2f)", 
+                    i+1, 
+                    order.getFormattedOrderDate(), 
+                    order.getGrandTotal()));
+            }
+
+            JLineMenu ordersMenu = new JLineMenu("Your Orders", options, 
+                "Select an order to view details", true, false);
+            int selection = ordersMenu.drawMenu();
+
+            if (selection >= 0 && selection < userOrders.size()) {
+                displayOrderDetails(userOrders.get(selection));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading orders: " + e.getMessage());
+            JLineMenu.waitMsg();
+        }
+    }
+
+    private static void displayOrderDetails(Order order) {
+        JLineMenu.clearScreen();
+        JLineMenu.printHeader("Order #" + order.getOrderId(), 20);
+
+        System.out.println("Order Date: " + order.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        System.out.println("Status: " + order.getStatus());
+        System.out.println("Payment Method: " + order.getPaymentMethod());
+        System.out.println("-------------------------------------");
+
+        System.out.printf("%-30s %-10s %-10s%n", "Product", "Qty", "Subtotal");
+        System.out.println("-------------------------------------");
+
+        for (OrderItem item : order.getItems()) {
+            System.out.printf("%-30s %-10d RM%-8.2f%n",
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getSubtotal());
+        }
+
+        System.out.println("\nGRAND TOTAL: \tRM " + String.format("%.2f", order.getGrandTotal()));
+        System.out.println("-------------------------------------");
+        JLineMenu.waitMsg();
     }
 }
 

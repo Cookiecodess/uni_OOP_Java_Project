@@ -5,6 +5,7 @@
 
 package mypackage;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,8 @@ public class Report {
 /////////////要有ifstatus is complete？
             for (Order order : orderList) {
                 // only consider the product between start date end date
-                LocalDate orderDate = order.getOrderDate();
+                //convert order's LocalDateTime to LocalDate
+                LocalDate orderDate = order.getOrderDate().toLocalDate();
                 if ((orderDate.isEqual(startDate) || orderDate.isAfter(startDate)) &&
                     (orderDate.isEqual(endDate) || orderDate.isBefore(endDate))) {
 

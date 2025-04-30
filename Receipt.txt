@@ -1,8 +1,7 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: null
-Payment Method	: Online Banking
-Bank		: Hong Leong Bank
+Order ID	: 66a71d34
+Payment Method	: QR code Payment
 Amount		: RM 10.00
-Date		: 2025-04-30 09:28:01
+Date		: 2025-05-01 00:14:57
