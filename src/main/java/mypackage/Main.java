@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 import static mypackage.JLineMenu.terminal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -1165,6 +1166,7 @@ static JLineMenu saveReceipt;
         if (category == null) {
             // if null is passed in as argument, that means we gonna list out ALL products regardless of category
             products = inventory.getAllProducts();
+            products.sort(Comparator.comparing(Product::getName)); // Sort alphabetically by name
             header = "All Products";
         } else {
             products = inventory.getProductsByCategoryName(category.getName());
