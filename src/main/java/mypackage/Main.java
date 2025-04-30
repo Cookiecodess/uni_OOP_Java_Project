@@ -234,7 +234,7 @@ static JLineMenu saveReceipt;
     
     public static void customerDashboard(){
         while(true){
-            int selection = customerDb.drawMenu("Welcome Back, " + JLineMenu.MAGENTA + currentCust.getName() + JLineMenu.WHITE + "!");
+            int selection = customerDb.drawMenu("Welcome Back, " + JLineMenu.MAGENTA + currentCust.getName() + JLineMenu.RESET + "!");
             
             if(selection == -1) break;
             if(selection == 4){
