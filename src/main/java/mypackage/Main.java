@@ -276,7 +276,9 @@ static JLineMenu saveReceipt;
 
     public static void adminDashboard() {
         while (true) {
-            int selection = adminDb.drawMenu();
+            int selection = adminDb.drawMenu("Welcome Back, " + 
+                    JLineMenu.MAGENTA + currentAdmin.getName() + JLineMenu.RESET + "!" + 
+                            " (" + JLineMenu.CYAN + currentAdmin.getRole().toUpperCase() + JLineMenu.RESET + ")");
             if (selection == -1)break;
 
             if (selection == 7) {
@@ -384,7 +386,7 @@ static JLineMenu saveReceipt;
         String gender;
 
         if (type.equals("admin") && !currentAdmin.isMain()) {
-            System.out.println(JLineMenu.RED+"Access Denied!"+JLineMenu.WHITE);
+            System.out.println(JLineMenu.RED+"Access Denied!"+JLineMenu.RESET);
             System.out.print("Press Enter To Go Back....");
             scanner.nextLine();
             return;
@@ -449,10 +451,10 @@ static JLineMenu saveReceipt;
 
             System.out.print("Enter your name: ");
             name = scanner.nextLine();
-            if (!name.isEmpty() && !name.matches(".*[^a-zA-Z0-9].*")) {
+            if (!name.isEmpty() && !name.matches(".*[^a-zA-Z0-9 ].*")) {
                 break;
             }
-            else if(name.matches(".*[^a-zA-Z0-9].*")){
+            else if(name.matches(".*[^a-zA-Z0-9 ].*")){
                 JLineMenu.clearScreen();
                 System.out.println("Name Cannot Have Symbols!\n");
             }
@@ -728,10 +730,10 @@ static JLineMenu saveReceipt;
                 return;
             }
 
-            if (!input.isEmpty() && !input.matches(".*[^a-zA-Z0-9].*")) {
+            if (!input.isEmpty() && !input.matches(".*[^a-zA-Z0-9 ].*")) {
                 break;
             }
-            else if(input.matches(".*[^a-zA-Z0-9].*")){
+            else if(input.matches(".*[^a-zA-Z0-9 ].*")){
                 JLineMenu.clearScreen();
                 System.out.println("Name Cannot Have Symbols!\n");
             }
