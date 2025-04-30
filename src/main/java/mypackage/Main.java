@@ -769,14 +769,14 @@ static JLineMenu saveReceipt;
         AuthServices.changeEmail(x, input);
     }
 
-    public static void payment() {
+    public static boolean payment() {
         Order a = new Order();
 
-        boolean valid = true;
-        while (valid) {
+        boolean valid = false;
+        while (!valid) {    //=true then 
             int selection = payment.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
-                return;
+                return false;
             }
 
             switch (selection) {
@@ -799,6 +799,7 @@ static JLineMenu saveReceipt;
             }
 
         }
+        return valid;
     }
 
     public static boolean onlineBankingPaymentProcess(Order a) {
