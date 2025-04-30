@@ -9,6 +9,7 @@ package mypackage;
 // (replace "<path>" with your path to OOP_Java_Project):
 //   cd "C:\<path>\OOP_Java_Project"
 //songlynn punya : cd "C:\Users\songl\source\repos\OOP_Java_Project"
+//jon: cd /Users/Acer/OOP_Java_Project
 // Since our project uses a dependency called JLine (for detecting arrow key presses), 
 // we must use Maven to compile, as it automatically handles dependencies.
 // You'll need to install Maven on your computer, then add it to your PATH.
@@ -29,9 +30,11 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 import static mypackage.JLineMenu.terminal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
 
 /**
  *
@@ -66,6 +69,9 @@ public class Main {
 static JLineMenu saveReceipt;
     public static void main(String[] args) {      
         
+        inventory = new ProductInventory();
+        inventory.init();
+        loadStockFromCart();
         // initialize all menus
         initAllMenus();
         
@@ -1008,6 +1014,7 @@ static JLineMenu saveReceipt;
                     continue;
                 }
                 case 1 -> {
+                    listProducts(null); // pass in null to list ALL products regardless of category
                     continue;
                 }
                 default -> {
@@ -1150,26 +1157,43 @@ static JLineMenu saveReceipt;
 
             // add to cart method here
             //addToCart(selectedProduct) or something
+            //I hath arrived; i shall giveth addToCartFlow(selectedProduct)
+            addToCartFlow(selectedProduct);
         }
     }
     
-    
+    /** Prints a selection menu for products.
+     * 
+     * @param category A ProductCategory, limits the products listed. If this is `null`, ALL products regardless of category are listed.
+     * @return A Product object, or null (if user selects "Back" instead of a product).
+     */
     public static Product listProducts(ProductCategory category) {
-        List<Product> products = inventory.getProductsByCategoryName(category.getName());
+        List<Product> products;
+        String header;
+
+        if (category == null) {
+            // if null is passed in as argument, that means we gonna list out ALL products regardless of category
+            products = inventory.getAllProducts();
+            products.sort(Comparator.comparing(Product::getName)); // Sort alphabetically by name
+            header = "All Products";
+        } else {
+            products = inventory.getProductsByCategoryName(category.getName());
+            header = "Products: " + category.getName();
+        }
+        // Cast the products to a list of MenuItems so we can pass it into the OOMenu constructor
         List<MenuItem> menuItems = new ArrayList<>(products);
 
-        // List<String> productNames = PropertyExtractor.extractProperty(products, "name");
-        String header = "Products: " + category.getName();
+        // Create the menu
         OOMenu productMenu = new OOMenu(header, menuItems, "Use the UP and DOWN keys to navigate the menu and view product details.\nHit ENTER to ADD TO CART.", true, false);
         
-        // while (true) {
+        // Draw menu and get selected index
         int selection = productMenu.drawMenu(); // drawMenu() returns either BACK_OPTION_INT or a positive integer which is an index of products
-
         if (selection == OOMenu.BACK_OPTION_INT) 
+            // return null if the user selects "Back"
             return null;
 
+        // Return selected Product if the user has selected one
         return products.get(selection);
-        // }
     }
 
     
@@ -1194,12 +1218,7 @@ static JLineMenu saveReceipt;
                 // Check Range 1 - 10
                 int quantity = Integer.parseInt(input);
                 if (quantity < 1 || quantity > 10) {
-                    System.out.println("Invalid Input, Please try again.");
-                    continue;
-                }
-                
-                if (!product.minusStock(quantity)) {
-                    System.out.printf("Not enough stock! Only %d available.\n", product.getStock());
+                    System.out.println("Invalid Range, Please try again.");
                     continue;
                 }
                 
@@ -1209,16 +1228,42 @@ static JLineMenu saveReceipt;
                 continue;
                 }
                 
-                // Add to cart
-                currentCust.addToCart(product, quantity);
-                System.out.println(product.getName() + " x" + quantity + " added to cart!");
-                JLineMenu.waitMsg();
-                return;
+                //Check Stock
+                if (!product.minusStock(quantity)) {
+                    System.out.printf("Not enough stock! Only %d available.\n", product.getStock());
+                    continue;
+                }
+               
+                // Add to cart, return quantity if something goes wrong
+                try {
+                    currentCust.addToCart(product, quantity);
+                    System.out.println(product.getName() + " x" + quantity + " added to cart!");
+                    JLineMenu.waitMsg();
+                    return;
+                } catch (Exception e) {
+                    product.addStock(quantity); // ROLLBACK
+                    System.out.println("Failed to add to cart. Please try again.");
+                    continue;
+                }
 
             } catch (NumberFormatException e) {
                 System.out.println("Invalid Input, Please try again.");
             }
         }
+    }
+    
+    private static void loadStockFromCart() {
+        Map<Integer, Map<Integer, Integer>> allCarts = CartStorage.loadAllCarts();
+
+        allCarts.forEach((userId, cart) -> {
+            cart.forEach((productId, quantity) -> {
+                Product p = inventory.getProductById(productId);
+                if (p != null) {
+                    // Ensure stock reflects what's reserved in carts
+                    p.minusStock(quantity); 
+                }
+            });
+        });
     }
 }
 
