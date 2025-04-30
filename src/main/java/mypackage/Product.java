@@ -37,8 +37,12 @@ public class Product {
         this.stock += amount;
     }
     
-    public void minusStock(int amount) {
+    public boolean minusStock(int amount) {
+        if (amount > this.stock) {
+            return false;
+        }
         this.stock -= amount;
+        return true;
     }
     
     /*

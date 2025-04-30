@@ -122,6 +122,7 @@ static JLineMenu saveReceipt;
 
         options.clear();
         options.add("View Products");
+        options.add("View Cart");
         options.add("View Orders");
         options.add("Change Account Details");
         options.add("Log Out");
@@ -228,7 +229,8 @@ static JLineMenu saveReceipt;
             int selection = customerDb.drawMenu("Welcome Back, " + JLineMenu.MAGENTA + currentCust.getName() + JLineMenu.WHITE + "!");
             
             if(selection == -1) break;
-            if(selection == 3){
+            if(selection == 4){
+                currentCust.saveCart();
                 currentCust=null;
                 break;
             }
@@ -237,12 +239,17 @@ static JLineMenu saveReceipt;
                 case 0 -> {
                     productMainMenu();
                 }
-
+                
                 case 1 -> {
+                    viewCart();
+                }   
+                
+                //View Order
+                case 2 -> {
                     break;
                 }
 
-                case 2 -> {
+                case 3 -> {
                     updateInfo("customer");
                     break;
                 }
@@ -325,6 +332,7 @@ static JLineMenu saveReceipt;
 
                 if ((currentCust = AuthServices.custlogin(username, password)) != null) {
                     currentAdmin = null;
+                    currentCust.loadCartFromStorage();
                     break;
                 } else {
                     JLineMenu.clearScreen();
@@ -1001,6 +1009,125 @@ static JLineMenu saveReceipt;
         }
     }
     
+    //gets View Cart menu, has X(Cart Items) + 2 Choices (Place Order & Back)
+    public static void viewCart() {
+        while (true) {
+            // Build dynamic options
+            ArrayList<String> options = new ArrayList<>();
+
+            // 1. Add cart items as selectable options
+            currentCust.getCartItems().forEach((product, qty) -> {
+                options.add(String.format("%s x%d (RM %.2f)", 
+                    product.getName(), qty, product.getPrice() * qty));
+            });
+
+            // 2. Add standard buttons
+            if (!options.isEmpty()) options.add("Place Order");
+            options.add("Back");
+
+            // Display menu
+            JLineMenu cartMenu = new JLineMenu("Your Cart", options, 
+                options.isEmpty() ? "Your cart is empty" : "", 
+                false,  // Back is manually added
+                false
+            );
+
+            int selection = cartMenu.drawMenu();
+
+            // Handle selection
+            if (selection == JLineMenu.BACK_OPTION || 
+                selection == options.size() - 1) return; // Back
+
+            if (!options.isEmpty() && selection == options.size() - 2) {
+                System.out.print("Placeing ORder Placeholder");
+                //placeOrderFlow(); // Place Order
+                continue;
+            }
+
+            // Item selected - show action menu
+            Product selectedProduct = (Product) currentCust.getCartItems().keySet().toArray()[selection];
+            editCartItem(selectedProduct);
+        }
+    }
+    
+    //Selects an item, gets 3 choices: Edit Quantity, Remove Item, Back
+    private static void editCartItem(Product product) {
+        int currentQty = currentCust.getCartItems().get(product);
+
+        while (true) {
+            ArrayList<String> options = new ArrayList<>();
+            options.add("Edit Quantity");
+            options.add("Remove Item");
+            options.add("Back");
+
+            JLineMenu actionMenu = new JLineMenu(product.getName(), options, 
+                String.format("Current quantity: %d", currentQty), 
+                false, false);
+
+            int action = actionMenu.drawMenu();
+            if (action == 2 || action == JLineMenu.BACK_OPTION) return; // Back
+
+            if (action == 1) { // Remove
+                returnToStock(product, currentQty);
+                currentCust.getCartItems().remove(product);
+                System.out.println("Item removed!");
+                JLineMenu.waitMsg();
+                return;
+            }
+
+            if (action == 0) { // Edit Qty
+                editItemQuantity(product, currentQty);
+                return;
+            }
+        }
+    }
+    
+    // Adds back to stock
+    private static void returnToStock(Product product, int quantity) {
+        product.addStock(quantity); 
+    }
+
+    //Option for Edit Item in View Cart, has validations to check for: Type, Range (1-10), Stock is available or not
+    private static void editItemQuantity(Product product, int oldQty) {
+        while (true) {
+            System.out.print("New quantity (1-10, 'b' to cancel): ");
+            String input = scanner.nextLine();
+            if (input.equalsIgnoreCase("b")) return;
+
+            try {
+                int newQty = Integer.parseInt(input);
+                if (newQty < 1 || newQty > 10) {
+                    System.out.println("Invalid quantity (1-10 only)");
+                    continue;
+                }
+
+                // Calculate stock difference
+                int delta = newQty - oldQty;
+
+                // Check stock availability for increases
+                if (delta > 0 && !product.minusStock(delta)) {
+                    System.out.println(product.getStock() > 0 ?
+                        "Only " + product.getStock() + " available to add" :
+                        "Out of stock");
+                    continue;
+                }
+
+                // Update cart and stock
+                if (delta < 0) {
+                    product.addStock(-delta); // Return excess
+                }
+
+                currentCust.getCartItems().put(product, newQty);
+                System.out.println("Quantity updated!");
+                JLineMenu.waitMsg();
+                return;
+
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input");
+            }
+        }
+    }
+    
     public static void productCategoryMenu() {
         while (true) {
             int selection = productCategoryMenu.drawMenu();
@@ -1022,8 +1149,66 @@ static JLineMenu saveReceipt;
             
             if (selection == JLineMenu.BACK_OPTION) break;
             
-            System.out.println(products.get(selection).getName());
-            JLineMenu.waitMsg();
+            ArrayList<String> options = new ArrayList<>();
+            options.add("Add to Cart");
+
+            Product selectedProduct = products.get(selection);
+            JLineMenu actionMenu = new JLineMenu(selectedProduct.getName(), options, 
+                selectedProduct.getDescription(), true, false);
+
+            int action = actionMenu.drawMenu();
+            if (action == 0) { // Add to Cart
+            addToCartFlow(selectedProduct);
+        }
+    }
+} 
+    
+
+    //When Selecting an Item in Products, Call addToCartFlow to validate, if true, call currentCust.addToCart() in Customer.java
+    public static void addToCartFlow(Product product) {
+        while (true) {
+            if (product.getStock() <= 0) {
+                System.out.println("Apologies, but we're out of stock.");
+                JLineMenu.waitMsg();
+                return;
+            }
+            
+            System.out.print("Please enter quantity (Max 10) (Input 'b' to cancel): ");
+            String input = scanner.nextLine();
+
+            if (input.equalsIgnoreCase("b")) {
+                return;
+            }
+
+            try {
+                // Check Range 1 - 10
+                int quantity = Integer.parseInt(input);
+                if (quantity < 1 || quantity > 10) {
+                    System.out.println("Invalid Input, Please try again.");
+                    continue;
+                }
+                
+                if (!product.minusStock(quantity)) {
+                    System.out.printf("Not enough stock! Only %d available.\n", product.getStock());
+                    continue;
+                }
+                
+                //Check Max Limit
+                if (!currentCust.canAddToCart(product, quantity)) {
+                System.out.println("Already Exceeded Max Limit! (Max 10)");
+                continue;
+                }
+                
+                // Add to cart
+                currentCust.addToCart(product, quantity);
+                System.out.println(product.getName() + " x" + quantity + " added to cart!");
+                JLineMenu.waitMsg();
+                return;
+
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid Input, Please try again.");
+            }
         }
     }
 }
+
