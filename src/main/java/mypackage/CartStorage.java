@@ -55,7 +55,7 @@ public class CartStorage {
         return cart;
     }
     
-    private static Map<Integer, Map<Integer, Integer>> loadAllCarts() {
+    static Map<Integer, Map<Integer, Integer>> loadAllCarts() {
         Map<Integer, Map<Integer, Integer>> allCarts = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             reader.readLine();

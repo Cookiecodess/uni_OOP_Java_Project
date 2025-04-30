@@ -59,6 +59,7 @@ public class Customer extends User{
     //adds to cartItems
     public void addToCart(Product product, int quantity) {
         cartItems.merge(product, quantity, Integer::sum);
+        saveCart();
     }
     
     public void placeOrder(Order x){

@@ -34,6 +34,7 @@ import java.util.Comparator;
 import static mypackage.JLineMenu.terminal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Map;
 
 /**
  *
@@ -68,6 +69,9 @@ public class Main {
 static JLineMenu saveReceipt;
     public static void main(String[] args) {      
         
+        inventory = new ProductInventory();
+        inventory.init();
+        loadStockFromCart();
         // initialize all menus
         initAllMenus();
         
@@ -1245,6 +1249,20 @@ static JLineMenu saveReceipt;
                 System.out.println("Invalid Input, Please try again.");
             }
         }
+    }
+    
+    private static void loadStockFromCart() {
+        Map<Integer, Map<Integer, Integer>> allCarts = CartStorage.loadAllCarts();
+
+        allCarts.forEach((userId, cart) -> {
+            cart.forEach((productId, quantity) -> {
+                Product p = inventory.getProductById(productId);
+                if (p != null) {
+                    // Ensure stock reflects what's reserved in carts
+                    p.minusStock(quantity); 
+                }
+            });
+        });
     }
 }
 
