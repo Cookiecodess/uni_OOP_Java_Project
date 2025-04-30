@@ -17,7 +17,7 @@ public class Report {
         // 统计产品的销售数量
         for (Product product : productList) {
             int totalSales = 0;
-
+/////////////要有ifstatus is complete？
             for (Order order : orderList) {
                 // 只考虑在给定日期范围内的订单
                 LocalDate orderDate = order.getOrderDate();
