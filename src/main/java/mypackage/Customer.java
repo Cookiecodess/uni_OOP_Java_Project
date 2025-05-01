@@ -18,10 +18,6 @@ public class Customer extends User{
     //This records Cart Items and its quantities
     private final Map<Product, Integer> cartItems;
     
-    private List<Order> orderHistory = new ArrayList<Order>();
-    private List<Product> wishList = new ArrayList<Product>();
-    
-    
     public Customer(String userName, String password, int UID, String name, String email, String phoneNumber, String address, String birthdate, String gender, String role,String status){
         super(userName, password, UID, name, email, phoneNumber, address, birthdate, gender, role, status);
         this.cartItems = new HashMap<>();
@@ -62,27 +58,9 @@ public class Customer extends User{
         saveCart();
     }
     
-    public void placeOrder(Order x){
-        orderHistory.add(x);
-    }
-    
-    public void addToWishlist(Product x){
-        wishList.add(x);
-    }
-  
     public Map<Product, Integer> getCartItems() {
         return cartItems;
     }
     
-    public void addOrder(Order x){
-        orderHistory.add(x);
-    }
-    
-    public List<Order> getAllOrders(){
-        return orderHistory;
-    }
-    
-    public List<Product> getWishList(){
-        return wishList;
-    }
+   
 }
