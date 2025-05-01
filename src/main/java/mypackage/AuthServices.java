@@ -58,7 +58,22 @@ public class AuthServices {
     }
     
     
-    
+    public static ArrayList<String> getBannedHWID(){
+        ArrayList<String> list = new ArrayList<>();
+        String line;
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
+            while ((line = br.readLine()) != null) {
+                String[] details = line.split(",");
+                if(details[9].equals("customer") && details[10].equals("suspended") && !list.contains(details[11])) list.add(details[11]);
+            }
+        } catch (Exception e) {
+            ;
+        }
+        
+        
+        return list;
+    }
     
    
     // Login for Admin
@@ -71,7 +86,7 @@ public class AuthServices {
                 // Split by comma
                 String[] values = line.split(",");
     
-                if(values[0].equals(username) && values[1].equals(password) && (values[9].equals("main") || values[9].equals("admin")) ){
+                if(values[0].equals(username) && values[1].equals(password) && (values[9].equals("main") || values[9].equals("admin")) && values[10].equals("active") ){
                     return new Admin(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],formatAddress(values[6], false),values[7],values[8],values[9],values[10]);
                 }else{
                     continue;
@@ -93,7 +108,7 @@ public class AuthServices {
             while ((line = br.readLine()) != null) {
                 // Split by comma
                 String[] values = line.split(",");
-                if(values[0].equals(username) && values[1].equals(password) && values[9].equals("customer") ){
+                if(values[0].equals(username) && values[1].equals(password) && values[9].equals("customer") && values[10].equals("active") ){
                     return new Customer(values[0],values[1],Integer.parseInt(values[2]),values[3],values[4],values[5],formatAddress(values[6], false),values[7],values[8],values[9],values[10]);
                 }else{
                     continue;
@@ -108,11 +123,11 @@ public class AuthServices {
         return null;
     }
     
-    public static boolean register(String userName, String password, String name, String email, String phoneNumber, String address, String birthdate, String gender){
+    public static boolean register(String userName, String password, String name, String email, String phoneNumber, String address, String birthdate, String gender, String HWID){
         int UID = genUID();
         String role = "customer";
         String status = "active";
-        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + formatAddress(address, true) + "," + birthdate + "," + gender + "," + role + "," + status;
+        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + formatAddress(address, true) + "," + birthdate + "," + gender + "," + role + "," + status + "," + HWID;
         
         try (FileWriter fw = new FileWriter(FILE, true)) { // 'true' enables append mode
             fw.write("\n" + newLine); // add newline before writing
@@ -123,12 +138,12 @@ public class AuthServices {
         return false;
     }
     
-    public static boolean registerAdmin(String userName, String password, String name, String email, String phoneNumber, String address, String birthdate, String gender){
+    public static boolean registerAdmin(String userName, String password, String name, String email, String phoneNumber, String address, String birthdate, String gender, String HWID){
         int UID = genUID();
         String role = "admin";
         String status = "active";
         
-        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + formatAddress(address, true) + "," + birthdate + "," + gender + "," + role + "," + status;
+        String newLine = userName + "," + password + "," + String.valueOf(UID) + "," + name + "," + email + "," + phoneNumber + "," + formatAddress(address, true) + "," + birthdate + "," + gender + "," + role + "," + status + "," + HWID;
         
         try (FileWriter fw = new FileWriter(FILE, true)) { // 'true' enables append mode
             fw.write("\n" + newLine); // add newline before writing
