@@ -36,6 +36,8 @@ public class OrderStorage {
                     order.getFormattedOrderDate()));
                 writer.newLine();
             }
+            //calls to set order visibility in order_visibility.csv
+            OrderVisibility.setVisible(order.getOrderId(), order.getUserId());
         }
     }
 

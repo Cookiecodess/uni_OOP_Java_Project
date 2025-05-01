@@ -1,8 +1,8 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: 43525994
+Order ID	: 86e8261f
 Payment Method	: Online Banking
 Bank		: Hong Leong Bank
-Amount		: RM 37.09
-Date		: 2025-05-01 08:33:45
+Amount		: RM 445.15
+Date		: 2025-05-01 18:08:36

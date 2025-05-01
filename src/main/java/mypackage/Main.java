@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -1503,61 +1504,113 @@ JLineMenu.waitMsg();
     }
   
     //Customer view their made orders.
+    //Update: customers can clear all order history.
     public static void viewOrders() {
-        try {
-            List<Order> userOrders = OrderStorage.loadOrdersForUser(currentCust.getUID());
+        boolean shouldStayInMenu = true;
 
-            if (userOrders.isEmpty()) {
-                JLineMenu.clearScreen();
-                System.out.println("No orders made yet.");
+        while (shouldStayInMenu) {
+            try {
+                List<Order> visibleOrders = OrderStorage.loadOrdersForUser(currentCust.getUID())
+                    .stream()
+                    .filter(order -> OrderVisibility.isVisible(order.getOrderId()))
+                    .collect(Collectors.toList());
+
+                ArrayList<String> options = new ArrayList<>();
+
+                // 1. Add order listings
+                for (int i = 0; i < visibleOrders.size(); i++) {
+                    Order order = visibleOrders.get(i);
+                    options.add(String.format("Order #%s - %s (RM %.2f)", 
+                        order.getOrderId(),
+                        order.getFormattedOrderDate(), 
+                        order.getGrandTotal()));
+                }
+
+                // 2. Add action buttons
+                if (!visibleOrders.isEmpty()) {
+                    options.add(JLineMenu.RED + "Hide All Visible Orders" + JLineMenu.RESET);
+                }
+                options.add("Back to Dashboard");
+
+                JLineMenu ordersMenu = new JLineMenu(
+                    "Your Orders", 
+                    options,
+                    visibleOrders.isEmpty() ? 
+                        "No visible orders found" : 
+                        "Select an order to view details",
+                    false, 
+                    false
+                );
+
+                int selection = ordersMenu.drawMenu();
+
+                // Handle selection
+                if (selection == JLineMenu.BACK_OPTION || 
+                    selection == options.size() - 1) {
+                    shouldStayInMenu = false; // Exit loop
+                }
+                else if (!visibleOrders.isEmpty() && 
+                        selection == options.size() - 2) {
+                    // Hide Orders flow
+                    if (confirmHideHistory(visibleOrders.size())) {
+                        for (Order order : visibleOrders) {
+                            OrderVisibility.hideOrder(order.getOrderId(), currentCust.getUID());
+                        }
+                        System.out.println(JLineMenu.GREEN + "Orders hidden from view." + JLineMenu.RESET);
+                        JLineMenu.waitMsg();
+                        // Loop will restart and show updated list
+                    }
+                } 
+                else if (selection >= 0 && selection < visibleOrders.size()) {
+                    displayOrderDetails(visibleOrders.get(selection));
+                    // After viewing details, loop will restart
+                }
+            } catch (IOException e) {
+                System.out.println("Error: " + e.getMessage());
                 JLineMenu.waitMsg();
-                return;
+                shouldStayInMenu = false;
             }
-
-            ArrayList<String> options = new ArrayList<>();
-            for (int i = 0; i < userOrders.size(); i++) {
-                Order order = userOrders.get(i);
-                options.add(String.format("Order #%d - %s (RM %.2f)", 
-                    i+1, 
-                    order.getFormattedOrderDate(), 
-                    order.getGrandTotal()));
-            }
-
-            JLineMenu ordersMenu = new JLineMenu("Your Orders", options, 
-                "Select an order to view details", true, false);
-            int selection = ordersMenu.drawMenu();
-
-            if (selection >= 0 && selection < userOrders.size()) {
-                displayOrderDetails(userOrders.get(selection));
-            }
-        } catch (IOException e) {
-            System.out.println("Error loading orders: " + e.getMessage());
-            JLineMenu.waitMsg();
         }
     }
-
+    
+    //Used to Confirm Hide History
+    private static boolean confirmHideHistory(int orderCount) {
+        JLineMenu confirmMenu = new JLineMenu("Confirm", 
+            List.of(JLineMenu.RED + "Hide " + orderCount + " Orders" + JLineMenu.RESET, "Cancel"), 
+            "Are you sure? This willl clear your order history!", 
+            false, false);
+        return confirmMenu.drawMenu() == 0;
+    }
+    
+    //Used to Display Order Details
     private static void displayOrderDetails(Order order) {
-        JLineMenu.clearScreen();
-        JLineMenu.printHeader("Order #" + order.getOrderId(), 20);
+        // 1. Build the details string first
+        StringBuilder details = new StringBuilder();
+        details.append("Order ID\t: ").append(order.getOrderId()).append("\n");
+        details.append("Order Date\t: ").append(order.getFormattedOrderDate()).append("\n");
+        details.append("Status\t\t: ").append(order.getStatus()).append("\n");
+        details.append("Payment Method\t: ").append(order.getPaymentMethod()).append("\n\n");
 
-        System.out.println("Order Date: " + order.getFormattedOrderDate());
-        System.out.println("Status: " + order.getStatus());
-        System.out.println("Payment Method: " + order.getPaymentMethod());
-        System.out.println("-------------------------------------");
-
-        System.out.printf("%-30s %-10s %-10s%n", "Product", "Qty", "Subtotal");
-        System.out.println("-------------------------------------");
-
+        details.append("Items:\n");
+        details.append("-------------------------------------\n");
         for (OrderItem item : order.getItems()) {
-            System.out.printf("%-30s %-10d RM%-8.2f%n",
+            details.append(String.format("%-30s %3d x RM%.2f\n", 
                 item.getProduct().getName(),
                 item.getQuantity(),
-                item.getSubtotal());
+                item.getProduct().getPrice()));
         }
+        details.append("-------------------------------------\n");
+        details.append(String.format("Grand Total: RM%.2f", order.getGrandTotal()));
 
-        System.out.println("\nGRAND TOTAL: \tRM " + String.format("%.2f", order.getGrandTotal()));
-        System.out.println("-------------------------------------");
-        JLineMenu.waitMsg();
+        // 2. Create a menu with the details as description
+        JLineMenu detailsMenu = new JLineMenu("Order Details",
+            List.of("Back to Orders"),
+            details.toString(),  // Show details here
+            false,
+            false);
+
+        // 3. Display and wait for user input
+        detailsMenu.drawMenu(); // Will stay until user presses Enter
     }
     
     
@@ -1620,7 +1673,7 @@ JLineMenu.waitMsg();
                 orders.forEach(order -> {
                     String userName = AuthServices.getUserDetails(order.getUserId())[3];
                     options.add(String.format("Order #%s (%s, %s) - %s", 
-                        order.getOrderId().substring(0,6),
+                        order.getOrderId(),
                         userName,
                         order.getFormattedOrderDate(),
                         order.getStatus()));

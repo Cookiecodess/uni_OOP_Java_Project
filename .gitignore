@@ -28,3 +28,4 @@ nbdist/
 nb-configuration.xml
 carts.csv
 orders.csv
+order_visibility.csv
