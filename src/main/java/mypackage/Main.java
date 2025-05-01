@@ -1011,7 +1011,7 @@ static JLineMenu saveReceipt;
        List<Order> orders;
        
       try {
-         orders= OrderStorage.loadOrdersForAll(); // 加载全部订单
+         orders= OrderStorage.loadOrdersForAll(); // load all order
       } catch (IOException e) {
           System.out.println("Warning: Could not load orders - " + e.getMessage());
           return;
@@ -1060,6 +1060,7 @@ dateChecker.setMonthlyReport(anyDayInMonth);
         Report report = new Report();
         
         report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
+        System.out.println();
 JLineMenu.waitMsg();
                 int continueOrNot = quitOrContinue.drawMenu();
                 if (continueOrNot == JLineMenu.BACK_OPTION) {
@@ -1080,10 +1081,10 @@ JLineMenu.waitMsg();
         String input = scan.next();
         try {
             year = Integer.parseInt(input);
-            if (year >= 1900 && year <= 2100) { // 你可以自己设定范围
+            if (year >= 1900 && year <= 2100) { //set the year range
                 valid = true;
             } else {
-                System.out.println("Year out of range. Please try again.");
+                System.out.print("Year out of range. Please try again.");
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid year format. Please enter a 4-digit year.");
@@ -1098,10 +1099,10 @@ JLineMenu.waitMsg();
     boolean valid = false;
 
     while (!valid) {
-        System.out.println(prompt);
+        System.out.print(prompt);
         String input = scan.next();
         try {
-            yearMonth = YearMonth.parse(input); // 使用 YYYY-MM 格式
+            yearMonth = YearMonth.parse(input); // user YYYY-MM format
             valid = true;
         } catch (DateTimeParseException e) {
             System.out.println("Invalid format! Please enter in YYYY-MM format.");
@@ -1119,7 +1120,7 @@ JLineMenu.waitMsg();
         Scanner scan = new Scanner(System.in);
         // continue loop until valid format
         while (!validInput) {
-            System.out.println(prompt);
+            System.out.print(prompt);
             String input = scan.next();
 
             try {

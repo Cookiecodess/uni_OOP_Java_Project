@@ -1,8 +1,7 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: 43525994
-Payment Method	: Online Banking
-Bank		: Hong Leong Bank
-Amount		: RM 37.09
-Date		: 2025-05-01 08:33:45
+Order ID	: 24d9c263
+Payment Method	: QR code Payment
+Amount		: RM 869.09
+Date		: 2025-05-01 15:29:20

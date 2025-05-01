@@ -5,24 +5,30 @@
 
 package mypackage;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 /**
  *
  * @author songl
  */
 public class Report {
+    
+    
       public void generateSalesReport(List<Order> orderList, List<Product> productList, LocalDate startDate, LocalDate endDate) {
-        System.out.println("Report " + startDate + " to " + endDate);
+          JLineMenu.clearScreen();
+          
+          JLineMenu.printHeader("Report",40);
+        System.out.println(JLineMenu.BLUE+JLineMenu.BOLD+JLineMenu.UNDERLINE+"From " + startDate + " to " + endDate+JLineMenu.RESET);
+            System.out.println();
   if (orderList == null || productList == null) {
             System.out.println("No order or no product.");
             return;
         }
   
-   System.out.printf("%-50s %-10s%n", "Product Name", "Sales Quantity");//%-50s means 50 space
-     Map<Product, Integer> productSalesMap = new HashMap<>();    
+      Map<Product, Integer> productSalesMap = new HashMap<>();    
         //product  integer=total salse quantity
         //product a   10
         //product b   200
@@ -50,7 +56,19 @@ public class Report {
                     }
                 }
             }
-            System.out.printf("%-50s %-10s%n",product.getName() ,totalSales);
+             productSalesMap.put(product, totalSales);
+           // System.out.printf("%-50s %-10s%n",product.getName() ,totalSales);
+        }
+         List<Map.Entry<Product, Integer>> sortedSalesList = productSalesMap.entrySet().stream()
+            .sorted(Map.Entry.<Product, Integer>comparingByValue().reversed())
+            .collect(Collectors.toList());
+
+        System.out.printf("%-5s %-45s %-10s%n", "Rank", "Product Name", "Sales Quantity");//%-50s means 50 space
+
+        int rank = 1;
+        for (Map.Entry<Product, Integer> entry : sortedSalesList) {
+            System.out.printf("%-5d %-50s %-10d%n", rank++, entry.getKey().getName(), entry.getValue());
         }
     }
+    
 }
