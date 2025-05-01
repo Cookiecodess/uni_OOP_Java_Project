@@ -2084,7 +2084,7 @@ public class Main {
             JLineMenu.printHeader("Add New Product", JLineMenu.LEFT_RIGHT_PADDING);
             
             if (showTempMsg) {
-                System.out.println(tempMsg);
+                System.out.println(tempMsg + "\n");
                 showTempMsg = false;
             }
             
@@ -2092,21 +2092,20 @@ public class Main {
             System.out.println("To "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", enter '"+JLineMenu.YELLOW+backKey+JLineMenu.RESET+"' in any field. "+JLineMenu.RED+"\nPlease beware that doing this discards all details entered."+JLineMenu.RESET);
             System.out.println();
     
+            // Print auto-incremented product ID
             System.out.println("ID: " + newProduct.getId());
+
             // Input name
-            System.out.print("Name: ");
-            String name = scanner.nextLine();
-            if (name.equalsIgnoreCase(backKey)) {
-                return;
-            }
-            newProduct.setName(name);
+            String name = Helper.getNonEmptyStringInputInterruptable(scanner, "Name: ", backKey);
+            newProduct.setName(name);        
     
             // Input price
             double price = Helper.getNextDoubleInputInterruptable(scanner, "Price: RM ", true, backKey);
             if (price == Helper.INTRP) {
                 return;
             } 
-            newProduct.setPrice(price);            
+            newProduct.setPrice(price);  
+            System.out.println(CUR_UP + CLR_LN + String.format("Price: RM %.2f", price));          
     
             // Input stock
             int stock = Helper.getNextIntInputInterruptable(scanner, "Stock: ", true, backKey);
@@ -2125,19 +2124,11 @@ public class Main {
             newProduct.setCategory(category);
     
             // Input color
-            System.out.print("Enter color: ");
-            String color = scanner.nextLine();
-            if (color.equalsIgnoreCase(backKey)) {
-                return;
-            }
+            String color = Helper.getNonEmptyStringInputInterruptable(scanner, "Color: ", backKey);
             newProduct.setColor(color);
     
             // Input description
-            System.out.println("Description: ");
-            String desc = scanner.nextLine();
-            if (desc.equalsIgnoreCase(backKey)) {
-                return;
-            }
+            String desc = Helper.getNonEmptyStringInputInterruptable(scanner, "Description: ", backKey);
             newProduct.setDescription(desc);
     
             // Launch right now?
@@ -2178,7 +2169,7 @@ public class Main {
                 if (confirm.equalsIgnoreCase("no")) {
                     Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                     showTempMsg = true;
-                    tempMsg = "Product not added.";
+                    tempMsg = JLineMenu.YELLOW + "Product not added." + JLineMenu.RESET;
                     break;
                 } 
                 System.out.println("Invalid input. Please try again.");

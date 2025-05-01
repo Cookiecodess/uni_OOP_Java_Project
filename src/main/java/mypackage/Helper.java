@@ -11,7 +11,7 @@ import java.io.*;
 
 public class Helper {
     static Terminal terminal = JLineMenu.terminal;
-    
+
     public static final String CUR_UP = "\u001B[1A";
     public static final String CUR_DOWN = "\u001B[1B";
     public static final String CLR_LINE = "\r"+" ".repeat(terminal.getWidth())+"\r";
@@ -129,6 +129,31 @@ public class Helper {
                 System.out.print("Invalid input. Try again." + JLineMenu.RST_CUR);
             }
         }
+    }
+
+    /**
+     * 
+     * @param scanner
+     * @param prompt
+     * @param interruptStr If user inputs this, that means they want to do certain action like "go back" instead of entering data
+     * @return a non-empty string from user input. Returns null if interruptStr is received from input
+     */
+    public static String getNonEmptyStringInputInterruptable(Scanner scanner, String prompt, String interruptStr) {
+        String input;
+        while (true) {
+            System.out.print(JLineMenu.SAV_CUR + prompt);
+            input = scanner.nextLine();
+            if (input.equalsIgnoreCase(interruptStr)) {
+                return null;
+            } 
+            if (!input.isEmpty()) {
+                break;
+            }
+            System.out.print("Invalid input. Please try again.");
+            System.out.print(JLineMenu.RST_CUR + CLR_LINE);
+        } 
+        System.out.print(CLR_LINE); // clear error message below "Name: ..."
+        return input;
     }
 
     public static boolean isNumeric(String str) {
