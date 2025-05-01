@@ -13,16 +13,16 @@ import java.time.format.DateTimeFormatter;
 
 public abstract class Payment implements Payable{    //since payment is an "idea" dont have a specific method to implement
 //public abstract class Payment{  
-        private String paymentMethod; 
+       private String paymentMethod; 
         
-        private double amount;
+     //   private double amount;
         private Order order;
         private LocalDateTime dateTime=LocalDateTime.now();
 
-    public Payment(String paymentMethod, double amount, Order order){
+    public Payment(String paymentMethod, Order order){
         this.order=order;
-        this.amount=amount;
-        this.paymentMethod=paymentMethod;
+     //   this.amount=amount;
+       this.paymentMethod=paymentMethod;
     }
 
 
@@ -34,16 +34,16 @@ public abstract class Payment implements Payable{    //since payment is an "idea
         this.paymentMethod = paymentMethod;
     }
 
-    public double getAmount() {
-        return amount;
-    }
+//    public double getAmount() {
+//        return amount;
+//    }
 
-    public void setAmount(double amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative.");
-        }
-        this.amount = amount;
-    }
+//    public void setAmount(double amount) {
+//        if (amount < 0) {
+//            throw new IllegalArgumentException("Amount cannot be negative.");
+//        }
+//        this.amount = amount;
+//    }
 
     public Order getOrder() {
         return order;

@@ -104,10 +104,7 @@ static JLineMenu saveReceipt;
                     }
                     continue;
                 }
-                case 2 -> {
-                    payment();
-                    continue;
-                }
+               
                 default -> {
                     continue;
                 }
@@ -121,7 +118,6 @@ static JLineMenu saveReceipt;
         ArrayList<String> options = new ArrayList<>();
         options.add("Customer");
         options.add("Admin");
-        options.add("Payment");
         mainMenu = new JLineMenu("Main menu", options, "Select an action to continue.", false, true);
 
         options.clear();
@@ -821,7 +817,7 @@ static JLineMenu saveReceipt;
         AuthServices.changeEmail(x, input);
     }
 
-    public static boolean payment() {
+    public static boolean payment(Order order) {
         Order dummyOrder = new Order(currentCust.getUID());
         currentCust.getCartItems().forEach((p,q) -> dummyOrder.addItem(p,q));
         
@@ -868,7 +864,7 @@ static JLineMenu saveReceipt;
         }
     }
     
-    public static boolean onlineBankingPaymentProcess(Order a) {
+    public static boolean onlineBankingPaymentProcess(Order order) {
         Payment paymentO;
         String bankName;
         while (true) {
@@ -900,13 +896,13 @@ static JLineMenu saveReceipt;
                 lastPaymentMethod = "Online Banking";
                 lastBankName = bankName;
             }
-            paymentO = new OnlineBankingPayment(10.00, a, bankName);
-            return processPayment(paymentO, a);
+            paymentO = new OnlineBankingPayment(order, bankName);
+            return processPayment(paymentO, order);
         }
 
     }
 
-    private static boolean processPayment(Payment paymentO, Order a) {
+    private static boolean processPayment(Payment paymentO, Order order) {
         boolean shouldExit = false;
         while (!shouldExit) {
             if (paymentO.validation()) {
@@ -915,14 +911,14 @@ static JLineMenu saveReceipt;
                 JLineMenu.waitMsg();
                 JLineMenu.clearScreen();
                 JLineMenu.printHeader("Receipt", 20);
-                paymentO.generateReceipt(a);
+                paymentO.generateReceipt(order);
                 
                 
                 int selection = saveReceipt.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                  
             }else{
-             paymentO.generatePrintableReceipt(a);
+             paymentO.generatePrintableReceipt(order);
               JLineMenu.sound();
              JLineMenu.waitMsg();
             }
@@ -948,8 +944,8 @@ static JLineMenu saveReceipt;
 
     }
 
-    public static boolean qrCodePayment(Order a) {
-        Payment paymentO = new qrCodePayment(10.00, a);
+    public static boolean qrCodePayment(Order order) {
+        Payment paymentO = new qrCodePayment(order);
         JLineMenu.printHeader("QR code Payment", 45);
         paymentO.generateQR();
         
@@ -959,11 +955,11 @@ static JLineMenu saveReceipt;
             lastBankName = ""; // No bank name for TnG
         }
         
-        return processPayment(paymentO, a);
+        return processPayment(paymentO, order);
 
     }
 
-    public static boolean cardPaymentProcess(Order a) {
+    public static boolean cardPaymentProcess(Order order) {
 
         Payment paymentO;
         String bankName;
@@ -996,8 +992,8 @@ static JLineMenu saveReceipt;
                 lastPaymentMethod = "Card Payment";
                 lastBankName = bankName;
             }
-            paymentO = new CardPayment(10.00, a, bankName);
-            return processPayment(paymentO, a);
+            paymentO = new CardPayment(order, bankName);
+            return processPayment(paymentO, order);
         }
 
     }
@@ -1426,7 +1422,7 @@ static JLineMenu saveReceipt;
     //2) clear & save cart
     //3) PAYMENT SUCCESSFUL! FRICGGIN FINALLY JESUS CHRIST ALMIGHTY
     private static void processPayment(Order order) {
-        if (payment()) {
+        if (payment(order)) {
             try {
                 order.setPaymentMethod(getFormattedPaymentMethod());
                 order.setStatus("Pending");
