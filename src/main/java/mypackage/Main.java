@@ -1476,7 +1476,7 @@ static JLineMenu saveReceipt;
         JLineMenu.clearScreen();
         JLineMenu.printHeader("Order #" + order.getOrderId(), 20);
 
-        System.out.println("Order Date: " + order.getOrderDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        System.out.println("Order Date: " + order.getFormattedOrderDate());
         System.out.println("Status: " + order.getStatus());
         System.out.println("Payment Method: " + order.getPaymentMethod());
         System.out.println("-------------------------------------");
