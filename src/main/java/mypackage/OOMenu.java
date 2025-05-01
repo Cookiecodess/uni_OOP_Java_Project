@@ -113,10 +113,7 @@ public class OOMenu {
         System.out.println("Hello from OOMenu.main");
         terminal.writer().println("\u001b[7m> " + "yo! testing" + "\u001b[0m");
 
-        ProductInventory inventory = new ProductInventory();
-        inventory.init();
-
-        List<Product> products = inventory.getProductsByCategoryName("Keyboards");
+        List<Product> products = Main.inventory.getProductsByCategoryName("Keyboards");
         List<MenuItem> menuItems = new ArrayList<>(products);
 
         // List<String> productNames = PropertyExtractor.extractProperty(products, "name");

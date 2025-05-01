@@ -42,6 +42,8 @@ import java.time.format.DateTimeParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jline.console.impl.JlineCommandRegistry;
+
 /**
  *
  * @author User
@@ -55,7 +57,7 @@ public class Main {
     static JLineMenu customerDb;
     static JLineMenu productMainMenu;
     static OOMenu productCategoryMenu;
-//    static JLineMenu productListMenu;
+    // static JLineMenu productListMenu;
     static JLineMenu adminDb;
     static JLineMenu changeDetails;
     static JLineMenu quitOrContinue;
@@ -63,29 +65,31 @@ public class Main {
     static JLineMenu bankSelection;
     static JLineMenu payment;
     static JLineMenu reportSelection;
+    static JLineMenu saveReceipt;
+
+    // Global user objects
     static Customer currentCust = null;
     static Admin currentAdmin = null;
-    //Here, these 2 is used to store Payment Method with/without Bank Name. 
+    // Here, these 2 is used to store Payment Method with/without Bank Name.
     private static String lastPaymentMethod;
     private static String lastBankName;
-    
-    static ProductInventory inventory;
+
+    // Initialize Productinventory. Can be accessed anywhere in this project.
+    public static ProductInventory inventory;
     static {
-        // initialize product inventory 
+        // initialize product inventory
         inventory = new ProductInventory();
         inventory.init();
     }
-static JLineMenu saveReceipt;
-    public static void main(String[] args) {  
-        
-        inventory = new ProductInventory();
-        inventory.init();
-        //deduct stock based on cart and orders
+
+    public static void main(String[] args) {
+
+        // deduct stock based on cart and orders
         loadStockFromCart();
         loadStockFromOrders();
         // initialize all menus
         initAllMenus();
-        
+
         // start program
         while (true) {
             int selection = mainMenu.drawMenu();
@@ -108,7 +112,7 @@ static JLineMenu saveReceipt;
                     }
                     continue;
                 }
-               
+
                 default -> {
                     continue;
                 }
@@ -145,11 +149,11 @@ static JLineMenu saveReceipt;
         options.add("Browse by Category");
         options.add("All Products");
         productMainMenu = new JLineMenu("View Products", options, "Select an action to continue.", true, false);
-        
-        // productCategoryMenu = new JLineMenu("Browse by Category", inventory.getAllCategoryNames(), "Select a product category.", true, false);
+
+        // productCategoryMenu = new JLineMenu("Browse by Category",
+        // inventory.getAllCategoryNames(), "Select a product category.", true, false);
         List<MenuItem> menuItems = new ArrayList<>(inventory.getAllCategories());
         productCategoryMenu = new OOMenu("Browse by Category", menuItems, "Select a product category.", true, false);
-        
 
         options.clear();
         options.add("Add New Products");
@@ -176,7 +180,7 @@ static JLineMenu saveReceipt;
         options.add("Monthly Report");
         options.add("Yearly Report");
         options.add("Customize Report");
-         options.add("Loyal Customer Analysis");
+        options.add("Loyal Customer Analysis");
         reportSelection = new JLineMenu("Report", options, "Select a report type.", true, true);
 
         options.clear();
@@ -200,15 +204,10 @@ static JLineMenu saveReceipt;
 
         options.clear();
         options.add("Print Receipt");
-       
+
         saveReceipt = new JLineMenu("Print Receipt?", options, "Do you want to save your receipt.", true, true);
 
-        
     }
-    
-
-        
-    
 
     public static void customer() {
 
@@ -240,15 +239,17 @@ static JLineMenu saveReceipt;
 
         }
     }
-    
-    public static void customerDashboard(){
-        while(true){
-            int selection = customerDb.drawMenu("Welcome Back, " + JLineMenu.MAGENTA + currentCust.getName() + JLineMenu.RESET + "!");
-            
-            if(selection == -1) break;
-            if(selection == 4){
+
+    public static void customerDashboard() {
+        while (true) {
+            int selection = customerDb
+                    .drawMenu("Welcome Back, " + JLineMenu.MAGENTA + currentCust.getName() + JLineMenu.RESET + "!");
+
+            if (selection == -1)
+                break;
+            if (selection == 4) {
                 currentCust.saveCart();
-                currentCust=null;
+                currentCust = null;
                 break;
             }
 
@@ -256,12 +257,12 @@ static JLineMenu saveReceipt;
                 case 0 -> {
                     productMainMenu();
                 }
-                
+
                 case 1 -> {
                     viewCart();
-                }   
-                
-                //View Order
+                }
+
+                // View Order
                 case 2 -> {
                     viewOrders();
                 }
@@ -278,10 +279,11 @@ static JLineMenu saveReceipt;
 
     public static void adminDashboard() {
         while (true) {
-            int selection = adminDb.drawMenu("Welcome Back, " + 
-                    JLineMenu.MAGENTA + currentAdmin.getName() + JLineMenu.RESET + "!" + 
-                            " (" + JLineMenu.CYAN + currentAdmin.getRole().toUpperCase() + JLineMenu.RESET + ")");
-            if (selection == -1)break;
+            int selection = adminDb.drawMenu("Welcome Back, " +
+                    JLineMenu.MAGENTA + currentAdmin.getName() + JLineMenu.RESET + "!" +
+                    " (" + JLineMenu.CYAN + currentAdmin.getRole().toUpperCase() + JLineMenu.RESET + ")");
+            if (selection == -1)
+                break;
 
             if (selection == 8) {
                 currentAdmin = null;
@@ -299,7 +301,8 @@ static JLineMenu saveReceipt;
                 }
 
                 case 2 -> {
-                    //Call to View ALL orders made by customers. So far code is running ok, but further testing needs to be done.
+                    // Call to View ALL orders made by customers. So far code is running ok, but
+                    // further testing needs to be done.
                     adminViewAllOrders();
                 }
 
@@ -309,24 +312,24 @@ static JLineMenu saveReceipt;
                 }
 
                 case 4 -> {
-                    //register admin
+                    // register admin
                     register("admin");
                     break;
                 }
 
                 case 5 -> {
-                    //suspend customer
+                    // suspend customer
                     suspend(true);
                     break;
                 }
 
                 case 6 -> {
-                    //unsuspend customer
+                    // unsuspend customer
                     suspend(false);
                     break;
                 }
                 case 7 -> {
-                   
+
                     try {
                         reportPage();
                     } catch (IOException ex) {
@@ -349,15 +352,14 @@ static JLineMenu saveReceipt;
             if (username.equals("999")) {
                 break;
             }
-            
+
             System.out.print("Enter your Password:" + JLineMenu.GREEN);
             String password = JLineMenu.reader.readLine(" ", '*');
             System.out.print(JLineMenu.RESET);
 
-
-            //validating
+            // validating
             if (type.equals("customer")) {
-                //customer login
+                // customer login
 
                 if ((currentCust = AuthServices.custlogin(username, password)) != null) {
                     currentAdmin = null;
@@ -369,7 +371,7 @@ static JLineMenu saveReceipt;
                     System.out.println();
                 }
             } else {
-                //admin login
+                // admin login
                 if ((currentAdmin = AuthServices.login(username, password)) != null) {
                     currentCust = null;
                     break;
@@ -398,7 +400,7 @@ static JLineMenu saveReceipt;
         String gender;
 
         if (type.equals("admin") && !currentAdmin.isMain()) {
-            System.out.println(JLineMenu.RED+"Access Denied!"+JLineMenu.RESET);
+            System.out.println(JLineMenu.RED + "Access Denied!" + JLineMenu.RESET);
             System.out.print("Press Enter To Go Back....");
             scanner.nextLine();
             return;
@@ -412,46 +414,39 @@ static JLineMenu saveReceipt;
 
             if (!username.isEmpty() && !usernames.contains(username) && !username.matches(".*[^a-zA-Z0-9].*")) {
                 break;
-            }
-            else if(username.matches(".*[^a-zA-Z0-9].*")){
+            } else if (username.matches(".*[^a-zA-Z0-9].*")) {
                 JLineMenu.clearScreen();
                 System.out.println("Username Cannot Have Symbols!");
-            }
-            else {
+            } else {
                 JLineMenu.clearScreen();
                 System.out.println("Username Taken!");
             }
 
-            
         }
 
         JLineMenu.clearScreen();
 
         // Password
         while (true) {
-            System.out.println("Enter a username: "+username);
-            
-            
+            System.out.println("Enter a username: " + username);
+
             System.out.print("Enter a password:" + JLineMenu.GREEN);
             password = JLineMenu.reader.readLine(" ", '*');
             System.out.print(JLineMenu.RESET);
-            
+
             System.out.print("Re-Enter your password:" + JLineMenu.GREEN);
             String password2 = JLineMenu.reader.readLine(" ", '*');
             System.out.print(JLineMenu.RESET);
-            
-            if(password.contains(",") || password.contains(" ")){
-                   JLineMenu.clearScreen();
-                   System.out.println("Password Cannot Have Comma or Space!\n");
-            }
-            else if(!password.equals(password2)){
-                    JLineMenu.clearScreen();
-                    System.out.println("Password did not match!\n");
-            }
-            else {
+
+            if (password.contains(",") || password.contains(" ")) {
+                JLineMenu.clearScreen();
+                System.out.println("Password Cannot Have Comma or Space!\n");
+            } else if (!password.equals(password2)) {
+                JLineMenu.clearScreen();
+                System.out.println("Password did not match!\n");
+            } else {
                 break;
             }
-            
 
         }
 
@@ -459,29 +454,29 @@ static JLineMenu saveReceipt;
         // Name
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
+            System.out
+                    .println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
 
             System.out.print("Enter your name: ");
             name = scanner.nextLine();
             if (!name.isEmpty() && !name.matches(".*[^a-zA-Z0-9 ].*")) {
                 break;
-            }
-            else if(name.matches(".*[^a-zA-Z0-9 ].*")){
+            } else if (name.matches(".*[^a-zA-Z0-9 ].*")) {
                 JLineMenu.clearScreen();
                 System.out.println("Name Cannot Have Symbols!\n");
-            }
-            else{
+            } else {
                 JLineMenu.clearScreen();
                 System.out.println("Name cannot be empty!\n");
             }
-            
+
         }
 
         JLineMenu.clearScreen();
         // Email
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
+            System.out
+                    .println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
 
             System.out.print("Enter your email: ");
@@ -498,7 +493,8 @@ static JLineMenu saveReceipt;
         // Phone number
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
+            System.out
+                    .println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
 
@@ -517,7 +513,8 @@ static JLineMenu saveReceipt;
         // Address
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
+            System.out
+                    .println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -536,7 +533,8 @@ static JLineMenu saveReceipt;
         // Birth day
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
+            System.out
+                    .println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -557,7 +555,8 @@ static JLineMenu saveReceipt;
         // Gender
         while (true) {
             System.out.println("Enter a username: " + username);
-            System.out.println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
+            System.out
+                    .println("Enter a password: " + JLineMenu.GREEN + "*".repeat(password.length()) + JLineMenu.RESET);
             System.out.println("Enter your name: " + name);
             System.out.println("Enter your email: " + email);
             System.out.println("Enter your phone number: +" + phoneNumber);
@@ -582,9 +581,8 @@ static JLineMenu saveReceipt;
         }
 
     }
-    
-    
-    public static void suspend(boolean suspended){
+
+    public static void suspend(boolean suspended) {
         JLineMenu.clearScreen();
         String[] details;
         int UID;
@@ -608,8 +606,9 @@ static JLineMenu saveReceipt;
                 continue;
             }
 
-            //checking if the uid exists
-            if ((details = AuthServices.getUserDetails(UID)) != null && (!details[9].equals("admin") && !details[9].equals("main"))) {
+            // checking if the uid exists
+            if ((details = AuthServices.getUserDetails(UID)) != null
+                    && (!details[9].equals("admin") && !details[9].equals("main"))) {
                 JLineMenu.clearScreen();
                 System.out.println("-----------USER INFORMATION-----------");
                 System.out.println("Username: " + details[0]);
@@ -652,28 +651,28 @@ static JLineMenu saveReceipt;
         int selection = changeDetails.drawMenu();
         switch (selection) {
             case 0 -> {
-                //change name
+                // change name
                 changeName(currentUser);
                 break;
             }
             case 1 -> {
-                //change address
+                // change address
                 changeAddress(currentUser);
                 break;
             }
             case 2 -> {
-                //change password
+                // change password
                 changePass(currentUser);
                 break;
             }
             case 3 -> {
-                //change phone
+                // change phone
                 changePhone(currentUser);
                 break;
             }
 
             case 4 -> {
-                //change emial
+                // change emial
                 changeEmail(currentUser);
                 break;
             }
@@ -701,27 +700,24 @@ static JLineMenu saveReceipt;
             System.out.println("Invalid Password!\n");
 
         }
-        
-        while(true){
-            
+
+        while (true) {
+
             System.out.print("Enter Your New Password:" + JLineMenu.GREEN);
             input = JLineMenu.reader.readLine(" ", '*');
             System.out.print(JLineMenu.RESET);
-            
-            
+
             System.out.print("Re-Enter Your New Password:" + JLineMenu.GREEN);
             String input2 = JLineMenu.reader.readLine(" ", '*');
             System.out.print(JLineMenu.RESET);
-            
-            if(input.contains(",") || input.contains(" ")){
-                   JLineMenu.clearScreen();
-                   System.out.println("Password Cannot Have Comma or Space!\n");
-            }
-            else if(!input.equals(input2)){
-                    JLineMenu.clearScreen();
-                    System.out.println("Password did not match!\n");
-            }
-            else {
+
+            if (input.contains(",") || input.contains(" ")) {
+                JLineMenu.clearScreen();
+                System.out.println("Password Cannot Have Comma or Space!\n");
+            } else if (!input.equals(input2)) {
+                JLineMenu.clearScreen();
+                System.out.println("Password did not match!\n");
+            } else {
                 break;
             }
         }
@@ -744,12 +740,10 @@ static JLineMenu saveReceipt;
 
             if (!input.isEmpty() && !input.matches(".*[^a-zA-Z0-9 ].*")) {
                 break;
-            }
-            else if(input.matches(".*[^a-zA-Z0-9 ].*")){
+            } else if (input.matches(".*[^a-zA-Z0-9 ].*")) {
                 JLineMenu.clearScreen();
                 System.out.println("Name Cannot Have Symbols!\n");
-            }
-            else{
+            } else {
                 JLineMenu.clearScreen();
                 System.out.println("Name cannot be empty!\n");
             }
@@ -822,7 +816,7 @@ static JLineMenu saveReceipt;
                 return;
             }
 
-            if (input.contains("@") &&  input.contains(".") && !input.contains(",")) {
+            if (input.contains("@") && input.contains(".") && !input.contains(",")) {
                 break;
             }
             JLineMenu.clearScreen();
@@ -835,31 +829,33 @@ static JLineMenu saveReceipt;
 
     public static boolean payment(Order order) {
         Order dummyOrder = new Order(currentCust.getUID());
-        currentCust.getCartItems().forEach((p,q) -> dummyOrder.addItem(p,q));
-        
+        currentCust.getCartItems().forEach((p, q) -> dummyOrder.addItem(p, q));
+
         boolean valid = false;
-        while (!valid) {    //=true then 
+        while (!valid) { // =true then
             int selection = payment.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                 return false;
             }
-            
-            
+
             // here, depending on what we chose, save the payment method
             switch (selection) {
                 case 0 -> {
                     valid = onlineBankingPaymentProcess(dummyOrder);
-                    if (valid) lastPaymentMethod = "Online Banking";
+                    if (valid)
+                        lastPaymentMethod = "Online Banking";
                     continue;
                 }
                 case 1 -> {
                     valid = qrCodePayment(dummyOrder);
-                    if (valid) lastPaymentMethod = "Touch and Go";
+                    if (valid)
+                        lastPaymentMethod = "Touch and Go";
                     continue;
                 }
                 case 2 -> {
                     valid = cardPaymentProcess(dummyOrder);
-                    if (valid) lastPaymentMethod = "Card Payment";
+                    if (valid)
+                        lastPaymentMethod = "Card Payment";
                     continue;
                 }
                 default -> {
@@ -871,7 +867,8 @@ static JLineMenu saveReceipt;
         return valid;
     }
 
-    //here, we call this method to combine payment method and bank name, and is used to save it into orders.csv
+    // here, we call this method to combine payment method and bank name, and is
+    // used to save it into orders.csv
     public static String getFormattedPaymentMethod() {
         if (lastPaymentMethod.equals("Touch and Go")) {
             return "Touch and Go";
@@ -879,7 +876,7 @@ static JLineMenu saveReceipt;
             return String.format("%s - %s", lastPaymentMethod, lastBankName);
         }
     }
-    
+
     public static boolean onlineBankingPaymentProcess(Order order) {
         Payment paymentO;
         String bankName;
@@ -906,8 +903,8 @@ static JLineMenu saveReceipt;
                 }
 
             }
-            
-            //save payment method and bank name
+
+            // save payment method and bank name
             if (true) {
                 lastPaymentMethod = "Online Banking";
                 lastBankName = bankName;
@@ -928,24 +925,18 @@ static JLineMenu saveReceipt;
                 JLineMenu.clearScreen();
                 JLineMenu.printHeader("Receipt", 20);
                 paymentO.generateReceipt(order);
-                
-                
+
                 int selection = saveReceipt.drawMenu();
-            if (selection == JLineMenu.BACK_OPTION) {
-                 
-            }else{
-             paymentO.generatePrintableReceipt(order);
-              JLineMenu.sound();
-             JLineMenu.waitMsg();
-            }
-                
+                if (selection == JLineMenu.BACK_OPTION) {
+
+                } else {
+                    paymentO.generatePrintableReceipt(order);
+                    JLineMenu.sound();
+                    JLineMenu.waitMsg();
+                }
+
                 shouldExit = true;
-                
-                
-                
-                
-                
-               
+
                 shouldExit = true;
             } else {
                 System.out.println(JLineMenu.RED + paymentO.failMessage() + JLineMenu.RESET);
@@ -964,13 +955,13 @@ static JLineMenu saveReceipt;
         Payment paymentO = new qrCodePayment(order);
         JLineMenu.printHeader("QR code Payment", 45);
         paymentO.generateQR();
-        
-        //save payment method, bank name = "" (none)
+
+        // save payment method, bank name = "" (none)
         if (true) {
             lastPaymentMethod = "Touch and Go";
             lastBankName = ""; // No bank name for TnG
         }
-        
+
         return processPayment(paymentO, order);
 
     }
@@ -1002,8 +993,8 @@ static JLineMenu saveReceipt;
                 }
 
             }
-            
-            //save payment method and bank name
+
+            // save payment method and bank name
             if (true) {
                 lastPaymentMethod = "Card Payment";
                 lastBankName = bankName;
@@ -1014,125 +1005,125 @@ static JLineMenu saveReceipt;
 
     }
 
- 
-  public static void reportPage() throws IOException{
-       List<Order> orders;
+    public static void reportPage() throws IOException {
+        List<Order> orders;
         Report report = new Report();
-      try {
-         orders= OrderStorage.loadOrdersForAll(); // load all order
-      } catch (IOException e) {
-          System.out.println("Warning: Could not load orders - " + e.getMessage());
-          return;
-      }
-      
+        try {
+            orders = OrderStorage.loadOrdersForAll(); // load all order
+        } catch (IOException e) {
+            System.out.println("Warning: Could not load orders - " + e.getMessage());
+            return;
+        }
+
         DateChecker dateChecker = new DateChecker();
-      
-    while(true){
-        int selection = reportSelection.drawMenu();
+
+        while (true) {
+            int selection = reportSelection.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                 return;
             }
-         
-        LocalDate userDate;
-        switch (selection) {
+
+            LocalDate userDate;
+            switch (selection) {
                 case 0 -> {
-            // Daily Report
-             userDate = getUserDateInput("Please enter the date (YYYY-MM-DD):");
-             dateChecker.setDailyReport(userDate);
-              report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
-        }  case 1 -> {
-            // Monthly Report
-          YearMonth yearMonth = getUserYearMonthInput("Please enter the month (YYYY-MM):");
-LocalDate anyDayInMonth = yearMonth.atDay(1);
-dateChecker.setMonthlyReport(anyDayInMonth);
- report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
-        } case 2 -> {
-            // Yearly Report
-         int year = getUserYearInput("Please enter the year (e.g., 2024):");
-    LocalDate firstDayOfYear = LocalDate.of(year, 1, 1);
-    dateChecker.setYearlyReport(firstDayOfYear);
-     report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
-        }  case 3 -> {
-            // Customize Report
-
-            LocalDate startDate = getUserDateInput("Please enter the START date (YYYY-MM-DD):");
-            LocalDate endDate = getUserDateInput("Please enter the END date (YYYY-MM-DD):");
-            dateChecker.setCustomizeReport(startDate, endDate);
-             report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
-        }
-        
-        case 4 -> {
-            // analysiscustomer
-
-           report.generateUserRanking(orders);
-        }
-        
-         default -> {
-                continue;
-            }
-        }
-        
-
-        
-       
-        System.out.println();
-JLineMenu.waitMsg();
-                int continueOrNot = quitOrContinue.drawMenu();
-                if (continueOrNot == JLineMenu.BACK_OPTION) {
-                    return ;
+                    // Daily Report
+                    userDate = getUserDateInput("Please enter the date (YYYY-MM-DD):");
+                    dateChecker.setDailyReport(userDate);
+                    report.generateSalesReport(orders, inventory.getAllProducts(), dateChecker.getStartDate(),
+                            dateChecker.getEndDate());
                 }
-       
-        }
-    
- 
-  }
-  
-  
-  
-  public static int getUserYearInput(String prompt) {
-    Scanner scan = new Scanner(System.in);
-    int year = 0;
-    boolean valid = false;
+                case 1 -> {
+                    // Monthly Report
+                    YearMonth yearMonth = getUserYearMonthInput("Please enter the month (YYYY-MM):");
+                    LocalDate anyDayInMonth = yearMonth.atDay(1);
+                    dateChecker.setMonthlyReport(anyDayInMonth);
+                    report.generateSalesReport(orders, inventory.getAllProducts(), dateChecker.getStartDate(),
+                            dateChecker.getEndDate());
+                }
+                case 2 -> {
+                    // Yearly Report
+                    int year = getUserYearInput("Please enter the year (e.g., 2024):");
+                    LocalDate firstDayOfYear = LocalDate.of(year, 1, 1);
+                    dateChecker.setYearlyReport(firstDayOfYear);
+                    report.generateSalesReport(orders, inventory.getAllProducts(), dateChecker.getStartDate(),
+                            dateChecker.getEndDate());
+                }
+                case 3 -> {
+                    // Customize Report
 
-    while (!valid) {
-        System.out.println(prompt);
-        String input = scan.next();
-        try {
-            year = Integer.parseInt(input);
-            if (year >= 1900 && year <= 2100) { //set the year range
-                valid = true;
-            } else {
-                System.out.print("Year out of range. Please try again.");
+                    LocalDate startDate = getUserDateInput("Please enter the START date (YYYY-MM-DD):");
+                    LocalDate endDate = getUserDateInput("Please enter the END date (YYYY-MM-DD):");
+                    dateChecker.setCustomizeReport(startDate, endDate);
+                    report.generateSalesReport(orders, inventory.getAllProducts(), dateChecker.getStartDate(),
+                            dateChecker.getEndDate());
+                }
+
+                case 4 -> {
+                    // analysiscustomer
+
+                    report.generateUserRanking(orders);
+                }
+
+                default -> {
+                    continue;
+                }
             }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid year format. Please enter a 4-digit year.");
+
+            System.out.println();
+            JLineMenu.waitMsg();
+            int continueOrNot = quitOrContinue.drawMenu();
+            if (continueOrNot == JLineMenu.BACK_OPTION) {
+                return;
+            }
+
         }
+
     }
 
-    return year;
-}
-  public static YearMonth getUserYearMonthInput(String prompt) {
-    Scanner scan = new Scanner(System.in);
-    YearMonth yearMonth = null;
-    boolean valid = false;
+    public static int getUserYearInput(String prompt) {
+        Scanner scan = new Scanner(System.in);
+        int year = 0;
+        boolean valid = false;
 
-    while (!valid) {
-        System.out.print(prompt);
-        String input = scan.next();
-        try {
-            yearMonth = YearMonth.parse(input); // user YYYY-MM format
-            valid = true;
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid format! Please enter in YYYY-MM format.");
+        while (!valid) {
+            System.out.println(prompt);
+            String input = scan.next();
+            try {
+                year = Integer.parseInt(input);
+                if (year >= 1900 && year <= 2100) { // set the year range
+                    valid = true;
+                } else {
+                    System.out.print("Year out of range. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid year format. Please enter a 4-digit year.");
+            }
         }
+
+        return year;
     }
 
-    return yearMonth;
-}
+    public static YearMonth getUserYearMonthInput(String prompt) {
+        Scanner scan = new Scanner(System.in);
+        YearMonth yearMonth = null;
+        boolean valid = false;
 
+        while (!valid) {
+            System.out.print(prompt);
+            String input = scan.next();
+            try {
+                yearMonth = YearMonth.parse(input); // user YYYY-MM format
+                valid = true;
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid format! Please enter in YYYY-MM format.");
+            }
+        }
 
- //check the date is valid format or not
- public static LocalDate getUserDateInput(String prompt) {
+        return yearMonth;
+    }
+
+    // check the date is valid format or not
+    public static LocalDate getUserDateInput(String prompt) {
         LocalDate userDate = null;
         boolean validInput = false;
         Scanner scan = new Scanner(System.in);
@@ -1142,16 +1133,16 @@ JLineMenu.waitMsg();
             String input = scan.next();
 
             try {
-                userDate = LocalDate.parse(input); //get the date
+                userDate = LocalDate.parse(input); // get the date
                 validInput = true; // if no exception means is valid format
             } catch (DateTimeParseException e) {
                 System.out.println("Invalid Format！Please try again");
             }
         }
-        
+
         return userDate; // return valid date
     }
-    
+
     public static void productMainMenu() {
         while (true) {
             int selection = productMainMenu.drawMenu();
@@ -1159,71 +1150,71 @@ JLineMenu.waitMsg();
                 return;
             }
             switch (selection) {
-                case 0 -> { 
+                case 0 -> {
                     productCategoryMenu();
                     continue;
                 }
                 case 1 -> {
                     Product selectedProduct = listProducts(null);
-                       if (selectedProduct != null) {
-                       addToCartFlow(selectedProduct);
-                   }
+                    if (selectedProduct != null) {
+                        addToCartFlow(selectedProduct);
+                    }
                     continue;
                 }
                 default -> {
                     continue;
                 }
-            }            
+            }
         }
     }
-    
-    //gets View Cart menu, has X(Cart Items) + 2 Choices (Place Order & Back)
+
+    // gets View Cart menu, has X(Cart Items) + 2 Choices (Place Order & Back)
     public static void viewCart() {
-    while (true) {
-        // Build dynamic options
-        ArrayList<String> options = new ArrayList<>();
+        while (true) {
+            // Build dynamic options
+            ArrayList<String> options = new ArrayList<>();
 
-        // 1. Add cart items as selectable options
-        currentCust.getCartItems().forEach((product, qty) -> {
-            options.add(String.format("%s x%d (RM %.2f)", 
-                product.getName(), qty, product.getPrice() * qty));
-        });
+            // 1. Add cart items as selectable options
+            currentCust.getCartItems().forEach((product, qty) -> {
+                options.add(String.format("%s x%d (RM %.2f)",
+                        product.getName(), qty, product.getPrice() * qty));
+            });
 
-        // 2. Add standard buttons
-        boolean isEmpty = options.isEmpty();
-        if (!isEmpty) {
-            options.add("Place Order");
+            // 2. Add standard buttons
+            boolean isEmpty = options.isEmpty();
+            if (!isEmpty) {
+                options.add("Place Order");
+            }
+            options.add("Back");
+
+            // Display menu with clearer empty state handling
+            String description = isEmpty ? JLineMenu.RED + "Your cart is empty!" + JLineMenu.RESET
+                    : "Select an item to edit.";
+
+            JLineMenu cartMenu = new JLineMenu("Your Cart", options,
+                    description, // Now more visible
+                    false, // Back is manually added
+                    false);
+
+            int selection = cartMenu.drawMenu();
+
+            // Handle selection
+            if (selection == JLineMenu.BACK_OPTION ||
+                    selection == options.size() - 1)
+                return;
+
+            if (!isEmpty && selection == options.size() - 2) {
+                placeOrderFlow();
+                continue;
+            }
+
+            // Item selected - show action menu
+            Product selectedProduct = (Product) currentCust.getCartItems().keySet().toArray()[selection];
+            editCartItem(selectedProduct);
         }
-        options.add("Back");
-
-        // Display menu with clearer empty state handling
-        String description = isEmpty ? JLineMenu.RED + "Your cart is empty!" + JLineMenu.RESET 
-                                   : "Select an item to edit.";
-        
-        JLineMenu cartMenu = new JLineMenu("Your Cart", options, 
-            description,  // Now more visible
-            false,  // Back is manually added
-            false
-        );
-
-        int selection = cartMenu.drawMenu();
-
-        // Handle selection
-        if (selection == JLineMenu.BACK_OPTION || 
-            selection == options.size() - 1) return;
-
-        if (!isEmpty && selection == options.size() - 2) {
-            placeOrderFlow();
-            continue;
-        }
-
-        // Item selected - show action menu
-        Product selectedProduct = (Product) currentCust.getCartItems().keySet().toArray()[selection];
-        editCartItem(selectedProduct);
     }
-}
-    
-    //Selects an item, gets 3 choices: Edit Quantity, Remove Item, Back
+
+    // Selects an item, gets 3 choices: Edit Quantity, Remove Item, Back
     private static void editCartItem(Product product) {
         int currentQty = currentCust.getCartItems().get(product);
 
@@ -1233,12 +1224,13 @@ JLineMenu.waitMsg();
             options.add("Remove Item");
             options.add("Back");
 
-            JLineMenu actionMenu = new JLineMenu(product.getName(), options, 
-                String.format("Current quantity: %d", currentQty), 
-                false, false);
+            JLineMenu actionMenu = new JLineMenu(product.getName(), options,
+                    String.format("Current quantity: %d", currentQty),
+                    false, false);
 
             int action = actionMenu.drawMenu();
-            if (action == 2 || action == JLineMenu.BACK_OPTION) return; // Back
+            if (action == 2 || action == JLineMenu.BACK_OPTION)
+                return; // Back
 
             if (action == 1) { // Remove
                 returnToStock(product, currentQty);
@@ -1254,18 +1246,20 @@ JLineMenu.waitMsg();
             }
         }
     }
-    
+
     // Adds back to stock
     private static void returnToStock(Product product, int quantity) {
-        product.addStock(quantity); 
+        product.addStock(quantity);
     }
 
-    //Option for Edit Item in View Cart, has validations to check for: Type, Range (1-10), Stock is available or not
+    // Option for Edit Item in View Cart, has validations to check for: Type, Range
+    // (1-10), Stock is available or not
     private static void editItemQuantity(Product product, int oldQty) {
         while (true) {
             System.out.print("New quantity (1-10, 'b' to cancel): ");
             String input = scanner.nextLine();
-            if (input.equalsIgnoreCase("b")) return;
+            if (input.equalsIgnoreCase("b"))
+                return;
 
             try {
                 int newQty = Integer.parseInt(input);
@@ -1279,9 +1273,8 @@ JLineMenu.waitMsg();
 
                 // Check stock availability for increases
                 if (delta > 0 && !product.minusStock(delta)) {
-                    System.out.println(product.getStock() > 0 ?
-                        "Only " + product.getStock() + " available to add" :
-                        "Out of stock");
+                    System.out.println(product.getStock() > 0 ? "Only " + product.getStock() + " available to add"
+                            : "Out of stock");
                     continue;
                 }
 
@@ -1300,7 +1293,7 @@ JLineMenu.waitMsg();
             }
         }
     }
-    
+
     public static void productCategoryMenu() {
         while (true) {
             int selection = productCategoryMenu.drawMenu();
@@ -1309,29 +1302,37 @@ JLineMenu.waitMsg();
             }
 
             // If user selected a product, proceed to add to cart
-            Product selectedProduct = listProducts(inventory.getCategoryByIndex(selection)); // list products that belong to the selected category
+            Product selectedProduct = listProducts(inventory.getCategoryByIndex(selection)); // list products that
+                                                                                             // belong to the selected
+                                                                                             // category
 
-            if (selectedProduct == null) continue; // User selected "back" -- redraw this menu.
+            if (selectedProduct == null)
+                continue; // User selected "back" -- redraw this menu.
 
             // add to cart method here
-            //addToCart(selectedProduct) or something
-            //I hath arrived; i shall giveth addToCartFlow(selectedProduct)
-            //Oh, how could i, a mere mortal, receive a gift of such generosity without being crushed under the weight of my guilt?
+            // addToCart(selectedProduct) or something
+            // I hath arrived; i shall giveth addToCartFlow(selectedProduct)
+            // Oh, how could i, a mere mortal, receive a gift of such generosity without
+            // being crushed under the weight of my guilt?
             addToCartFlow(selectedProduct);
         }
     }
-    
-    /** Prints a selection menu for products.
+
+    /**
+     * Prints a selection menu for products.
      * 
-     * @param category A ProductCategory, limits the products listed. If this is `null`, ALL products regardless of category are listed.
-     * @return A Product object, or null (if user selects "Back" instead of a product).
+     * @param category A ProductCategory, limits the products listed. If this is
+     *                 `null`, ALL products regardless of category are listed.
+     * @return A Product object, or null (if user selects "Back" instead of a
+     *         product).
      */
     public static Product listProducts(ProductCategory category) {
         List<Product> products;
         String header;
 
         if (category == null) {
-            // if null is passed in as argument, that means we gonna list out ALL products regardless of category
+            // if null is passed in as argument, that means we gonna list out ALL products
+            // regardless of category
             products = inventory.getAllProducts();
             products.sort(Comparator.comparing(Product::getName)); // Sort alphabetically by name
             header = "All Products";
@@ -1339,15 +1340,19 @@ JLineMenu.waitMsg();
             products = inventory.getProductsByCategoryName(category.getName());
             header = "Products: " + category.getName();
         }
-        // Cast the products to a list of MenuItems so we can pass it into the OOMenu constructor
+        // Cast the products to a list of MenuItems so we can pass it into the OOMenu
+        // constructor
         List<MenuItem> menuItems = new ArrayList<>(products);
 
         // Create the menu
-        OOMenu productMenu = new OOMenu(header, menuItems, "Use the UP and DOWN keys to navigate the menu and view product details.\nHit ENTER to ADD TO CART.", true, false);
-        
+        OOMenu productMenu = new OOMenu(header, menuItems,
+                "Use the UP and DOWN keys to navigate the menu and view product details.\nHit ENTER to ADD TO CART.",
+                true, false);
+
         // Draw menu and get selected index
-        int selection = productMenu.drawMenu(); // drawMenu() returns either BACK_OPTION_INT or a positive integer which is an index of products
-        if (selection == OOMenu.BACK_OPTION_INT) 
+        int selection = productMenu.drawMenu(); // drawMenu() returns either BACK_OPTION_INT or a positive integer which
+                                                // is an index of products
+        if (selection == OOMenu.BACK_OPTION_INT)
             // return null if the user selects "Back"
             return null;
 
@@ -1355,9 +1360,8 @@ JLineMenu.waitMsg();
         return products.get(selection);
     }
 
-    
-
-    //When Selecting an Item in Products, Call addToCartFlow to validate, if true, call currentCust.addToCart() in Customer.java
+    // When Selecting an Item in Products, Call addToCartFlow to validate, if true,
+    // call currentCust.addToCart() in Customer.java
     public static void addToCartFlow(Product product) {
         while (true) {
             if (product.getStock() <= 0) {
@@ -1365,7 +1369,7 @@ JLineMenu.waitMsg();
                 JLineMenu.waitMsg();
                 return;
             }
-            
+
             System.out.print("Please enter quantity (Max 10) (Input 'b' to cancel): ");
             String input = scanner.nextLine();
 
@@ -1380,19 +1384,19 @@ JLineMenu.waitMsg();
                     System.out.println("Invalid Range, Please try again.");
                     continue;
                 }
-                
-                //Check Max Limit
+
+                // Check Max Limit
                 if (!currentCust.canAddToCart(product, quantity)) {
-                System.out.println("Already Exceeded Max Limit! (Max 10)");
-                continue;
+                    System.out.println("Already Exceeded Max Limit! (Max 10)");
+                    continue;
                 }
-                
-                //Check Stock
+
+                // Check Stock
                 if (!product.minusStock(quantity)) {
                     System.out.printf("Not enough stock! Only %d available.\n", product.getStock());
                     continue;
                 }
-               
+
                 // Add to cart, return quantity if something goes wrong
                 try {
                     currentCust.addToCart(product, quantity);
@@ -1410,8 +1414,8 @@ JLineMenu.waitMsg();
             }
         }
     }
-    
-    //deduct item stock based on cart
+
+    // deduct item stock based on cart
     private static void loadStockFromCart() {
         Map<Integer, Map<Integer, Integer>> allCarts = CartStorage.loadAllCarts();
 
@@ -1420,13 +1424,13 @@ JLineMenu.waitMsg();
                 Product p = inventory.getProductById(productId);
                 if (p != null) {
                     // Ensure stock reflects what's reserved in carts
-                    p.minusStock(quantity); 
+                    p.minusStock(quantity);
                 }
             });
         });
     }
-    
-    //deduct item stock based on orders made
+
+    // deduct item stock based on orders made
     private static void loadStockFromOrders() {
         try {
             // Get all orders (regardless of status)
@@ -1448,8 +1452,8 @@ JLineMenu.waitMsg();
             System.out.println("Warning: Could not update stock from orders - " + e.getMessage());
         }
     }
-    
-    //Print The Place Order Menu
+
+    // Print The Place Order Menu
     public static void placeOrderFlow() {
         if (currentCust.getCartItems().isEmpty()) {
             System.out.println("Your cart is empty!");
@@ -1461,7 +1465,7 @@ JLineMenu.waitMsg();
         currentCust.getCartItems().forEach((product, quantity) -> {
             order.addItem(product, quantity);
         });
-        
+
         ArrayList<String> options = new ArrayList<>();
         options.add("Proceed to Payment");
         String summary = buildOrderSummaryString(order);
@@ -1471,8 +1475,9 @@ JLineMenu.waitMsg();
             processPayment(order);
         }
     }
-    
-    //Build Order Summary String to display the calculations and Grand Total of Order
+
+    // Build Order Summary String to display the calculations and Grand Total of
+    // Order
     private static String buildOrderSummaryString(Order order) {
         StringBuilder sb = new StringBuilder();
 
@@ -1483,10 +1488,10 @@ JLineMenu.waitMsg();
         // Items
         for (OrderItem item : order.getItems()) {
             sb.append(String.format("%-8d %-30s %-10d RM%-8.2f%n",
-                item.getProduct().getId(),
-                item.getProduct().getName(),
-                item.getQuantity(),
-                item.getSubtotal()));
+                    item.getProduct().getId(),
+                    item.getProduct().getName(),
+                    item.getQuantity(),
+                    item.getSubtotal()));
         }
 
         // Totals
@@ -1499,11 +1504,11 @@ JLineMenu.waitMsg();
 
         return sb.toString();
     }
-    
-    //if payment() returns true, we :
-    //1) set all the thingamagiks into order class
-    //2) clear & save cart
-    //3) PAYMENT SUCCESSFUL! FRICGGIN FINALLY JESUS CHRIST ALMIGHTY
+
+    // if payment() returns true, we :
+    // 1) set all the thingamagiks into order class
+    // 2) clear & save cart
+    // 3) PAYMENT SUCCESSFUL! FRICGGIN FINALLY JESUS CHRIST ALMIGHTY
     private static void processPayment(Order order) {
         if (payment(order)) {
             try {
@@ -1520,8 +1525,8 @@ JLineMenu.waitMsg();
             }
         }
     }
-  
-    //Customer view their made orders.
+
+    // Customer view their made orders.
     public static void viewOrders() {
         try {
             List<Order> userOrders = OrderStorage.loadOrdersForUser(currentCust.getUID());
@@ -1536,14 +1541,14 @@ JLineMenu.waitMsg();
             ArrayList<String> options = new ArrayList<>();
             for (int i = 0; i < userOrders.size(); i++) {
                 Order order = userOrders.get(i);
-                options.add(String.format("Order #%d - %s (RM %.2f)", 
-                    i+1, 
-                    order.getFormattedOrderDate(), 
-                    order.getGrandTotal()));
+                options.add(String.format("Order #%d - %s (RM %.2f)",
+                        i + 1,
+                        order.getFormattedOrderDate(),
+                        order.getGrandTotal()));
             }
 
-            JLineMenu ordersMenu = new JLineMenu("Your Orders", options, 
-                "Select an order to view details", true, false);
+            JLineMenu ordersMenu = new JLineMenu("Your Orders", options,
+                    "Select an order to view details", true, false);
             int selection = ordersMenu.drawMenu();
 
             if (selection >= 0 && selection < userOrders.size()) {
@@ -1569,19 +1574,18 @@ JLineMenu.waitMsg();
 
         for (OrderItem item : order.getItems()) {
             System.out.printf("%-30s %-10d RM%-8.2f%n",
-                item.getProduct().getName(),
-                item.getQuantity(),
-                item.getSubtotal());
+                    item.getProduct().getName(),
+                    item.getQuantity(),
+                    item.getSubtotal());
         }
 
         System.out.println("\nGRAND TOTAL: \tRM " + String.format("%.2f", order.getGrandTotal()));
         System.out.println("-------------------------------------");
         JLineMenu.waitMsg();
     }
-    
-    
-    //Section: Admin View Orders Menu
-    //String for description
+
+    // Section: Admin View Orders Menu
+    // String for description
     private static String formatOrderDetails(Order order) {
         String[] userDetails = AuthServices.getUserDetails(order.getUserId());
         StringBuilder sb = new StringBuilder();
@@ -1598,10 +1602,10 @@ JLineMenu.waitMsg();
 
         order.getItems().forEach(item -> {
             sb.append(String.format("%-8d %-30s %-10d RM%-8.2f%n",
-                item.getProduct().getId(),
-                item.getProduct().getName(),
-                item.getQuantity(),
-                item.getSubtotal()));
+                    item.getProduct().getId(),
+                    item.getProduct().getName(),
+                    item.getQuantity(),
+                    item.getSubtotal()));
         });
 
         // Footer Totals
@@ -1610,27 +1614,25 @@ JLineMenu.waitMsg();
 
         return sb.toString();
     }
-    
+
     public static void adminViewAllOrders() {
         String currentSort = "Date(^)";
-        boolean[] sortFlags = {true, true}; // [0] = dateAscending, [1] = nameAscending
+        boolean[] sortFlags = { true, true }; // [0] = dateAscending, [1] = nameAscending
 
         while (true) {
             try {
                 // Load and sort orders
                 List<Order> orders = OrderStorage.loadOrdersForAll();
-                
-                //Apply Sorting using final array (idfk what this is honestly)
+
+                // Apply Sorting using final array (idfk what this is honestly)
                 if (currentSort.startsWith("Date")) {
-                    orders.sort(sortFlags[0] ? 
-                        Comparator.comparing(Order::getOrderDate) :
-                        Comparator.comparing(Order::getOrderDate).reversed());
+                    orders.sort(sortFlags[0] ? Comparator.comparing(Order::getOrderDate)
+                            : Comparator.comparing(Order::getOrderDate).reversed());
                 } else {
                     orders.sort((o1, o2) -> {
                         String name1 = AuthServices.getUserDetails(o1.getUserId())[3];
                         String name2 = AuthServices.getUserDetails(o2.getUserId())[3];
-                        return sortFlags[1] ? 
-                            name1.compareTo(name2) : name2.compareTo(name1);
+                        return sortFlags[1] ? name1.compareTo(name2) : name2.compareTo(name1);
                     });
                 }
 
@@ -1638,36 +1640,34 @@ JLineMenu.waitMsg();
                 ArrayList<String> options = new ArrayList<>();
                 orders.forEach(order -> {
                     String userName = AuthServices.getUserDetails(order.getUserId())[3];
-                    options.add(String.format("Order #%s (%s, %s) - %s", 
-                        order.getOrderId().substring(0,6),
-                        userName,
-                        order.getFormattedOrderDate(),
-                        order.getStatus()));
+                    options.add(String.format("Order #%s (%s, %s) - %s",
+                            order.getOrderId().substring(0, 6),
+                            userName,
+                            order.getFormattedOrderDate(),
+                            order.getStatus()));
                 });
 
                 // Add sort options
-                options.add("Sort: Date" + (currentSort.startsWith("Date") ? 
-                    (sortFlags[0] ? "(^)" : "(v)") : ""));
-                options.add("Sort: Customer" + (currentSort.startsWith("Customer") ? 
-                    (sortFlags[1] ? "(^)" : "(v)") : ""));
+                options.add("Sort: Date" + (currentSort.startsWith("Date") ? (sortFlags[0] ? "(^)" : "(v)") : ""));
+                options.add(
+                        "Sort: Customer" + (currentSort.startsWith("Customer") ? (sortFlags[1] ? "(^)" : "(v)") : ""));
 
-                JLineMenu menu = new JLineMenu("All Orders", options, 
-                    "Total Orders: " + orders.size(), true, false);
+                JLineMenu menu = new JLineMenu("All Orders", options,
+                        "Total Orders: " + orders.size(), true, false);
 
                 int selection = menu.drawMenu();
 
                 // Handle selection
-                if (selection == JLineMenu.BACK_OPTION) return;
+                if (selection == JLineMenu.BACK_OPTION)
+                    return;
 
                 if (selection == options.size() - 2) { // Date sort
                     sortFlags[0] = !sortFlags[0];
                     currentSort = "Date" + (sortFlags[0] ? "(^)" : "(v)");
-                } 
-                else if (selection == options.size() - 1) { // Name sort
+                } else if (selection == options.size() - 1) { // Name sort
                     sortFlags[1] = !sortFlags[1];
                     currentSort = "Customer" + (sortFlags[1] ? "(^)" : "(v)");
-                }
-                else {
+                } else {
                     adminManageOrder(orders.get(selection));
                 }
             } catch (Exception e) {
@@ -1676,40 +1676,45 @@ JLineMenu.waitMsg();
             }
         }
     }
-    
-    //Selects an order, gives selection: Update Status which calls updateOrderStatus, and the description is the Order Details, Header is order ID.
+
+    // Selects an order, gives selection: Update Status which calls
+    // updateOrderStatus, and the description is the Order Details, Header is order
+    // ID.
     private static void adminManageOrder(Order order) throws IOException {
         while (true) {
             // Create menu with order details as description
             ArrayList<String> options = new ArrayList<>();
             options.add("Update Status");
 
-            JLineMenu menu = new JLineMenu("Order " + order.getOrderId(), 
-                options, 
-                formatOrderDetails(order), 
-                true, false);
+            JLineMenu menu = new JLineMenu("Order " + order.getOrderId(),
+                    options,
+                    formatOrderDetails(order),
+                    true, false);
 
             int choice = menu.drawMenu();
 
-            if (choice == JLineMenu.BACK_OPTION) return;
-            if (choice == 0) updateOrderStatus(order);
+            if (choice == JLineMenu.BACK_OPTION)
+                return;
+            if (choice == 0)
+                updateOrderStatus(order);
         }
     }
-    
-    
-    //Updates Order Status: Selections: Pending, Shipping, Completed, Cancelled. Theres no Validation if you select the same Status.
+
+    // Updates Order Status: Selections: Pending, Shipping, Completed, Cancelled.
+    // Theres no Validation if you select the same Status.
     private static void updateOrderStatus(Order order) throws IOException {
-        String[] statusOptions = {"Pending", "Shipping", "Completed", "Cancelled"};
+        String[] statusOptions = { "Pending", "Shipping", "Completed", "Cancelled" };
 
         while (true) {
-            JLineMenu statusMenu = new JLineMenu("Update Status", 
-                Arrays.asList(statusOptions), 
-                "Current Status: " + order.getStatus(), 
-                true, false);
+            JLineMenu statusMenu = new JLineMenu("Update Status",
+                    Arrays.asList(statusOptions),
+                    "Current Status: " + order.getStatus(),
+                    true, false);
 
             int selection = statusMenu.drawMenu();
 
-            if (selection == JLineMenu.BACK_OPTION) return;
+            if (selection == JLineMenu.BACK_OPTION)
+                return;
 
             String newStatus = statusOptions[selection];
             if (!order.getStatus().equals(newStatus)) {
@@ -1721,8 +1726,8 @@ JLineMenu.waitMsg();
             }
         }
     }
-    
-    //End of Section: Admin View Orders Menu
+
+    // End of Section: Admin View Orders Menu
 
     private static void editProductMenu() {
         List<Product> products = inventory.getAllProducts();
@@ -1734,7 +1739,8 @@ JLineMenu.waitMsg();
         String message = "";
         while (true) {
             products = inventory.getAllProducts(); // update view of products
-            // products.sort(Comparator.comparing(Product::getName)); // Sort alphabetically by name
+            // products.sort(Comparator.comparing(Product::getName)); // Sort alphabetically
+            // by name
             menuItems = new ArrayList<>(products);
             editProductMenu.setOptions(menuItems);
 
@@ -1745,9 +1751,9 @@ JLineMenu.waitMsg();
 
             boolean isChangesMade = editProductPage(products.get(selection));
             if (isChangesMade) {
-                message = "Product details updated.";
+                message = JLineMenu.GREEN + "Product details updated." + JLineMenu.RESET;
             } else {
-                message = "No changes made.";
+                message = JLineMenu.YELLOW + "No changes made." + JLineMenu.RESET;
             }
         }
     }
@@ -1778,7 +1784,7 @@ JLineMenu.waitMsg();
             int selection = Integer.valueOf(input);
             selection--; // normalize for index
             switch (selection) {
-                case 0: 
+                case 0:
                     System.out.println("Sorry, you can't change the ID!");
                     JLineMenu.waitMsg();
                     continue;
@@ -1804,22 +1810,24 @@ JLineMenu.waitMsg();
                     newCategory = (ProductCategory) categories.get(selected);
                     // while (true) {
 
-                    //     System.out.print(Helper.CLR_LINE + "Enter new category: ");
-                    //     newCategory = inventory.getCategoryByName(scanner.nextLine());
-                    //     if (newCategory != null) {
-                    //         break;
-                    //     }
-                    //     System.out.println("No such category. Try again.");
+                    // System.out.print(Helper.CLR_LINE + "Enter new category: ");
+                    // newCategory = inventory.getCategoryByName(scanner.nextLine());
+                    // if (newCategory != null) {
+                    // break;
+                    // }
+                    // System.out.println("No such category. Try again.");
 
-                    //     Table categoryTable = new Table(2, 5);
-                    //     List<ProductCategory> categories = inventory.getAllCategories();
-                    //     for (ProductCategory category : categories) {
-                    //         categoryTable.add(category.getName(), category.getDescription());
-                    //     }
-                    //     categoryTable.print();
+                    // Table categoryTable = new Table(2, 5);
+                    // List<ProductCategory> categories = inventory.getAllCategories();
+                    // for (ProductCategory category : categories) {
+                    // categoryTable.add(category.getName(), category.getDescription());
+                    // }
+                    // categoryTable.print();
 
-                    //     int columnsFromPrompt = categories.size() + 1;
-                    //     System.out.print(Helper.CUR_UP.repeat(columnsFromPrompt)); // move cursor up to the line with the prompt, so that in next iteration of this loop, we can clear the line with prompt and reprint the prompt
+                    // int columnsFromPrompt = categories.size() + 1;
+                    // System.out.print(Helper.CUR_UP.repeat(columnsFromPrompt)); // move cursor up
+                    // to the line with the prompt, so that in next iteration of this loop, we can
+                    // clear the line with prompt and reprint the prompt
                     // }
                     productBuffer.setCategory(newCategory);
                     break;
@@ -1836,7 +1844,7 @@ JLineMenu.waitMsg();
                 case 7:
                     // scanner.nextLine();
                     String statusAfterToggle = productBuffer.isDiscontinued() ? "On sale" : "Discontinued";
-                    System.out.println("Change to '"+statusAfterToggle+"'? (y/n)");
+                    System.out.println("Change to '" + statusAfterToggle + "'? (y/n)");
                     String response = scanner.nextLine();
                     if (!response.equalsIgnoreCase("y")) {
                         break;
@@ -1876,7 +1884,7 @@ JLineMenu.waitMsg();
         }
         // Display product info and let user choose which field they'd like to change
 
-        // If user selects a field, 
+        // If user selects a field,
 
         // return false;
     }
@@ -1897,4 +1905,3 @@ JLineMenu.waitMsg();
         productDetailsTable.print();
     }
 }
-
