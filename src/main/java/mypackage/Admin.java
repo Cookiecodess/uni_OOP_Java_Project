@@ -16,16 +16,6 @@ public class Admin extends User{
         super(userName, password, UID, name, email, phoneNumber, address, birthdate, gender, role, status);
     }
     
-    //addprodct
-    public void addProduct(Product x){
-        //Inventory.add(x);
-    }
-    
-    
-    //remove products
-    public void removeProduct(Product x){
-        //Inventory.remove(x);
-    }
     
     //suspend and unsuspend user
     public void suspendCust(int uid, boolean suspended){
