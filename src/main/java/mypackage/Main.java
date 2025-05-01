@@ -69,7 +69,7 @@ public class Main {
     static JLineMenu payment;
     static JLineMenu reportSelection;
     static JLineMenu saveReceipt;
-
+     static JLineMenu returnReportPage;
     // Global user objects
     static Customer currentCust = null;
     static Admin currentAdmin = null;
@@ -216,6 +216,9 @@ public class Main {
         options.add("Try Again");
         quitOrContinue = new JLineMenu("Continue?", options, "Select an action to continue.", true, true);
 
+          options.clear();
+        options.add("Back to Report Page");
+        returnReportPage = new JLineMenu("Continue?", options, "Select an action to continue.", true, true);
         options.clear();
         options.add("Hong Leong Bank");
         options.add("Alliance Bank");
@@ -1177,7 +1180,7 @@ public class Main {
 
             System.out.println();
             JLineMenu.waitMsg();
-            int continueOrNot = quitOrContinue.drawMenu();
+            int continueOrNot = returnReportPage.drawMenu();
             if (continueOrNot == JLineMenu.BACK_OPTION) {
                 return;
             }
@@ -1192,18 +1195,20 @@ public class Main {
         boolean valid = false;
 
         while (!valid) {
-            System.out.println(prompt);
+          
+            System.out.print(prompt);
             String input = scan.next();
             try {
                 year = Integer.parseInt(input);
-                if (year >= 1900 && year <= 2100) { // set the year range
+                if (year >= 2000 && year <= 2100) { // set the year range
                     valid = true;
                 } else {
-                    System.out.print("Year out of range. Please try again.");
+                    System.out.println(JLineMenu.RED+"Year out of range. Please try again."+JLineMenu.RESET);
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid year format. Please enter a 4-digit year.");
+                System.out.println(JLineMenu.RED+"Invalid year format. Please enter a 4-digit year."+JLineMenu.RESET);
             }
+              System.out.println();
         }
 
         return year;
@@ -1221,8 +1226,9 @@ public class Main {
                 yearMonth = YearMonth.parse(input); // user YYYY-MM format
                 valid = true;
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid format! Please enter in YYYY-MM format.");
+                System.out.println(JLineMenu.RED+"Invalid format! Please enter in YYYY-MM format."+JLineMenu.RESET);
             }
+              System.out.println();
         }
 
         return yearMonth;
@@ -1242,8 +1248,9 @@ public class Main {
                 userDate = LocalDate.parse(input); // get the date
                 validInput = true; // if no exception means is valid format
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid Format！Please try again");
+                System.out.println(JLineMenu.RED+"Invalid Format！Please try again"+JLineMenu.RESET);
             }
+              System.out.println();
         }
 
         return userDate; // return valid date
