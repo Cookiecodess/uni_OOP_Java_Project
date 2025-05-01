@@ -71,4 +71,34 @@ public class Report {
         }
     }
     
+      
+      
+      public void generateUserRanking(List<Order> orderList) {
+    // user ID -> total spend
+      JLineMenu.clearScreen();
+    Map<Integer, Double> userSpendingMap = new HashMap<>();
+
+    for (Order order : orderList) {
+    //    if (!order.getStatus().equalsIgnoreCase("Complete")) continue;
+
+        int userId = order.getUserId();
+        double amount = order.getGrandTotal();
+
+        userSpendingMap.put(userId, userSpendingMap.getOrDefault(userId, 0.0) + amount);
+    }
+
+    // sort money
+    List<Map.Entry<Integer, Double>> sortedUsers = userSpendingMap.entrySet()
+        .stream()
+        .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
+        .toList();
+  JLineMenu.printHeader("Customer Ranking",20);
+    System.out.printf("%-10s %-15s %-25s%n","Rank", "User ID", "Total Spending");
+    int rank = 1;
+    for (Map.Entry<Integer, Double> entry : sortedUsers) {
+        System.out.printf("%-10d %-20d RM%-25.2f%n",rank++, entry.getKey(), entry.getValue());
+    }
+}
+
+      
 }

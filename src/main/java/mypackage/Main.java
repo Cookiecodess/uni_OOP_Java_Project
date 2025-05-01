@@ -174,6 +174,7 @@ static JLineMenu saveReceipt;
         options.add("Monthly Report");
         options.add("Yearly Report");
         options.add("Customize Report");
+         options.add("Loyal Customer Analysis");
         reportSelection = new JLineMenu("Report", options, "Select a report type.", true, true);
 
         options.clear();
@@ -1009,7 +1010,7 @@ static JLineMenu saveReceipt;
  
   public static void reportPage() throws IOException{
        List<Order> orders;
-       
+        Report report = new Report();
       try {
          orders= OrderStorage.loadOrdersForAll(); // load all order
       } catch (IOException e) {
@@ -1031,35 +1032,42 @@ static JLineMenu saveReceipt;
             // Daily Report
              userDate = getUserDateInput("Please enter the date (YYYY-MM-DD):");
              dateChecker.setDailyReport(userDate);
+              report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
         }  case 1 -> {
             // Monthly Report
           YearMonth yearMonth = getUserYearMonthInput("Please enter the month (YYYY-MM):");
 LocalDate anyDayInMonth = yearMonth.atDay(1);
 dateChecker.setMonthlyReport(anyDayInMonth);
-
+ report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
         } case 2 -> {
             // Yearly Report
          int year = getUserYearInput("Please enter the year (e.g., 2024):");
     LocalDate firstDayOfYear = LocalDate.of(year, 1, 1);
     dateChecker.setYearlyReport(firstDayOfYear);
+     report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
         }  case 3 -> {
             // Customize Report
 
             LocalDate startDate = getUserDateInput("Please enter the START date (YYYY-MM-DD):");
             LocalDate endDate = getUserDateInput("Please enter the END date (YYYY-MM-DD):");
             dateChecker.setCustomizeReport(startDate, endDate);
+             report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
         }
+        
+        case 4 -> {
+            // analysiscustomer
+
+           report.generateUserRanking(orders);
+        }
+        
          default -> {
                 continue;
             }
         }
         
 
-
-        // generate sales report
-        Report report = new Report();
         
-        report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
+       
         System.out.println();
 JLineMenu.waitMsg();
                 int continueOrNot = quitOrContinue.drawMenu();
@@ -1068,8 +1076,11 @@ JLineMenu.waitMsg();
                 }
        
         }
+    
  
   }
+  
+  
   
   public static int getUserYearInput(String prompt) {
     Scanner scan = new Scanner(System.in);
