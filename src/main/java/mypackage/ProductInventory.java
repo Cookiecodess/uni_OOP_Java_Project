@@ -4,8 +4,8 @@
  */
 package mypackage;
 
-import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.*;
+// import java.util.ArrayList;
 
 
 /**
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class ProductInventory {
 
     // Maps ProductID to Product. Speeds up searching by productID.
-    private HashMap<Integer, Product> productsMap = new HashMap<>();
+    private Map<Integer, Product> productsMap = new HashMap<>();
     private ArrayList<Product> products = new ArrayList<>();
     private ArrayList<ProductCategory> categories = new ArrayList<>();
 
@@ -61,7 +61,7 @@ public class ProductInventory {
                 25,
                 keyboards,
                 "Black",
-                "Compact layout with RGB, hot-swappable, and no regrets."
+                "Compact layout with RGB, hot-swappable, and no regrets.", false
         );
 
         Product tklKeyboard = new Product(
@@ -70,7 +70,7 @@ public class ProductInventory {
                 15,
                 keyboards,
                 "White",
-                "Full function row without the numpad – for true WASD warriors."
+                "Full function row without the numpad – for true WASD warriors.", false
         );
 
         Product orthoBoard = new Product(
@@ -79,7 +79,7 @@ public class ProductInventory {
                 10,
                 keyboards,
                 "Navy Blue",
-                "Grid layout keyboard that will ruin and then improve your typing forever."
+                "Grid layout keyboard that will ruin and then improve your typing forever.", false
         );
 
         Product screamingKeyboard = new Product(
@@ -88,7 +88,7 @@ public class ProductInventory {
                 5,
                 keyboards,
                 "Neon Green",
-                "Plays a Wilhelm scream every time you hit Backspace. Unnecessary? Yes. Perfect? Also yes."
+                "Plays a Wilhelm scream every time you hit Backspace. Unnecessary? Yes. Perfect? Also yes.", false
         );
 
         // Switches category
@@ -98,7 +98,7 @@ public class ProductInventory {
                 100,
                 switches,
                 "Red",
-                "Linear switches with smooth actuation and zero drama."
+                "Linear switches with smooth actuation and zero drama.", false
         );
 
         Product gateronSet = new Product(
@@ -107,7 +107,7 @@ public class ProductInventory {
                 80,
                 switches,
                 "Yellow",
-                "Smooth like butter. Ideal for fast typists and casual butter fans."
+                "Smooth like butter. Ideal for fast typists and casual butter fans.", false
         );
 
         Product silentU4 = new Product(
@@ -116,7 +116,7 @@ public class ProductInventory {
                 30,
                 switches,
                 "White",
-                "Silky smooth and dead quiet – your coworkers will thank you."
+                "Silky smooth and dead quiet – your coworkers will thank you.", false
         );
 
         Product chaosSwitches = new Product(
@@ -125,7 +125,7 @@ public class ProductInventory {
                 20,
                 switches,
                 "Rainbow",
-                "100 random switches. No guarantees. You might cry. Or find enlightenment."
+                "100 random switches. No guarantees. You might cry. Or find enlightenment.", false
         );
 
         // Keycaps category
@@ -135,7 +135,7 @@ public class ProductInventory {
                 60,
                 keycaps,
                 "Black/White",
-                "Durable legends and a crispy feel. Not edible, we checked."
+                "Durable legends and a crispy feel. Not edible, we checked.", false
         );
 
         Product artisanDragon = new Product(
@@ -144,7 +144,7 @@ public class ProductInventory {
                 12,
                 keycaps,
                 "Purple",
-                "Resin masterpiece that intimidates nearby switches."
+                "Resin masterpiece that intimidates nearby switches.", false
         );
 
         Product gmkOcean = new Product(
@@ -153,7 +153,7 @@ public class ProductInventory {
                 8,
                 keycaps,
                 "Teal",
-                "Premium feel, deep sea vibes. Costs as much as an actual vacation."
+                "Premium feel, deep sea vibes. Costs as much as an actual vacation.", false
         );
 
         Product bananaKeycap = new Product(
@@ -162,7 +162,7 @@ public class ProductInventory {
                 6,
                 keycaps,
                 "Yellow",
-                "Glows. Peels. Has no business being this cute."
+                "Glows. Peels. Has no business being this cute.", false
         );
 
         // Accessories and modding tools
@@ -172,7 +172,7 @@ public class ProductInventory {
                 50,
                 accessories,
                 "Silver",
-                "Everything you need to make your switches thicc and smooth."
+                "Everything you need to make your switches thicc and smooth.", false
         );
 
         Product stabilizerSet = new Product(
@@ -181,7 +181,7 @@ public class ProductInventory {
                 40,
                 accessories,
                 "Black",
-                "Reduces rattle. Increases happiness. Science."
+                "Reduces rattle. Increases happiness. Science.", false
         );
 
         Product coiledCable = new Product(
@@ -190,7 +190,7 @@ public class ProductInventory {
                 35,
                 accessories,
                 "Electric Blue",
-                "Braided, detachable, and 100% cooler than necessary."
+                "Braided, detachable, and 100% cooler than necessary.", false
         );
 
         Product modderStarterPack = new Product(
@@ -199,7 +199,7 @@ public class ProductInventory {
                 10,
                 accessories,
                 "Various",
-                "Includes lube, opener, tweezers, and a playlist of Lo-Fi typing sounds."
+                "Includes lube, opener, tweezers, and a playlist of Lo-Fi typing sounds.", false
         );
 
         // Storage and protection
@@ -209,7 +209,7 @@ public class ProductInventory {
                 40,
                 storage,
                 "Grey",
-                "Protects your keyboard like it’s the crown jewels. Foam included."
+                "Protects your keyboard like it’s the crown jewels. Foam included.", false
         );
 
         Product deskmatCat = new Product(
@@ -218,7 +218,7 @@ public class ProductInventory {
                 22,
                 storage,
                 "Pastel Pink",
-                "Adorable, soft, and dangerously distracting."
+                "Adorable, soft, and dangerously distracting.", false
         );
 
         Product dustCover = new Product(
@@ -227,7 +227,7 @@ public class ProductInventory {
                 45,
                 storage,
                 "Clear",
-                "Keeps out dust, crumbs, and the judgment of non-keyboard people."
+                "Keeps out dust, crumbs, and the judgment of non-keyboard people.", false
         );
 
         Product keyboardArmor = new Product(
@@ -236,7 +236,7 @@ public class ProductInventory {
                 2,
                 storage,
                 "Titanium",
-                "Overkill? Yes. Will it survive a fall from space? Probably."
+                "Overkill? Yes. Will it survive a fall from space? Probably.", false
         );
 
         // Add all Product object to the productsMap hashmap
@@ -327,6 +327,15 @@ public class ProductInventory {
     public int getProductCount() {
         return productsMap.size();
     }
+
+    public void updateProduct(Product product) {
+        if (!productsMap.containsKey(product.getId())) {
+            // if given Product's ID cannot be found, do nothing
+            return;
+        }
+        productsMap.put(product.getId(), product); // auto-replace the old Product with the new one
+        productsMap = new TreeMap<>(productsMap); // sort by key
+    }
     
     //========================= Category methods 
     public ArrayList<ProductCategory> getAllCategories() {
@@ -343,6 +352,15 @@ public class ProductInventory {
     
     public ProductCategory getCategoryByIndex(int index) {
         return this.categories.get(index);
+    }
+
+    public ProductCategory getCategoryByName(String name) {
+        for (ProductCategory c : this.categories) {
+            if (c.getName().equalsIgnoreCase(name)) {
+                return c;
+            }
+        }
+        return null;
     }
     
     

@@ -41,8 +41,8 @@ import static mypackage.TestMain.scanner;
 //     )
 
 public class JLineMenu {
-    // static final String SAV_CUR = "\033[s"; // save cursor position
-    // static final String RST_CUR = "\033[u"; // restore cursor position
+    static final String SAV_CUR = "\u001B[s"; // save cursor position
+    static final String RST_CUR = "\u001B[u"; // restore cursor position
     // static final String CLEAR_LINE_CUR_TIL_END = "\033[K"; // clear from cursor
     // until end of line
     public static final String HIDE_CUR = "\033[?25l";
