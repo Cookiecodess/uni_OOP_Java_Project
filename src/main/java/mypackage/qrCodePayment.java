@@ -54,7 +54,15 @@ public boolean validation() {
          System.out.println("Payment Method\t: "+getPaymentMethod());
         System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getGrandTotal())+JLineMenu.RESET);
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
-         System.out.println("===============================================");
+         
+          System.out.println("-------------------------------------------------------------------\n");
+
+        for (OrderItem item : order.getItems()) {
+            System.out.printf("%-30s %-10d RM%-8.2f%n",item.getProduct().getName(),item.getQuantity(),item.getSubtotal());
+        }
+      
+         System.out.println("===================================================================");
+         
          JLineMenu.waitMsg();
    
     };
@@ -83,6 +91,12 @@ try {
         writeReceipt.write("Payment Method\t: "+getPaymentMethod()+"\n");
         writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", order.getGrandTotal())+"\n");
         writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
+        writeReceipt.write("============================================\n");
+
+        for (OrderItem item : order.getItems()) {
+            writeReceipt.write(item.getProduct().getName()+"\t"+item.getQuantity()+"\t"+item.getSubtotal()+"\n");
+        }
+         writeReceipt.write("============================================\n");
     }
             
             System.out.println(JLineMenu.GREEN+"The receipt is generate successfully!"+JLineMenu.RESET);

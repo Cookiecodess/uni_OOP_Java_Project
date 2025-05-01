@@ -1029,7 +1029,7 @@ public class Main {
                 System.out.println(JLineMenu.GREEN + "Successful!" + JLineMenu.RESET);
                 JLineMenu.waitMsg();
                 JLineMenu.clearScreen();
-                JLineMenu.printHeader("Receipt", 20);
+                JLineMenu.printHeader("Receipt", 30);
                 paymentO.generateReceipt(order);
 
                 int selection = saveReceipt.drawMenu();
@@ -1041,7 +1041,7 @@ public class Main {
                     JLineMenu.waitMsg();
                 }
 
-                shouldExit = true;
+                
 
                 shouldExit = true;
             } else {

@@ -1,8 +1,13 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: 86e8261f
-Payment Method	: Online Banking
-Bank		: Hong Leong Bank
-Amount		: RM 445.15
-Date		: 2025-05-01 18:08:36
+Order ID	: ff657cbf
+Payment Method	: Card
+Bank		: CIMB Bank
+Amount		: RM 137.42
+Date		: 2025-05-01 19:43:24
+============================================
+Acrylic Dust Cover	1	12.99
+60% Mechanical Keyboard	1	79.99
+Artisan Keycap - RGB Banana	1	16.66
+============================================

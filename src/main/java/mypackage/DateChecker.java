@@ -35,6 +35,12 @@ public class DateChecker {
 
     // set Custom Report date domain
     public void setCustomizeReport(LocalDate start, LocalDate end) {
+         if (start.isAfter(end)) {
+        // automatic change if user input up sidedown
+        LocalDate temp = start;
+        start = end;
+        end = temp;
+    }
         this.startDate = start;
         this.endDate = end;
     }
