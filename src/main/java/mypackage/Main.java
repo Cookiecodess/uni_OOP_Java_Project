@@ -27,14 +27,15 @@ package mypackage;
 //          Caused by: java.lang.NoClassDefFoundError: org/jline/terminal/Terminal
 //     )
 import java.io.IOException;
-import java.util.Scanner;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
+// import java.util.Scanner;
+// import java.util.List;
+// import java.util.ArrayList;
+// import java.util.Comparator;
+// import java.util.Map;
 import static mypackage.JLineMenu.terminal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Map;
 
 /**
  *
@@ -67,7 +68,9 @@ public class Main {
         inventory.init();
     }
 static JLineMenu saveReceipt;
-    public static void main(String[] args) {      
+    public static void main(String[] args) {  
+        // temp, for debugging
+        editProductMenu();    
         
         inventory = new ProductInventory();
         inventory.init();
@@ -146,6 +149,7 @@ static JLineMenu saveReceipt;
 
         options.clear();
         options.add("Add New Products");
+        options.add("Edit Products");
         options.add("View Pending Orders");
         options.add("Change Account Details");
         options.add("Add Other Admin");
@@ -273,7 +277,7 @@ static JLineMenu saveReceipt;
             if (selection == -1) {
                 break;
             }
-            if (selection == 6) {
+            if (selection == 8) {
                 currentAdmin = null;
                 break;
             }
@@ -284,32 +288,33 @@ static JLineMenu saveReceipt;
                 }
 
                 case 1 -> {
-                    break;
-                }
-
-                case 2 -> {
-                    updateInfo("admin");
+                    editProductMenu();
                     break;
                 }
 
                 case 3 -> {
+                    updateInfo("admin");
+                    break;
+                }
+
+                case 4 -> {
                     //register admin
                     register("admin");
                     break;
                 }
 
-                case 4 -> {
+                case 5 -> {
                     //suspend customer
                     suspend(true);
                     break;
                 }
 
-                case 5 -> {
+                case 6 -> {
                     //unsuspend customer
                     suspend(false);
                     break;
                 }
-                case 6 -> {
+                case 7 -> {
                     //report();
                     break;
                 }
@@ -1268,6 +1273,179 @@ static JLineMenu saveReceipt;
                 }
             });
         });
+    }
+
+    private static void editProductMenu() {
+        List<Product> products = inventory.getAllProducts();
+        List<MenuItem> menuItems = new ArrayList<>(products);
+
+        OOMenu editProductMenu = new OOMenu("Edit Products", menuItems, "Select a product to edit.", true, false);
+        editProductMenu.ignoreDisabled(true); // so that admin can select discontinued/zero-stock products
+
+        String message = "";
+        while (true) {
+            products = inventory.getAllProducts(); // update view of products
+            // products.sort(Comparator.comparing(Product::getName)); // Sort alphabetically by name
+            menuItems = new ArrayList<>(products);
+            editProductMenu.setOptions(menuItems);
+
+            int selection = editProductMenu.drawMenu(message);
+            if (selection == JLineMenu.BACK_OPTION) {
+                return;
+            }
+
+            boolean isChangesMade = editProductPage(products.get(selection));
+            if (isChangesMade) {
+                message = "Product details updated.";
+            } else {
+                message = "No changes made.";
+            }
+        }
+    }
+
+    private static boolean editProductPage(Product product) {
+        Product productBuffer = (Product) product.clone();
+
+        boolean showInvalidMsg = false;
+        while (true) {
+            JLineMenu.clearScreen();
+
+            printProductDetails(productBuffer);
+            System.out.print("\n\n");
+
+            if (showInvalidMsg) {
+                System.out.println("Invalid input. Try again.");
+            }
+            showInvalidMsg = false;
+
+            System.out.print("Select a number to edit a field (enter 'b' to cancel and go back): ");
+            String input = scanner.nextLine();
+            if (input.equalsIgnoreCase("b")) {
+                return false;
+            } else if (!Helper.isPositiveInt(input)) {
+                showInvalidMsg = true;
+                continue;
+            }
+            int selection = Integer.valueOf(input);
+            selection--; // normalize for index
+            switch (selection) {
+                case 0: 
+                    System.out.println("Sorry, you can't change the ID!");
+                    JLineMenu.waitMsg();
+                    continue;
+                case 1:
+                    System.out.print("Enter new name: ");
+                    productBuffer.setName(scanner.nextLine());
+                    break;
+                case 2:
+                    // System.out.println("Enter new price: RM ");
+                    double newPrice = Helper.getNextDoubleInput(scanner, "Enter new price: RM ");
+                    productBuffer.setPrice(newPrice);
+                    break;
+                case 3:
+                    int newStock = Helper.getNextIntInput(scanner, "Enter new stock: ", true);
+                    productBuffer.setStock(newStock);
+                    break;
+                case 4:
+                    ProductCategory newCategory;
+                    List<MenuItem> categories = new ArrayList<>(inventory.getAllCategories());
+                    DropdownMenu categorySelection = new DropdownMenu(categories, "Select a category: ");
+
+                    int selected = categorySelection.draw();
+                    newCategory = (ProductCategory) categories.get(selected);
+                    // while (true) {
+
+                    //     System.out.print(Helper.CLR_LINE + "Enter new category: ");
+                    //     newCategory = inventory.getCategoryByName(scanner.nextLine());
+                    //     if (newCategory != null) {
+                    //         break;
+                    //     }
+                    //     System.out.println("No such category. Try again.");
+
+                    //     Table categoryTable = new Table(2, 5);
+                    //     List<ProductCategory> categories = inventory.getAllCategories();
+                    //     for (ProductCategory category : categories) {
+                    //         categoryTable.add(category.getName(), category.getDescription());
+                    //     }
+                    //     categoryTable.print();
+
+                    //     int columnsFromPrompt = categories.size() + 1;
+                    //     System.out.print(Helper.CUR_UP.repeat(columnsFromPrompt)); // move cursor up to the line with the prompt, so that in next iteration of this loop, we can clear the line with prompt and reprint the prompt
+                    // }
+                    productBuffer.setCategory(newCategory);
+                    break;
+                case 5:
+                    System.out.println("Enter new color: ");
+                    String newColor = scanner.nextLine();
+                    productBuffer.setColor(newColor);
+                    break;
+                case 6:
+                    System.out.println("Enter new description: ");
+                    String newDesc = scanner.nextLine();
+                    productBuffer.setDescription(newDesc);
+                    break;
+                case 7:
+                    // scanner.nextLine();
+                    String statusAfterToggle = productBuffer.isDiscontinued() ? "On sale" : "Discontinued";
+                    System.out.println("Change to '"+statusAfterToggle+"'? (y/n)");
+                    String response = scanner.nextLine();
+                    if (!response.equalsIgnoreCase("y")) {
+                        break;
+                    }
+                    productBuffer.toggleDiscontinuation();
+                    break;
+                default:
+                    showInvalidMsg = true;
+                    continue;
+            }
+
+            JLineMenu.clearScreen();
+
+            printProductDetails(productBuffer);
+            System.out.print("\n\n");
+
+            System.out.println("[c]onfirm changes, keep [e]diting, or [d]iscard changes?");
+            while (true) {
+                System.out.print(Helper.CLR_LINE + JLineMenu.SAV_CUR + "> ");
+
+                String response = (scanner.nextLine()).toLowerCase();
+                if (response.equals("c")) {
+                    inventory.updateProduct(productBuffer);
+                    // product = productBuffer;
+                    // inventory.replaceProduct(product, productBuffer);
+                    return true;
+                } else if (response.equals("e")) {
+                    break;
+                } else if (response.equals("d")) {
+                    return false;
+                }
+
+                System.out.print("Invalid input. Please try again.");
+                System.out.print(JLineMenu.RST_CUR);
+            }
+
+        }
+        // Display product info and let user choose which field they'd like to change
+
+        // If user selects a field, 
+
+        // return false;
+    }
+
+    public static void printProductDetails(Product product) {
+        Table productDetailsTable = new Table(2, 5);
+        productDetailsTable.add("ID", String.valueOf(product.getId()));
+        productDetailsTable.add("Name", product.getName());
+        productDetailsTable.add("Price", "RM " + String.valueOf(product.getPrice()));
+        productDetailsTable.add("Stock", String.valueOf(product.getStock()));
+        productDetailsTable.add("Category", product.getCategory().getName());
+        productDetailsTable.add("Color", product.getColor());
+        productDetailsTable.add("Description", product.getDescription());
+        String status = product.isDiscontinued() ? "Discontinued" : "On sale";
+        productDetailsTable.add("Status", status);
+
+        productDetailsTable.setIndex(true);
+        productDetailsTable.print();
     }
 }
 

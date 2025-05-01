@@ -182,6 +182,7 @@ public class OOMenu {
     // private MenuBottomContent bottomContent;
     private boolean hasBackOption;
     private boolean hasExitOption;
+    private boolean ignoreDisabled;
 
     int firstItemIdx = 0;
     int currentSelection; // want to access in subclass
@@ -198,6 +199,7 @@ public class OOMenu {
         // this.bottomContent = bottomContent;
         this.hasBackOption = hasBackOption;
         this.hasExitOption = hasExitOption;
+        this.ignoreDisabled = false; // by default, make disabled selections non-selectable
 
         // for (MenuItem option : options) {
         //     this.optionLabels.add(option.getItemLabel());
@@ -228,7 +230,7 @@ public class OOMenu {
             if (i == currentSelection) {
                 // Highlight currentSelection item
                 terminal.writer().println("\u001b[7m> " + this.options.get(i).getItemLabel() + "\u001b[0m");
-            } else if (this.options.get(i).isDisabled()) {
+            } else if (!ignoreDisabled && this.options.get(i).isDisabled()) {
                 terminal.writer().println(DISABLED_COLOR + "  " + this.options.get(i).getItemLabel() + RESET);
             } else {
                 terminal.writer().println("  " + this.options.get(i).getItemLabel());
@@ -251,13 +253,13 @@ public class OOMenu {
     public void moveCursorUp() {
         do {
             currentSelection = (currentSelection - 1 + this.numOfOptions) % this.numOfOptions;
-        } while (this.options.get(currentSelection).isDisabled());
+        } while (!ignoreDisabled && this.options.get(currentSelection).isDisabled());
     }
 
     public void moveCursorDown() {
         do {
             currentSelection = (currentSelection + 1) % this.numOfOptions;
-        } while (this.options.get(currentSelection).isDisabled());
+        } while (!ignoreDisabled && this.options.get(currentSelection).isDisabled());
     }
 
     public void onLeft() {
@@ -438,6 +440,15 @@ public class OOMenu {
     // Getters and setters
     public void setOptions(List<MenuItem> options) {
         this.options = options;
+
+        if (hasBackOption) {
+            this.options.add(BACK);
+        }
+        if (hasExitOption) {
+            this.options.add(EXIT);
+        }
+
+        this.numOfOptions = this.options.size();
     }
 
     public int getCurrentSelection() {
@@ -454,6 +465,10 @@ public class OOMenu {
 
     public void setNumOfOptions(int numOfOptions) {
         this.numOfOptions = numOfOptions;
+    }
+
+    public void ignoreDisabled(boolean trueOrFalse) {
+        this.ignoreDisabled = trueOrFalse;
     }
 
     public static void sound() {
