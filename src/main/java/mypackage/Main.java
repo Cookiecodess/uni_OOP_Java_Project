@@ -1160,44 +1160,49 @@ JLineMenu.waitMsg();
     
     //gets View Cart menu, has X(Cart Items) + 2 Choices (Place Order & Back)
     public static void viewCart() {
-        while (true) {
-            // Build dynamic options
-            ArrayList<String> options = new ArrayList<>();
+    while (true) {
+        // Build dynamic options
+        ArrayList<String> options = new ArrayList<>();
 
-            // 1. Add cart items as selectable options
-            currentCust.getCartItems().forEach((product, qty) -> {
-                options.add(String.format("%s x%d (RM %.2f)", 
-                    product.getName(), qty, product.getPrice() * qty));
-            });
+        // 1. Add cart items as selectable options
+        currentCust.getCartItems().forEach((product, qty) -> {
+            options.add(String.format("%s x%d (RM %.2f)", 
+                product.getName(), qty, product.getPrice() * qty));
+        });
 
-            // 2. Add standard buttons
-            if (!options.isEmpty()) options.add("Place Order");
-            options.add("Back");
-
-            // Display menu
-            JLineMenu cartMenu = new JLineMenu("Your Cart", options, 
-                options.isEmpty() ? "Your cart is empty" : "", 
-                false,  // Back is manually added
-                false
-            );
-
-            int selection = cartMenu.drawMenu();
-
-            // Handle selection
-            if (selection == JLineMenu.BACK_OPTION || 
-                selection == options.size() - 1) return; // Back
-
-            if (!options.isEmpty() && selection == options.size() - 2) {
-                System.out.print("Placeing Order Placeholder");
-                placeOrderFlow(); // NEWLY ADDED TO PLACE ORDER! 
-                continue;
-            }
-
-            // Item selected - show action menu
-            Product selectedProduct = (Product) currentCust.getCartItems().keySet().toArray()[selection];
-            editCartItem(selectedProduct);
+        // 2. Add standard buttons
+        boolean isEmpty = options.isEmpty();
+        if (!isEmpty) {
+            options.add("Place Order");
         }
+        options.add("Back");
+
+        // Display menu with clearer empty state handling
+        String description = isEmpty ? JLineMenu.RED + "Your cart is empty!" + JLineMenu.RESET 
+                                   : "Select an item to edit.";
+        
+        JLineMenu cartMenu = new JLineMenu("Your Cart", options, 
+            description,  // Now more visible
+            false,  // Back is manually added
+            false
+        );
+
+        int selection = cartMenu.drawMenu();
+
+        // Handle selection
+        if (selection == JLineMenu.BACK_OPTION || 
+            selection == options.size() - 1) return;
+
+        if (!isEmpty && selection == options.size() - 2) {
+            placeOrderFlow();
+            continue;
+        }
+
+        // Item selected - show action menu
+        Product selectedProduct = (Product) currentCust.getCartItems().keySet().toArray()[selection];
+        editCartItem(selectedProduct);
     }
+}
     
     //Selects an item, gets 3 choices: Edit Quantity, Remove Item, Back
     private static void editCartItem(Product product) {
