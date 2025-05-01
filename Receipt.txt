@@ -1,7 +1,13 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: 24d9c263
-Payment Method	: QR code Payment
-Amount		: RM 869.09
-Date		: 2025-05-01 15:29:20
+Order ID	: ff657cbf
+Payment Method	: Card
+Bank		: CIMB Bank
+Amount		: RM 137.42
+Date		: 2025-05-01 19:43:24
+============================================
+Acrylic Dust Cover	1	12.99
+60% Mechanical Keyboard	1	79.99
+Artisan Keycap - RGB Banana	1	16.66
+============================================

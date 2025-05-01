@@ -17,7 +17,7 @@ import java.io.FileNotFoundException;
  */
 public class CardPayment extends Payment{
     private static final String CARD_NUMBER = "1234 5678 1234 5678";
-    private static final String EXPIRE_DATE = "01/23";
+    private static final String EXPIRE_DATE = "12/34";
     private static final String CVV = "123";
     private final String bankName;
         public CardPayment(Order order,String bankName) {
@@ -28,7 +28,7 @@ public class CardPayment extends Payment{
          @Override
     public boolean validation(){
     Scanner scanner = new Scanner(System.in);
-JLineMenu.printHeader("Card Payment",20);
+JLineMenu.printHeader("Card Payment",30);
           
         System.out.print("Enter your Card Number (**** **** **** ****): ");
     String cNInput=scanner.nextLine();
@@ -42,7 +42,11 @@ JLineMenu.printHeader("Card Payment",20);
         System.out.println("Username and password cannot be empty.");
         return false;
     }
-    return cNInput.compareTo(CARD_NUMBER)==0 && eDinput.compareTo(EXPIRE_DATE)==0 && eDinput.compareTo(CVV)==0;
+        
+//        System.out.println( cNInput.compareTo(CARD_NUMBER)==0);
+//        System.out.println( eDinput.compareTo(EXPIRE_DATE)==0);
+//        System.out.println( cvvInput.compareTo(CVV)==0);
+    return cNInput.compareTo(CARD_NUMBER)==0 && eDinput.compareTo(EXPIRE_DATE)==0 && cvvInput.compareTo(CVV)==0;
     }
     
      @Override
@@ -64,7 +68,14 @@ JLineMenu.printHeader("Card Payment",20);
           System.out.println("Bank\t\t: "+bankName);
         System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getGrandTotal())+JLineMenu.RESET);
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
-         System.out.println("===============================================");
+         
+         System.out.println("-------------------------------------------------------------------\n");
+
+        for (OrderItem item : order.getItems()) {
+            System.out.printf("%-30s %-10d RM%-8.2f%n",item.getProduct().getName(),item.getQuantity(),item.getSubtotal());
+        }
+      
+         System.out.println("===================================================================");
          JLineMenu.waitMsg();
     };
  @Override
@@ -89,6 +100,13 @@ public void generatePrintableReceipt(Order order){
                    writeReceipt.write("Bank\t\t: "+bankName+"\n");
                 writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", order.getGrandTotal())+"\n");
                 writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
+       
+        writeReceipt.write("============================================\n");
+
+        for (OrderItem item : order.getItems()) {
+            writeReceipt.write(item.getProduct().getName()+"\t"+item.getQuantity()+"\t"+item.getSubtotal()+"\n");
+        }
+         writeReceipt.write("============================================\n");
             }
 
                     System.out.println(JLineMenu.GREEN+"The receipt is generate successfully!"+JLineMenu.RESET);

@@ -41,6 +41,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import org.jline.console.impl.JlineCommandRegistry;
 
@@ -73,13 +76,37 @@ public class Main {
     // Here, these 2 is used to store Payment Method with/without Bank Name.
     private static String lastPaymentMethod;
     private static String lastBankName;
-
-    // Initialize Productinventory. Can be accessed anywhere in this project.
+    private static String hwid;
+    
     public static ProductInventory inventory;
     static {
         // initialize product inventory
         inventory = new ProductInventory();
         inventory.init();
+        
+        //getting the current HWID
+        try{
+            Process process = Runtime.getRuntime().exec("wmic csproduct get UUID");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            
+            String line;
+            boolean firstLineSkipped = false;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (!firstLineSkipped) {
+                    firstLineSkipped = true; // Skip header
+                    continue;
+                }
+                if (!line.isEmpty()) {
+                    hwid = line;
+                    break;
+                }
+            }
+        }catch (Exception e) {
+            hwid = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF";
+        }
+        
+        
     }
 
     public static void main(String[] args) {
@@ -161,6 +188,8 @@ public class Main {
         options.add("View Pending Orders");
         options.add("Change Account Details");
         options.add("Add Other Admin");
+        options.add("Suspend Admin");
+        options.add("Un-Suspend Admin");
         options.add("Suspend Customer");
         options.add("Un-Suspend Customer");
         options.add("View Report");
@@ -285,7 +314,7 @@ public class Main {
             if (selection == -1)
                 break;
 
-            if (selection == 8) {
+            if (selection == 10) {
                 currentAdmin = null;
                 break;
             }
@@ -317,25 +346,37 @@ public class Main {
                     register("admin");
                     break;
                 }
-
+                
                 case 5 -> {
-                    // suspend customer
-                    suspend(true);
+                    //suspend admin
+                    suspendAdmin(true);
                     break;
                 }
 
                 case 6 -> {
-                    // unsuspend customer
+                    //unsuspend admin
+                    suspendAdmin(false);
+                    break;
+                }
+                
+                case 7 -> {
+                    //suspend customer
+                    suspend(true);
+                    break;
+                }
+
+                case 8 -> {
+                    //unsuspend customer
                     suspend(false);
                     break;
                 }
-                case 7 -> {
-
-                    try {
-                        reportPage();
-                    } catch (IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                case 9 -> {
+                   
+                try {
+                    reportPage();
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
                     break;
                 }
 
@@ -399,6 +440,7 @@ public class Main {
         String address;
         String birthdate;
         String gender;
+        ArrayList<String> bannedHWID = AuthServices.getBannedHWID();
 
         if (type.equals("admin") && !currentAdmin.isMain()) {
             System.out.println(JLineMenu.RED + "Access Denied!" + JLineMenu.RESET);
@@ -406,13 +448,20 @@ public class Main {
             scanner.nextLine();
             return;
         }
+        
+        else if(type.equals("customer") && bannedHWID.contains(hwid)){
+            System.out.println(JLineMenu.RED+"You Have Been Banned!"+JLineMenu.RESET);
+            System.out.print("Press Enter To Go Back....");
+            scanner.nextLine();
+            return;
+        }
 
         // Username
         while (true) {
-            System.out.print("Enter a username: ");
+            System.out.print("Enter a username (-999 to go back): ");
             username = scanner.next();
             scanner.nextLine(); // flush
-
+            if(username.equals("-999")) return;
             if (!username.isEmpty() && !usernames.contains(username) && !username.matches(".*[^a-zA-Z0-9].*")) {
                 break;
             } else if (username.matches(".*[^a-zA-Z0-9].*")) {
@@ -576,14 +625,71 @@ public class Main {
         }
 
         if (type.equals("customer")) {
-            AuthServices.register(username, password, name, email, phoneNumber, address, birthdate, gender);
+            AuthServices.register(username, password, name, email, phoneNumber, address, birthdate, gender, hwid);
         } else {
-            AuthServices.registerAdmin(username, password, name, email, phoneNumber, address, birthdate, gender);
+            AuthServices.registerAdmin(username, password, name, email, phoneNumber, address, birthdate, gender, hwid);
         }
 
     }
+    
+    public static void suspendAdmin(boolean suspended){
+        JLineMenu.clearScreen();
+        String[] details;
+        int UID;
+        String action = "suspend";
+        if (!suspended) {
+            action = "unsuspend";
+        }
 
-    public static void suspend(boolean suspended) {
+        while (true) {
+            System.out.print("Enter a UID to " + action + " (-999 to exit): ");
+            try {
+                UID = scanner.nextInt();
+                scanner.nextLine();
+                if (UID == -999) {
+                    break;
+                }
+            } catch (Exception e) {
+                JLineMenu.clearScreen();
+                scanner.nextLine();
+                System.out.println("Invalid UID! \n");
+                continue;
+            }
+
+            //checking if the uid exists
+            if ((details = AuthServices.getUserDetails(UID)) != null && (!details[9].equals("customer") && !details[9].equals("main"))) {
+                JLineMenu.clearScreen();
+                System.out.println("-----------USER INFORMATION-----------");
+                System.out.println("Username: " + details[0]);
+                System.out.println("Name: " + details[3]);
+                System.out.println("UID: " + details[2]);
+                System.out.println("Role: " + details[9]);
+                System.out.println("Status: " + details[10]);
+                System.out.print("Are you sure you want to " + action + "? Y(es) N(o): ");
+                char selection = scanner.next().charAt(0);
+
+                scanner.nextLine();
+
+                switch (selection) {
+                    case 'y':
+                    case 'Y':
+                        AuthServices.suspend(UID, suspended);
+                        JLineMenu.clearScreen();
+                        System.out.println("Status Updated!\n");
+                        break;
+                    default:
+                        JLineMenu.clearScreen();
+                        break;
+                }
+
+            } else {
+                JLineMenu.clearScreen();
+                System.out.println("User Does not Exist!\n");
+            }
+        }
+    }
+    
+    public static void suspend(boolean suspended){
         JLineMenu.clearScreen();
         String[] details;
         int UID;
@@ -924,7 +1030,7 @@ public class Main {
                 System.out.println(JLineMenu.GREEN + "Successful!" + JLineMenu.RESET);
                 JLineMenu.waitMsg();
                 JLineMenu.clearScreen();
-                JLineMenu.printHeader("Receipt", 20);
+                JLineMenu.printHeader("Receipt", 30);
                 paymentO.generateReceipt(order);
 
                 int selection = saveReceipt.drawMenu();
@@ -936,7 +1042,7 @@ public class Main {
                     JLineMenu.waitMsg();
                 }
 
-                shouldExit = true;
+                
 
                 shouldExit = true;
             } else {
@@ -1526,63 +1632,116 @@ public class Main {
             }
         }
     }
-
-    // Customer view their made orders.
+  
+    //Customer view their made orders.
+    //Update: customers can clear all order history.
     public static void viewOrders() {
-        try {
-            List<Order> userOrders = OrderStorage.loadOrdersForUser(currentCust.getUID());
+        boolean shouldStayInMenu = true;
 
-            if (userOrders.isEmpty()) {
-                JLineMenu.clearScreen();
-                System.out.println("No orders made yet.");
-                JLineMenu.waitMsg();
-                return;
-            }
+        while (shouldStayInMenu) {
+            try {
+                List<Order> visibleOrders = OrderStorage.loadOrdersForUser(currentCust.getUID())
+                    .stream()
+                    .filter(order -> OrderVisibility.isVisible(order.getOrderId()))
+                    .collect(Collectors.toList());
 
-            ArrayList<String> options = new ArrayList<>();
-            for (int i = 0; i < userOrders.size(); i++) {
-                Order order = userOrders.get(i);
-                options.add(String.format("Order #%d - %s (RM %.2f)",
-                        i + 1,
-                        order.getFormattedOrderDate(),
+                ArrayList<String> options = new ArrayList<>();
+
+                // 1. Add order listings
+                for (int i = 0; i < visibleOrders.size(); i++) {
+                    Order order = visibleOrders.get(i);
+                    options.add(String.format("Order #%s - %s (RM %.2f)", 
+                        order.getOrderId(),
+                        order.getFormattedOrderDate(), 
                         order.getGrandTotal()));
-            }
+                }
 
-            JLineMenu ordersMenu = new JLineMenu("Your Orders", options,
-                    "Select an order to view details", true, false);
-            int selection = ordersMenu.drawMenu();
+                // 2. Add action buttons
+                if (!visibleOrders.isEmpty()) {
+                    options.add(JLineMenu.RED + "Hide All Visible Orders" + JLineMenu.RESET);
+                }
+                options.add("Back to Dashboard");
 
-            if (selection >= 0 && selection < userOrders.size()) {
-                displayOrderDetails(userOrders.get(selection));
+                JLineMenu ordersMenu = new JLineMenu(
+                    "Your Orders", 
+                    options,
+                    visibleOrders.isEmpty() ? 
+                        "No visible orders found" : 
+                        "Select an order to view details",
+                    false, 
+                    false
+                );
+
+                int selection = ordersMenu.drawMenu();
+
+                // Handle selection
+                if (selection == JLineMenu.BACK_OPTION || 
+                    selection == options.size() - 1) {
+                    shouldStayInMenu = false; // Exit loop
+                }
+                else if (!visibleOrders.isEmpty() && 
+                        selection == options.size() - 2) {
+                    // Hide Orders flow
+                    if (confirmHideHistory(visibleOrders.size())) {
+                        for (Order order : visibleOrders) {
+                            OrderVisibility.hideOrder(order.getOrderId(), currentCust.getUID());
+                        }
+                        System.out.println(JLineMenu.GREEN + "Orders hidden from view." + JLineMenu.RESET);
+                        JLineMenu.waitMsg();
+                        // Loop will restart and show updated list
+                    }
+                } 
+                else if (selection >= 0 && selection < visibleOrders.size()) {
+                    displayOrderDetails(visibleOrders.get(selection));
+                    // After viewing details, loop will restart
+                }
+            } catch (IOException e) {
+                System.out.println("Error: " + e.getMessage());
+                JLineMenu.waitMsg();
+                shouldStayInMenu = false;
             }
-        } catch (IOException e) {
-            System.out.println("Error loading orders: " + e.getMessage());
-            JLineMenu.waitMsg();
         }
     }
-
+    
+    //Used to Confirm Hide History
+    private static boolean confirmHideHistory(int orderCount) {
+        JLineMenu confirmMenu = new JLineMenu("Confirm", 
+            List.of(JLineMenu.RED + "Hide " + orderCount + " Orders" + JLineMenu.RESET, "Cancel"), 
+            "Are you sure? This willl clear your order history!", 
+            false, false);
+        return confirmMenu.drawMenu() == 0;
+    }
+    
+    //Used to Display Order Details
     private static void displayOrderDetails(Order order) {
-        JLineMenu.clearScreen();
-        JLineMenu.printHeader("Order #" + order.getOrderId(), 20);
+        // 1. Build the details string first
+        StringBuilder details = new StringBuilder();
+        details.append("Order ID\t: ").append(order.getOrderId()).append("\n");
+        details.append("Order Date\t: ").append(order.getFormattedOrderDate()).append("\n");
+        details.append("Status\t\t: ").append(order.getStatus()).append("\n");
+        details.append("Payment Method\t: ").append(order.getPaymentMethod()).append("\n\n");
 
-        System.out.println("Order Date: " + order.getFormattedOrderDate());
-        System.out.println("Status: " + order.getStatus());
-        System.out.println("Payment Method: " + order.getPaymentMethod());
-        System.out.println("-------------------------------------");
-
-        System.out.printf("%-30s %-10s %-10s%n", "Product", "Qty", "Subtotal");
-        System.out.println("-------------------------------------");
-
+        details.append("Items:\n");
+        details.append("-----------------------------------------------\n");
         for (OrderItem item : order.getItems()) {
-            System.out.printf("%-30s %-10d RM%-8.2f%n",
-                    item.getProduct().getName(),
-                    item.getQuantity(),
-                    item.getSubtotal());
+            details.append(String.format("%-30s %3d x RM%-6.2f = RM%-7.2f\n",
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getProduct().getPrice(),  // Unit price
+                item.getSubtotal()));          // Total for this line item
         }
+        details.append("-----------------------------------------------\n");
+        details.append(String.format("Grand Total: RM%.2f", order.getGrandTotal()));
 
-        System.out.println("\nGRAND TOTAL: \tRM " + String.format("%.2f", order.getGrandTotal()));
-        System.out.println("-------------------------------------");
-        JLineMenu.waitMsg();
+        // 2. Create a menu with the details as description
+        JLineMenu detailsMenu = new JLineMenu("Order Details",
+            List.of("Back to Orders"),
+            details.toString(),  // Show details here
+            false,
+            false);
+
+        // 3. Display and wait for user input
+        detailsMenu.drawMenu(); // Will stay until user presses Enter
     }
 
     // Section: Admin View Orders Menu
@@ -1641,11 +1800,11 @@ public class Main {
                 ArrayList<String> options = new ArrayList<>();
                 orders.forEach(order -> {
                     String userName = AuthServices.getUserDetails(order.getUserId())[3];
-                    options.add(String.format("Order #%s (%s, %s) - %s",
-                            order.getOrderId().substring(0, 6),
-                            userName,
-                            order.getFormattedOrderDate(),
-                            order.getStatus()));
+                    options.add(String.format("Order #%s (%s, %s) - %s", 
+                        order.getOrderId(),
+                        userName,
+                        order.getFormattedOrderDate(),
+                        order.getStatus()));
                 });
 
                 // Add sort options
