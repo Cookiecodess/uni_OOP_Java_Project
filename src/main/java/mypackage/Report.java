@@ -21,7 +21,7 @@ public class Report {
             return;
         }
   
-   System.out.printf("%-20s %-10s%n", "Product Naame", "Sales Quantity");//%-20s means 20 space
+   System.out.printf("%-50s %-10s%n", "Product Name", "Sales Quantity");//%-50s means 50 space
      Map<Product, Integer> productSalesMap = new HashMap<>();    
         //product  integer=total salse quantity
         //product a   10
@@ -34,24 +34,23 @@ public class Report {
    //calculate sales data
         for (Product product : productList) {
             int totalSales = 0;
-/////////////要有ifstatus is complete？
             for (Order order : orderList) {
-                // only consider the product between start date end date
-                //convert order's LocalDateTime to LocalDate
+               // if (!order.getStatus().equalsIgnoreCase("Complete")) continue;
+                        // only consider the product between start date end date
+                        //convert order's LocalDateTime to LocalDate
                 LocalDate orderDate = order.getOrderDate().toLocalDate();
                 if ((orderDate.isEqual(startDate) || orderDate.isAfter(startDate)) &&
                     (orderDate.isEqual(endDate) || orderDate.isBefore(endDate))) {
 
                     // 统计该产品的销售数量
-//                    for (OrderItem item : order.getOrderItems()) {
-//                        if (item.getProduct().equals(product)) {
-//                            totalSales += item.getQuantity();
-//                        }
+                    for (OrderItem item : order.getItems()) {
+                        if (item.getProduct().equals(product)) {
+                            totalSales += item.getQuantity();
+                        }
                     }
                 }
             }
-
-            //System.out.println("产品 " + product.getName() + " 销售数量: " + totalSales);
+            System.out.printf("%-50s %-10s%n",product.getName() ,totalSales);
         }
     }
-
+}

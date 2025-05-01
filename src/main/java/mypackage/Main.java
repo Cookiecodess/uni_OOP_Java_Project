@@ -33,10 +33,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import static mypackage.JLineMenu.terminal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -315,7 +318,12 @@ static JLineMenu saveReceipt;
                     break;
                 }
                 case 6 -> {
-                    //report();
+                   
+                try {
+                    reportPage();
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
                     break;
                 }
 
@@ -998,81 +1006,132 @@ static JLineMenu saveReceipt;
 
     }
 
-// 
-//  public static void reportPage(List<Order> orderList, List<Product> productList){
-//   
-//        DateChecker dateChecker = new DateChecker();
-//      
-//    while(true){
-//        int selection = payment.drawMenu();
-//            if (selection == JLineMenu.BACK_OPTION) {
-//                return;
-//            }
-//         
-//        LocalDate userDate;
-//        switch (selection) {
-//                case 0 -> {
-//            // Daily Report
-//             userDate = getUserDateInput("Please enter the date (YYYY-MM-DD):");
-//             dateChecker.setDailyReport(userDate);
-//        }  case 1 -> {
-//            // Monthly Report
-//           userDate = getUserDateInput("Please enter the month (YYYY-MM-DD):");
-//           
-//            dateChecker.setMonthlyReport(userDate);
-//        } case 2 -> {
-//            // Yearly Report
-//           userDate = getUserDateInput("Please enter the year (YYYY):");
-//            
-//            dateChecker.setYearlyReport(userDate);
-//        }  case 3 -> {
-//            // Customize Report
-//
-//            LocalDate startDate = getUserDateInput("Please enter the START date (YYYY-MM-DD):");
-//            LocalDate endDate = getUserDateInput("Please enter the END date (YYYY-MM-DD):");
-//            dateChecker.setCustomizeReport(startDate, endDate);
-//        }
-//         default -> {
-//                continue;
-//            }
-//        }
-//        
-//        // get the date domain
-//        LocalDate startDate = dateChecker.getStartDate();
-//        LocalDate endDate = dateChecker.getEndDate();
-//
-//        // 生成销售报告
-//        Report report = new Report();
-//        report.generateSalesReport(orderList, productList, startDate, endDate);
-//
-//                int continueOrNot = quitOrContinue.drawMenu();
-//                if (continueOrNot == JLineMenu.BACK_OPTION) {
-//                    return;
-//                }
-//        scanner.close();
-//        }
-// 
-//  }
- ////check the date is valid format or not
-// public static LocalDate getUserDateInput(String prompt) {
-//        LocalDate userDate = null;
-//        boolean validInput = false;
-//        Scanner scan = new Scanner(System.in);
-//        // continue loop until valid format
-//        while (!validInput) {
-//            System.out.println(prompt);
-//            String input = scan.next();
-//
-//            try {
-//                userDate = LocalDate.parse(input); //get the date
-//                validInput = true; // if no exception means is valid format
-//            } catch (DateTimeParseException e) {
-//                System.out.println("Invalid Format！Please try again");
-//            }
-//        }
-//        
-//        return userDate; // return valid date
-//    }
+ 
+  public static void reportPage() throws IOException{
+       List<Order> orders;
+       
+      try {
+         orders= OrderStorage.loadOrdersForAll(); // 加载全部订单
+      } catch (IOException e) {
+          System.out.println("Warning: Could not load orders - " + e.getMessage());
+          return;
+      }
+      
+        DateChecker dateChecker = new DateChecker();
+      
+    while(true){
+        int selection = reportSelection.drawMenu();
+            if (selection == JLineMenu.BACK_OPTION) {
+                return;
+            }
+         
+        LocalDate userDate;
+        switch (selection) {
+                case 0 -> {
+            // Daily Report
+             userDate = getUserDateInput("Please enter the date (YYYY-MM-DD):");
+             dateChecker.setDailyReport(userDate);
+        }  case 1 -> {
+            // Monthly Report
+          YearMonth yearMonth = getUserYearMonthInput("Please enter the month (YYYY-MM):");
+LocalDate anyDayInMonth = yearMonth.atDay(1);
+dateChecker.setMonthlyReport(anyDayInMonth);
+
+        } case 2 -> {
+            // Yearly Report
+         int year = getUserYearInput("Please enter the year (e.g., 2024):");
+    LocalDate firstDayOfYear = LocalDate.of(year, 1, 1);
+    dateChecker.setYearlyReport(firstDayOfYear);
+        }  case 3 -> {
+            // Customize Report
+
+            LocalDate startDate = getUserDateInput("Please enter the START date (YYYY-MM-DD):");
+            LocalDate endDate = getUserDateInput("Please enter the END date (YYYY-MM-DD):");
+            dateChecker.setCustomizeReport(startDate, endDate);
+        }
+         default -> {
+                continue;
+            }
+        }
+        
+
+
+        // generate sales report
+        Report report = new Report();
+        
+        report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
+JLineMenu.waitMsg();
+                int continueOrNot = quitOrContinue.drawMenu();
+                if (continueOrNot == JLineMenu.BACK_OPTION) {
+                    return ;
+                }
+       
+        }
+ 
+  }
+  
+  public static int getUserYearInput(String prompt) {
+    Scanner scan = new Scanner(System.in);
+    int year = 0;
+    boolean valid = false;
+
+    while (!valid) {
+        System.out.println(prompt);
+        String input = scan.next();
+        try {
+            year = Integer.parseInt(input);
+            if (year >= 1900 && year <= 2100) { // 你可以自己设定范围
+                valid = true;
+            } else {
+                System.out.println("Year out of range. Please try again.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid year format. Please enter a 4-digit year.");
+        }
+    }
+
+    return year;
+}
+  public static YearMonth getUserYearMonthInput(String prompt) {
+    Scanner scan = new Scanner(System.in);
+    YearMonth yearMonth = null;
+    boolean valid = false;
+
+    while (!valid) {
+        System.out.println(prompt);
+        String input = scan.next();
+        try {
+            yearMonth = YearMonth.parse(input); // 使用 YYYY-MM 格式
+            valid = true;
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid format! Please enter in YYYY-MM format.");
+        }
+    }
+
+    return yearMonth;
+}
+
+
+ //check the date is valid format or not
+ public static LocalDate getUserDateInput(String prompt) {
+        LocalDate userDate = null;
+        boolean validInput = false;
+        Scanner scan = new Scanner(System.in);
+        // continue loop until valid format
+        while (!validInput) {
+            System.out.println(prompt);
+            String input = scan.next();
+
+            try {
+                userDate = LocalDate.parse(input); //get the date
+                validInput = true; // if no exception means is valid format
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid Format！Please try again");
+            }
+        }
+        
+        return userDate; // return valid date
+    }
     
     public static void productMainMenu() {
         while (true) {
