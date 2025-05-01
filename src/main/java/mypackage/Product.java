@@ -33,6 +33,10 @@ public class Product implements MenuItem {
         this.description = description;
         this.isDiscontinued = isDiscontinued;
     }
+
+    public Product() {
+        this("", 0.0, 0, null, "", "", false);
+    }
     
     public void addStock(int amount) {
         this.stock += amount;
@@ -105,6 +109,14 @@ public class Product implements MenuItem {
     }
     
     // Getters and setters
+    public static int getNextId() {
+        return nextId;
+    }
+
+    public static void setNextId(int newNextId) {
+        nextId = newNextId;
+    }
+
     public int getId() {
         return id;
     }
@@ -179,7 +191,7 @@ public class Product implements MenuItem {
         Table productInfoTable = new Table(2, 4);
         productInfoTable.add("ID", String.valueOf(this.id));
         productInfoTable.add("Description", this.description);
-        productInfoTable.add("Unit Price", "RM "+String.valueOf(this.price));
+        productInfoTable.add("Unit Price", "RM "+String.format("%.2f", this.price));
         productInfoTable.add("Stock available", String.valueOf(this.stock));
         productInfoTable.add("Category", this.category.getName());
         productInfoTable.add("Color", this.color);

@@ -292,6 +292,7 @@ public class Main {
 
             switch (selection) {
                 case 0 -> {
+                    addProductPage();
                     break;
                 }
 
@@ -1794,7 +1795,7 @@ public class Main {
                     break;
                 case 2:
                     // System.out.println("Enter new price: RM ");
-                    double newPrice = Helper.getNextDoubleInput(scanner, "Enter new price: RM ");
+                    double newPrice = Helper.getNextDoubleInput(scanner, "Enter new price: RM ", true);
                     productBuffer.setPrice(newPrice);
                     break;
                 case 3:
@@ -1903,5 +1904,128 @@ public class Main {
 
         productDetailsTable.setIndex(true);
         productDetailsTable.print();
+    }
+
+    public static void addProductPage() {
+        final String backKey = "b";
+        final String SAV_CUR = JLineMenu.SAV_CUR; // save cursor position
+        final String RST_CUR = JLineMenu.RST_CUR; // restore cursor position
+        final String CLR_LN = Helper.CLR_LINE; // clear line and carriage return (move cursor to first column)
+        final String CUR_UP = Helper.CUR_UP; // move cursor one line up
+        
+        boolean showTempMsg = false;
+        String tempMsg = "";
+        
+        while (true) {
+
+            JLineMenu.clearScreen();
+    
+            Product newProduct = new Product();            
+            
+            JLineMenu.printHeader("Add New Product", JLineMenu.LEFT_RIGHT_PADDING);
+            
+            if (showTempMsg) {
+                System.out.println(tempMsg);
+                showTempMsg = false;
+            }
+            
+            System.out.println("Please enter the details of the new product. \nThe input fields will appear one at a time.\n");
+            System.out.println("To "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", enter '"+JLineMenu.YELLOW+backKey+JLineMenu.RESET+"' in any field. "+JLineMenu.RED+"\nPlease beware that doing this discards all details entered."+JLineMenu.RESET);
+            System.out.println();
+    
+            System.out.println("ID: " + newProduct.getId());
+            // Input name
+            System.out.print("Name: ");
+            String name = scanner.nextLine();
+            if (name.equalsIgnoreCase(backKey)) {
+                return;
+            }
+            newProduct.setName(name);
+    
+            // Input price
+            double price = Helper.getNextDoubleInputInterruptable(scanner, "Price: RM ", true, backKey);
+            if (price == Helper.INTRP) {
+                return;
+            } 
+            newProduct.setPrice(price);            
+    
+            // Input stock
+            int stock = Helper.getNextIntInputInterruptable(scanner, "Stock: ", true, backKey);
+            if (stock == Helper.INTRP) {
+                return;
+            } 
+            newProduct.setStock(stock);
+    
+            // Input category
+            ProductCategory category;
+            List<MenuItem> categories = new ArrayList<>(inventory.getAllCategories());
+            DropdownMenu categorySelection = new DropdownMenu(categories, "Category: ");
+    
+            int selected = categorySelection.draw();
+            category = (ProductCategory) categories.get(selected);
+            newProduct.setCategory(category);
+    
+            // Input color
+            System.out.print("Enter color: ");
+            String color = scanner.nextLine();
+            if (color.equalsIgnoreCase(backKey)) {
+                return;
+            }
+            newProduct.setColor(color);
+    
+            // Input description
+            System.out.println("Description: ");
+            String desc = scanner.nextLine();
+            if (desc.equalsIgnoreCase(backKey)) {
+                return;
+            }
+            newProduct.setDescription(desc);
+    
+            // Launch right now?
+            System.out.println(SAV_CUR+"Would you like to launch this product now? \nCustomers will be able to see this product right away.");
+            while (true) {
+                System.out.print("(y/n) > ");
+                String launchOrNot = scanner.nextLine();
+                if (launchOrNot.equalsIgnoreCase(backKey)) {
+                    return;
+                }
+                if (launchOrNot.equalsIgnoreCase("y")) {
+                    newProduct.reinstate();
+                    break;
+                } 
+                if (launchOrNot.equalsIgnoreCase("n")) {
+                    newProduct.discontinue();
+                    break;
+                } 
+                System.out.println("Invalid input. Please try again.");
+                System.out.print(CUR_UP+CUR_UP + CLR_LN); // move cursor back to the prompt line ("(y/n) > ") and clear that line
+            }
+            System.out.print(RST_CUR + CLR_LN); // move cursor back to the line with "Would you like to..." and clear that line
+            Helper.clearLinesBelow(20);
+            System.out.print(Helper.CUR_UP);
+            System.out.println("Status: " + (newProduct.isDiscontinued() ? "Discontinued" : "On sale"));
+    
+            System.out.println();
+            System.out.println("Enter 'yes' to add new product, 'no' to discard all changes and go back.");
+            while (true) {
+                System.out.print(SAV_CUR+"> ");
+                String confirm = scanner.nextLine();
+                if (confirm.equalsIgnoreCase("yes")) {
+                    inventory.addProduct(newProduct);
+                    showTempMsg = true;
+                    tempMsg = JLineMenu.GREEN + "Product added." + JLineMenu.RESET;
+                    break;
+                } 
+                if (confirm.equalsIgnoreCase("no")) {
+                    Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
+                    showTempMsg = true;
+                    tempMsg = "Product not added.";
+                    break;
+                } 
+                System.out.println("Invalid input. Please try again.");
+                System.out.print(RST_CUR + CLR_LN); // move cursor back to the prompt line ("(y/n) > ") and clear that line
+            }
+        }
+
     }
 }

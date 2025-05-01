@@ -23,7 +23,7 @@ public class DropdownMenu {
         while (true) {
             MenuItem currentItem = this.menuItems.get(currentSelection);
 
-            System.out.print(JLineMenu.SAV_CUR);
+            System.out.print(JLineMenu.SAV_CUR + Helper.CLR_LINE);
             System.out.print(prompt);
             System.out.println(JLineMenu.BOLD + currentItem.getItemLabel() + JLineMenu.RESET);
 
@@ -45,6 +45,7 @@ public class DropdownMenu {
                 handleKeyPress();
 
                 if (isItemSelected) {
+                    clearMenuItems();
                     return currentSelection;
                 }
 
@@ -105,6 +106,12 @@ public class DropdownMenu {
         System.out.print(JLineMenu.RST_CUR);
         // Clear line
         System.out.print(Helper.CLR_LINE);
+    }
+
+    public void clearMenuItems() {
+        System.out.print(JLineMenu.RST_CUR);
+        Helper.clearLinesBelow(20);
+        // System.out.print(Helper.CUR_DOWN);
     }
 
 }
