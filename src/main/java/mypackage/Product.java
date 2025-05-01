@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *
  * @author cookie
  */
-public class Product implements MenuItem{    
+public class Product implements MenuItem {    
     private int id;    
     private String name;
     private double price;
@@ -23,7 +23,7 @@ public class Product implements MenuItem{
     
     private static int nextId = 0; // initialize id with 0
     
-    public Product(String name, double price, int stock, ProductCategory category, String color, String description) {
+    public Product(String name, double price, int stock, ProductCategory category, String color, String description, boolean isDiscontinued) {
         this.id = nextId++; // id auto-increments
         this.name = name;
         this.price = price;
@@ -31,6 +31,7 @@ public class Product implements MenuItem{
         this.category = category;
         this.color = color;
         this.description = description;
+        this.isDiscontinued = isDiscontinued;
     }
     
     public void addStock(int amount) {
@@ -81,6 +82,26 @@ public class Product implements MenuItem{
      */
     public void discontinue() {
         this.isDiscontinued = true;
+    }
+
+    /**
+     * Make a Product available for sale again. Same as Product.disdiscontinue().
+     */
+    public void reinstate() {
+        this.isDiscontinued = false;
+    }
+    /**
+     * Undo the discontinuation of a Product. Same as Product.reinstate().
+     */
+    public void disdiscontinue() {
+        this.isDiscontinued = false;
+    }
+
+    /**
+     * Discontinue a Product if it's on sale, or reinstate it if it's discontinued.
+     */
+    public void toggleDiscontinuation() {
+        this.isDiscontinued = !this.isDiscontinued;
     }
     
     // Getters and setters
@@ -141,21 +162,37 @@ public class Product implements MenuItem{
         return "Product{" + "id=" + id + ", name=" + name + ", price=" + price + ", stock=" + stock + ", category=" + category + ", color=" + color + ", description=" + description + '}';
     }
 
+    // Object.clone() is protected, so to use clone() publicly, we must override it
+    @Override
+    public Product clone() {
+        Product clone = new Product(this.name, this.price, this.stock, this.category, this.color, this.description, this.isDiscontinued);
+        clone.id = this.id; // have to do this to override the auto-incrementing ID behavior
+        return clone;
+    }
+
     // METHODS FOR MenuItem INTERFACE ========================================
     public String getItemLabel() {
         return this.name;
     }
 
     public void printInfo() {
-        System.out.println("Description: \t\t"+this.description);
-        System.out.println("Unit Price: \t\tRM "+this.price);
-        System.out.println("Stock available: \t"+this.stock);
-        System.out.println("Category: \t\t"+this.category.getName());
-        System.out.println("Color: \t\t\t"+this.color);
+        Table productInfoTable = new Table(2, 4);
+        productInfoTable.add("ID", String.valueOf(this.id));
+        productInfoTable.add("Description", this.description);
+        productInfoTable.add("Unit Price", "RM "+String.valueOf(this.price));
+        productInfoTable.add("Stock available", String.valueOf(this.stock));
+        productInfoTable.add("Category", this.category.getName());
+        productInfoTable.add("Color", this.color);
+        String status = this.isDiscontinued ? "Discontinued" : "On sale";
+        productInfoTable.add("Status", status);
+
+        productInfoTable.print();
     }
 
     public boolean isDisabled() {
         return this.stock == 0 || this.isDiscontinued;
     }
+
+    
     
 }

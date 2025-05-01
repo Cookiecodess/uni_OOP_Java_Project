@@ -20,8 +20,9 @@
 //        initAllMenus();
 //        
 //        // Initialize inventory
-//        ProductInventory inv = new ProductInventory();        
-//        inv.init();
+//        //ProductInventory inv = new ProductInventory();        
+//        //inv.init();
+//        inv = Main.inventory;
 //
 //        enterBrowsePage(inv);
 //        

@@ -95,10 +95,8 @@ public class Table {
     }
 
     public static void runExample() {
-        ProductInventory inv = new ProductInventory();
-        inv.init();
 
-        Product product = inv.getProductById(5);
+        Product product = Main.inventory.getProductById(5);
 
         Table productDetailsTable = new Table(2, 5);
         productDetailsTable.add("ID", String.valueOf(product.getId()));
