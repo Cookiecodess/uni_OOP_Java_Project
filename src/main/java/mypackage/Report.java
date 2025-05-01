@@ -28,7 +28,9 @@ public class Report {
             return;
         }
   
-      Map<Product, Integer> productSalesMap = new HashMap<>();    
+      Map<Product, Integer> productSalesMap = new HashMap<>();
+      Map<Product, Double> productRevenueMap = new HashMap<>();
+      double totalRevenue = 0;
         //product  integer=total salse quantity
         //product a   10
         //product b   200
@@ -40,6 +42,7 @@ public class Report {
    //calculate sales data
         for (Product product : productList) {
             int totalSales = 0;
+             double totalAmount = 0;
             for (Order order : orderList) {
                // if (!order.getStatus().equalsIgnoreCase("Complete")) continue;
                         // only consider the product between start date end date
@@ -48,27 +51,36 @@ public class Report {
                 if ((orderDate.isEqual(startDate) || orderDate.isAfter(startDate)) &&
                     (orderDate.isEqual(endDate) || orderDate.isBefore(endDate))) {
 
-                    // 统计该产品的销售数量
+                    // calculate the product sales quantity
                     for (OrderItem item : order.getItems()) {
                         if (item.getProduct().equals(product)) {
                             totalSales += item.getQuantity();
+                             totalAmount += item.getQuantity() * product.getPrice();
                         }
                     }
                 }
             }
              productSalesMap.put(product, totalSales);
-           // System.out.printf("%-50s %-10s%n",product.getName() ,totalSales);
+             productRevenueMap.put(product, totalAmount);
+              totalRevenue += totalAmount;
         }
          List<Map.Entry<Product, Integer>> sortedSalesList = productSalesMap.entrySet().stream()
             .sorted(Map.Entry.<Product, Integer>comparingByValue().reversed())
             .collect(Collectors.toList());
 
-        System.out.printf("%-5s %-45s %-10s%n", "Rank", "Product Name", "Sales Quantity");//%-50s means 50 space
+           System.out.printf("%-5s %-45s %-15s %-15s%n", "Rank", "Product Name", "Quantity", "Sales (RM)");//%-50s means 50 space
 
         int rank = 1;
-        for (Map.Entry<Product, Integer> entry : sortedSalesList) {
-            System.out.printf("%-5d %-50s %-10d%n", rank++, entry.getKey().getName(), entry.getValue());
+        for (Map.Entry<Product, Integer> entry : sortedSalesList) { //loop the product that already rank, and get the sales quantity
+         Product product = entry.getKey();//get current product
+        int qty = entry.getValue(); //get this product sales
+        double revenue = productRevenueMap.get(product);    //sales=quantity*amount
+        System.out.printf("%-5d %-45s %-15d RM %-12.2f%n", rank++, product.getName(), qty, revenue);
         }
+        
+        
+            System.out.println("---------------------------------------------------------------------------------------");
+          System.out.printf(JLineMenu.GREEN + "%-70s RM %.2f\n" + JLineMenu.RESET, "Total Sales Revenue:", totalRevenue);
     }
     
       

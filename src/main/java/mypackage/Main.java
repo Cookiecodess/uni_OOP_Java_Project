@@ -69,7 +69,7 @@ public class Main {
     static JLineMenu payment;
     static JLineMenu reportSelection;
     static JLineMenu saveReceipt;
-
+     static JLineMenu returnReportPage;
     // Global user objects
     static Customer currentCust = null;
     static Admin currentAdmin = null;
@@ -216,6 +216,9 @@ public class Main {
         options.add("Try Again");
         quitOrContinue = new JLineMenu("Continue?", options, "Select an action to continue.", true, true);
 
+          options.clear();
+        options.add("Back to Report Page");
+        returnReportPage = new JLineMenu("Continue?", options, "Select an action to continue.", true, true);
         options.clear();
         options.add("Hong Leong Bank");
         options.add("Alliance Bank");
@@ -321,6 +324,7 @@ public class Main {
 
             switch (selection) {
                 case 0 -> {
+                    addProductPage();
                     break;
                 }
 
@@ -1177,7 +1181,7 @@ public class Main {
 
             System.out.println();
             JLineMenu.waitMsg();
-            int continueOrNot = quitOrContinue.drawMenu();
+            int continueOrNot = returnReportPage.drawMenu();
             if (continueOrNot == JLineMenu.BACK_OPTION) {
                 return;
             }
@@ -1192,18 +1196,20 @@ public class Main {
         boolean valid = false;
 
         while (!valid) {
-            System.out.println(prompt);
+          
+            System.out.print(prompt);
             String input = scan.next();
             try {
                 year = Integer.parseInt(input);
-                if (year >= 1900 && year <= 2100) { // set the year range
+                if (year >= 2000 && year <= 2100) { // set the year range
                     valid = true;
                 } else {
-                    System.out.print("Year out of range. Please try again.");
+                    System.out.println(JLineMenu.RED+"Year out of range. Please try again."+JLineMenu.RESET);
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid year format. Please enter a 4-digit year.");
+                System.out.println(JLineMenu.RED+"Invalid year format. Please enter a 4-digit year."+JLineMenu.RESET);
             }
+              System.out.println();
         }
 
         return year;
@@ -1221,8 +1227,9 @@ public class Main {
                 yearMonth = YearMonth.parse(input); // user YYYY-MM format
                 valid = true;
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid format! Please enter in YYYY-MM format.");
+                System.out.println(JLineMenu.RED+"Invalid format! Please enter in YYYY-MM format."+JLineMenu.RESET);
             }
+              System.out.println();
         }
 
         return yearMonth;
@@ -1242,8 +1249,9 @@ public class Main {
                 userDate = LocalDate.parse(input); // get the date
                 validInput = true; // if no exception means is valid format
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid Format！Please try again");
+                System.out.println(JLineMenu.RED+"Invalid Format！Please try again"+JLineMenu.RESET);
             }
+              System.out.println();
         }
 
         return userDate; // return valid date
@@ -1953,7 +1961,7 @@ public class Main {
                     break;
                 case 2:
                     // System.out.println("Enter new price: RM ");
-                    double newPrice = Helper.getNextDoubleInput(scanner, "Enter new price: RM ");
+                    double newPrice = Helper.getNextDoubleInput(scanner, "Enter new price: RM ", true);
                     productBuffer.setPrice(newPrice);
                     break;
                 case 3:
@@ -2062,5 +2070,119 @@ public class Main {
 
         productDetailsTable.setIndex(true);
         productDetailsTable.print();
+    }
+
+    public static void addProductPage() {
+        final String backKey = "b";
+        final String SAV_CUR = JLineMenu.SAV_CUR; // save cursor position
+        final String RST_CUR = JLineMenu.RST_CUR; // restore cursor position
+        final String CLR_LN = Helper.CLR_LINE; // clear line and carriage return (move cursor to first column)
+        final String CUR_UP = Helper.CUR_UP; // move cursor one line up
+        
+        boolean showTempMsg = false;
+        String tempMsg = "";
+        
+        while (true) {
+
+            JLineMenu.clearScreen();
+    
+            Product newProduct = new Product();            
+            
+            JLineMenu.printHeader("Add New Product", JLineMenu.LEFT_RIGHT_PADDING);
+            
+            if (showTempMsg) {
+                System.out.println(tempMsg + "\n");
+                showTempMsg = false;
+            }
+            
+            System.out.println("Please enter the details of the new product. \nThe input fields will appear one at a time.\n");
+            System.out.println("To "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", enter '"+JLineMenu.YELLOW+backKey+JLineMenu.RESET+"' in any field. "+JLineMenu.RED+"\nPlease beware that doing this discards all details entered."+JLineMenu.RESET);
+            System.out.println();
+    
+            // Print auto-incremented product ID
+            System.out.println("ID: " + newProduct.getId());
+
+            // Input name
+            String name = Helper.getNonEmptyStringInputInterruptable(scanner, "Name: ", backKey);
+            newProduct.setName(name);        
+    
+            // Input price
+            double price = Helper.getNextDoubleInputInterruptable(scanner, "Price: RM ", true, backKey);
+            if (price == Helper.INTRP) {
+                return;
+            } 
+            newProduct.setPrice(price);  
+            System.out.println(CUR_UP + CLR_LN + String.format("Price: RM %.2f", price));          
+    
+            // Input stock
+            int stock = Helper.getNextIntInputInterruptable(scanner, "Stock: ", true, backKey);
+            if (stock == Helper.INTRP) {
+                return;
+            } 
+            newProduct.setStock(stock);
+    
+            // Input category
+            ProductCategory category;
+            List<MenuItem> categories = new ArrayList<>(inventory.getAllCategories());
+            DropdownMenu categorySelection = new DropdownMenu(categories, "Category: ");
+    
+            int selected = categorySelection.draw();
+            category = (ProductCategory) categories.get(selected);
+            newProduct.setCategory(category);
+    
+            // Input color
+            String color = Helper.getNonEmptyStringInputInterruptable(scanner, "Color: ", backKey);
+            newProduct.setColor(color);
+    
+            // Input description
+            String desc = Helper.getNonEmptyStringInputInterruptable(scanner, "Description: ", backKey);
+            newProduct.setDescription(desc);
+    
+            // Launch right now?
+            System.out.println(SAV_CUR+"Would you like to launch this product now? \nCustomers will be able to see this product right away.");
+            while (true) {
+                System.out.print("(y/n) > ");
+                String launchOrNot = scanner.nextLine();
+                if (launchOrNot.equalsIgnoreCase(backKey)) {
+                    return;
+                }
+                if (launchOrNot.equalsIgnoreCase("y")) {
+                    newProduct.reinstate();
+                    break;
+                } 
+                if (launchOrNot.equalsIgnoreCase("n")) {
+                    newProduct.discontinue();
+                    break;
+                } 
+                System.out.println("Invalid input. Please try again.");
+                System.out.print(CUR_UP+CUR_UP + CLR_LN); // move cursor back to the prompt line ("(y/n) > ") and clear that line
+            }
+            System.out.print(RST_CUR + CLR_LN); // move cursor back to the line with "Would you like to..." and clear that line
+            Helper.clearLinesBelow(20);
+            System.out.print(Helper.CUR_UP);
+            System.out.println("Status: " + (newProduct.isDiscontinued() ? "Discontinued" : "On sale"));
+    
+            System.out.println();
+            System.out.println("Enter 'yes' to add new product, 'no' to discard all changes and go back.");
+            while (true) {
+                System.out.print(SAV_CUR+"> ");
+                String confirm = scanner.nextLine();
+                if (confirm.equalsIgnoreCase("yes")) {
+                    inventory.addProduct(newProduct);
+                    showTempMsg = true;
+                    tempMsg = JLineMenu.GREEN + "Product added." + JLineMenu.RESET;
+                    break;
+                } 
+                if (confirm.equalsIgnoreCase("no")) {
+                    Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
+                    showTempMsg = true;
+                    tempMsg = JLineMenu.YELLOW + "Product not added." + JLineMenu.RESET;
+                    break;
+                } 
+                System.out.println("Invalid input. Please try again.");
+                System.out.print(RST_CUR + CLR_LN); // move cursor back to the prompt line ("(y/n) > ") and clear that line
+            }
+        }
+
     }
 }
