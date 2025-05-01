@@ -19,8 +19,8 @@ public class OnlineBankingPayment extends Payment{
      private static final String BANKINGUSERNAME = "aaa";
      private static final String BANKINGPASSWORD = "bbb";
      private final String bankName;
-     public  OnlineBankingPayment(double amount, Order order,String bankName) {
-       super("Online Banking", amount, order);
+     public  OnlineBankingPayment(Order order,String bankName) {
+       super("Online Banking", order);
        this.bankName=bankName;
     }
 
@@ -64,7 +64,7 @@ JLineMenu.printHeader("Online Banking",20);
          System.out.println("Order ID\t: "+order.getOrderId());
          System.out.println("Payment Method\t: "+getPaymentMethod());
           System.out.println("Bank\t\t: "+bankName);
-        System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", getAmount())+JLineMenu.RESET);
+        System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getGrandTotal())+JLineMenu.RESET);
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
          System.out.println("===============================================");
          JLineMenu.waitMsg();
@@ -94,7 +94,7 @@ JLineMenu.printHeader("Online Banking",20);
             writeReceipt.write("Order ID\t: "+order.getOrderId()+"\n");
             writeReceipt.write("Payment Method\t: "+getPaymentMethod()+"\n");
              writeReceipt.write("Bank\t\t: "+bankName+"\n");
-            writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", getAmount())+"\n");
+            writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", order.getGrandTotal())+"\n");
             writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
         }
 

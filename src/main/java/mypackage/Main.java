@@ -27,15 +27,20 @@ package mypackage;
 //          Caused by: java.lang.NoClassDefFoundError: org/jline/terminal/Terminal
 //     )
 import java.io.IOException;
-import java.util.*;
+import java.util.*; // import everything lumpsum je la
 // import java.util.Scanner;
 // import java.util.List;
-// import java.util.ArrayList;
+// import java.util.Arrays;
 // import java.util.Comparator;
+// import java.util.ArrayList;
 // import java.util.Map;
 import static mypackage.JLineMenu.terminal;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -60,6 +65,9 @@ public class Main {
     static JLineMenu reportSelection;
     static Customer currentCust = null;
     static Admin currentAdmin = null;
+    //Here, these 2 is used to store Payment Method with/without Bank Name. 
+    private static String lastPaymentMethod;
+    private static String lastBankName;
     
     static ProductInventory inventory;
     static {
@@ -69,12 +77,12 @@ public class Main {
     }
 static JLineMenu saveReceipt;
     public static void main(String[] args) {  
-        // temp, for debugging
-        editProductMenu();    
         
         inventory = new ProductInventory();
         inventory.init();
+        //deduct stock based on cart and orders
         loadStockFromCart();
+        loadStockFromOrders();
         // initialize all menus
         initAllMenus();
         
@@ -100,10 +108,7 @@ static JLineMenu saveReceipt;
                     }
                     continue;
                 }
-                case 2 -> {
-                    payment();
-                    continue;
-                }
+               
                 default -> {
                     continue;
                 }
@@ -117,7 +122,6 @@ static JLineMenu saveReceipt;
         ArrayList<String> options = new ArrayList<>();
         options.add("Customer");
         options.add("Admin");
-        options.add("Payment");
         mainMenu = new JLineMenu("Main menu", options, "Select an action to continue.", false, true);
 
         options.clear();
@@ -172,6 +176,7 @@ static JLineMenu saveReceipt;
         options.add("Monthly Report");
         options.add("Yearly Report");
         options.add("Customize Report");
+         options.add("Loyal Customer Analysis");
         reportSelection = new JLineMenu("Report", options, "Select a report type.", true, true);
 
         options.clear();
@@ -258,7 +263,7 @@ static JLineMenu saveReceipt;
                 
                 //View Order
                 case 2 -> {
-                    break;
+                    viewOrders();
                 }
 
                 case 3 -> {
@@ -273,10 +278,11 @@ static JLineMenu saveReceipt;
 
     public static void adminDashboard() {
         while (true) {
-            int selection = adminDb.drawMenu();
-            if (selection == -1) {
-                break;
-            }
+            int selection = adminDb.drawMenu("Welcome Back, " + 
+                    JLineMenu.MAGENTA + currentAdmin.getName() + JLineMenu.RESET + "!" + 
+                            " (" + JLineMenu.CYAN + currentAdmin.getRole().toUpperCase() + JLineMenu.RESET + ")");
+            if (selection == -1)break;
+
             if (selection == 8) {
                 currentAdmin = null;
                 break;
@@ -290,6 +296,11 @@ static JLineMenu saveReceipt;
                 case 1 -> {
                     editProductMenu();
                     break;
+                }
+
+                case 2 -> {
+                    //Call to View ALL orders made by customers. So far code is running ok, but further testing needs to be done.
+                    adminViewAllOrders();
                 }
 
                 case 3 -> {
@@ -315,7 +326,12 @@ static JLineMenu saveReceipt;
                     break;
                 }
                 case 7 -> {
-                    //report();
+                   
+                    try {
+                        reportPage();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     break;
                 }
 
@@ -382,7 +398,7 @@ static JLineMenu saveReceipt;
         String gender;
 
         if (type.equals("admin") && !currentAdmin.isMain()) {
-            System.out.println("Access Denied!");
+            System.out.println(JLineMenu.RED+"Access Denied!"+JLineMenu.RESET);
             System.out.print("Press Enter To Go Back....");
             scanner.nextLine();
             return;
@@ -394,12 +410,19 @@ static JLineMenu saveReceipt;
             username = scanner.next();
             scanner.nextLine(); // flush
 
-            if (!username.isEmpty() && !usernames.contains(username)) {
+            if (!username.isEmpty() && !usernames.contains(username) && !username.matches(".*[^a-zA-Z0-9].*")) {
                 break;
             }
+            else if(username.matches(".*[^a-zA-Z0-9].*")){
+                JLineMenu.clearScreen();
+                System.out.println("Username Cannot Have Symbols!");
+            }
+            else {
+                JLineMenu.clearScreen();
+                System.out.println("Username Taken!");
+            }
 
-            JLineMenu.clearScreen();
-            System.out.println("Username Taken!");
+            
         }
 
         JLineMenu.clearScreen();
@@ -417,9 +440,18 @@ static JLineMenu saveReceipt;
             String password2 = JLineMenu.reader.readLine(" ", '*');
             System.out.print(JLineMenu.RESET);
             
-            if (password.equals(password2)) break;
-            JLineMenu.clearScreen();
-            System.out.println("Password did not match!\n");
+            if(password.contains(",") || password.contains(" ")){
+                   JLineMenu.clearScreen();
+                   System.out.println("Password Cannot Have Comma or Space!\n");
+            }
+            else if(!password.equals(password2)){
+                    JLineMenu.clearScreen();
+                    System.out.println("Password did not match!\n");
+            }
+            else {
+                break;
+            }
+            
 
         }
 
@@ -431,11 +463,18 @@ static JLineMenu saveReceipt;
 
             System.out.print("Enter your name: ");
             name = scanner.nextLine();
-            if (!name.isEmpty()) {
+            if (!name.isEmpty() && !name.matches(".*[^a-zA-Z0-9 ].*")) {
                 break;
             }
-            JLineMenu.clearScreen();
-            System.out.println("Name cannot be empty!\n");
+            else if(name.matches(".*[^a-zA-Z0-9 ].*")){
+                JLineMenu.clearScreen();
+                System.out.println("Name Cannot Have Symbols!\n");
+            }
+            else{
+                JLineMenu.clearScreen();
+                System.out.println("Name cannot be empty!\n");
+            }
+            
         }
 
         JLineMenu.clearScreen();
@@ -448,7 +487,7 @@ static JLineMenu saveReceipt;
             System.out.print("Enter your email: ");
             email = scanner.next();
             scanner.nextLine();
-            if (email.contains("@") && email.contains(".")) {
+            if (email.contains("@") && email.contains(".") && !email.contains(",")) {
                 break;
             }
             JLineMenu.clearScreen();
@@ -674,9 +713,17 @@ static JLineMenu saveReceipt;
             String input2 = JLineMenu.reader.readLine(" ", '*');
             System.out.print(JLineMenu.RESET);
             
-            if(input.equals(input2)) break;
-            JLineMenu.clearScreen();
-            System.out.println("Password does not match!\n");
+            if(input.contains(",") || input.contains(" ")){
+                   JLineMenu.clearScreen();
+                   System.out.println("Password Cannot Have Comma or Space!\n");
+            }
+            else if(!input.equals(input2)){
+                    JLineMenu.clearScreen();
+                    System.out.println("Password did not match!\n");
+            }
+            else {
+                break;
+            }
         }
 
         AuthServices.changePassword(x, input);
@@ -695,11 +742,17 @@ static JLineMenu saveReceipt;
                 return;
             }
 
-            if (!input.isEmpty()) {
+            if (!input.isEmpty() && !input.matches(".*[^a-zA-Z0-9 ].*")) {
                 break;
             }
-            JLineMenu.clearScreen();
-            System.out.println("Name Cannot Be Empty!\n");
+            else if(input.matches(".*[^a-zA-Z0-9 ].*")){
+                JLineMenu.clearScreen();
+                System.out.println("Name Cannot Have Symbols!\n");
+            }
+            else{
+                JLineMenu.clearScreen();
+                System.out.println("Name cannot be empty!\n");
+            }
 
         }
 
@@ -769,7 +822,7 @@ static JLineMenu saveReceipt;
                 return;
             }
 
-            if (input.contains("@") &&  input.contains(".")) {
+            if (input.contains("@") &&  input.contains(".") && !input.contains(",")) {
                 break;
             }
             JLineMenu.clearScreen();
@@ -780,28 +833,33 @@ static JLineMenu saveReceipt;
         AuthServices.changeEmail(x, input);
     }
 
-    public static boolean payment() {
-        Order a = new Order();
-
+    public static boolean payment(Order order) {
+        Order dummyOrder = new Order(currentCust.getUID());
+        currentCust.getCartItems().forEach((p,q) -> dummyOrder.addItem(p,q));
+        
         boolean valid = false;
         while (!valid) {    //=true then 
             int selection = payment.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                 return false;
             }
-
+            
+            
+            // here, depending on what we chose, save the payment method
             switch (selection) {
                 case 0 -> {
-                    valid = onlineBankingPaymentProcess(a);
+                    valid = onlineBankingPaymentProcess(dummyOrder);
+                    if (valid) lastPaymentMethod = "Online Banking";
                     continue;
                 }
                 case 1 -> {
-                    valid = qrCodePayment(a);
-
+                    valid = qrCodePayment(dummyOrder);
+                    if (valid) lastPaymentMethod = "Touch and Go";
                     continue;
                 }
                 case 2 -> {
-                    valid = cardPaymentProcess(a);
+                    valid = cardPaymentProcess(dummyOrder);
+                    if (valid) lastPaymentMethod = "Card Payment";
                     continue;
                 }
                 default -> {
@@ -813,7 +871,16 @@ static JLineMenu saveReceipt;
         return valid;
     }
 
-    public static boolean onlineBankingPaymentProcess(Order a) {
+    //here, we call this method to combine payment method and bank name, and is used to save it into orders.csv
+    public static String getFormattedPaymentMethod() {
+        if (lastPaymentMethod.equals("Touch and Go")) {
+            return "Touch and Go";
+        } else {
+            return String.format("%s - %s", lastPaymentMethod, lastBankName);
+        }
+    }
+    
+    public static boolean onlineBankingPaymentProcess(Order order) {
         Payment paymentO;
         String bankName;
         while (true) {
@@ -839,14 +906,19 @@ static JLineMenu saveReceipt;
                 }
 
             }
-
-            paymentO = new OnlineBankingPayment(10.00, a, bankName);
-            return processPayment(paymentO, a);
+            
+            //save payment method and bank name
+            if (true) {
+                lastPaymentMethod = "Online Banking";
+                lastBankName = bankName;
+            }
+            paymentO = new OnlineBankingPayment(order, bankName);
+            return processPayment(paymentO, order);
         }
 
     }
 
-    private static boolean processPayment(Payment paymentO, Order a) {
+    private static boolean processPayment(Payment paymentO, Order order) {
         boolean shouldExit = false;
         while (!shouldExit) {
             if (paymentO.validation()) {
@@ -855,14 +927,14 @@ static JLineMenu saveReceipt;
                 JLineMenu.waitMsg();
                 JLineMenu.clearScreen();
                 JLineMenu.printHeader("Receipt", 20);
-                paymentO.generateReceipt(a);
+                paymentO.generateReceipt(order);
                 
                 
                 int selection = saveReceipt.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                  
             }else{
-             paymentO.generatePrintableReceipt(a);
+             paymentO.generatePrintableReceipt(order);
               JLineMenu.sound();
              JLineMenu.waitMsg();
             }
@@ -888,16 +960,22 @@ static JLineMenu saveReceipt;
 
     }
 
-    public static boolean qrCodePayment(Order a) {
-        Payment paymentO = new qrCodePayment(10.00, a);
+    public static boolean qrCodePayment(Order order) {
+        Payment paymentO = new qrCodePayment(order);
         JLineMenu.printHeader("QR code Payment", 45);
         paymentO.generateQR();
-
-        return processPayment(paymentO, a);
+        
+        //save payment method, bank name = "" (none)
+        if (true) {
+            lastPaymentMethod = "Touch and Go";
+            lastBankName = ""; // No bank name for TnG
+        }
+        
+        return processPayment(paymentO, order);
 
     }
 
-    public static boolean cardPaymentProcess(Order a) {
+    public static boolean cardPaymentProcess(Order order) {
 
         Payment paymentO;
         String bankName;
@@ -924,88 +1002,155 @@ static JLineMenu saveReceipt;
                 }
 
             }
-
-            paymentO = new CardPayment(10.00, a, bankName);
-            return processPayment(paymentO, a);
+            
+            //save payment method and bank name
+            if (true) {
+                lastPaymentMethod = "Card Payment";
+                lastBankName = bankName;
+            }
+            paymentO = new CardPayment(order, bankName);
+            return processPayment(paymentO, order);
         }
 
     }
 
-// 
-//  public static void reportPage(List<Order> orderList, List<Product> productList){
-//   
-//        DateChecker dateChecker = new DateChecker();
-//      
-//    while(true){
-//        int selection = payment.drawMenu();
-//            if (selection == JLineMenu.BACK_OPTION) {
-//                return;
-//            }
-//         
-//        LocalDate userDate;
-//        switch (selection) {
-//                case 0 -> {
-//            // Daily Report
-//             userDate = getUserDateInput("Please enter the date (YYYY-MM-DD):");
-//             dateChecker.setDailyReport(userDate);
-//        }  case 1 -> {
-//            // Monthly Report
-//           userDate = getUserDateInput("Please enter the month (YYYY-MM-DD):");
-//           
-//            dateChecker.setMonthlyReport(userDate);
-//        } case 2 -> {
-//            // Yearly Report
-//           userDate = getUserDateInput("Please enter the year (YYYY):");
-//            
-//            dateChecker.setYearlyReport(userDate);
-//        }  case 3 -> {
-//            // Customize Report
-//
-//            LocalDate startDate = getUserDateInput("Please enter the START date (YYYY-MM-DD):");
-//            LocalDate endDate = getUserDateInput("Please enter the END date (YYYY-MM-DD):");
-//            dateChecker.setCustomizeReport(startDate, endDate);
-//        }
-//         default -> {
-//                continue;
-//            }
-//        }
-//        
-//        // get the date domain
-//        LocalDate startDate = dateChecker.getStartDate();
-//        LocalDate endDate = dateChecker.getEndDate();
-//
-//        // 生成销售报告
-//        Report report = new Report();
-//        report.generateSalesReport(orderList, productList, startDate, endDate);
-//
-//                int continueOrNot = quitOrContinue.drawMenu();
-//                if (continueOrNot == JLineMenu.BACK_OPTION) {
-//                    return;
-//                }
-//        scanner.close();
-//        }
-// 
-//  }
- ////check the date is valid format or not
-// public static LocalDate getUserDateInput(String prompt) {
-//        LocalDate userDate = null;
-//        boolean validInput = false;
-//        Scanner scan = new Scanner(System.in);
-//        // continue loop until valid format
-//        while (!validInput) {
-//            System.out.println(prompt);
-//            String input = scan.next();
-//
-//            try {
-//                userDate = LocalDate.parse(input); //get the date
-//                validInput = true; // if no exception means is valid format
-//            } catch (DateTimeParseException e) {
-//                System.out.println("Invalid Format！Please try again");
-//            }
-//        }
-//        
-//        return userDate; // return valid date
-//    }
+ 
+  public static void reportPage() throws IOException{
+       List<Order> orders;
+        Report report = new Report();
+      try {
+         orders= OrderStorage.loadOrdersForAll(); // load all order
+      } catch (IOException e) {
+          System.out.println("Warning: Could not load orders - " + e.getMessage());
+          return;
+      }
+      
+        DateChecker dateChecker = new DateChecker();
+      
+    while(true){
+        int selection = reportSelection.drawMenu();
+            if (selection == JLineMenu.BACK_OPTION) {
+                return;
+            }
+         
+        LocalDate userDate;
+        switch (selection) {
+                case 0 -> {
+            // Daily Report
+             userDate = getUserDateInput("Please enter the date (YYYY-MM-DD):");
+             dateChecker.setDailyReport(userDate);
+              report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
+        }  case 1 -> {
+            // Monthly Report
+          YearMonth yearMonth = getUserYearMonthInput("Please enter the month (YYYY-MM):");
+LocalDate anyDayInMonth = yearMonth.atDay(1);
+dateChecker.setMonthlyReport(anyDayInMonth);
+ report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
+        } case 2 -> {
+            // Yearly Report
+         int year = getUserYearInput("Please enter the year (e.g., 2024):");
+    LocalDate firstDayOfYear = LocalDate.of(year, 1, 1);
+    dateChecker.setYearlyReport(firstDayOfYear);
+     report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
+        }  case 3 -> {
+            // Customize Report
+
+            LocalDate startDate = getUserDateInput("Please enter the START date (YYYY-MM-DD):");
+            LocalDate endDate = getUserDateInput("Please enter the END date (YYYY-MM-DD):");
+            dateChecker.setCustomizeReport(startDate, endDate);
+             report.generateSalesReport(orders, inventory.getAllProducts(),  dateChecker.getStartDate(), dateChecker.getEndDate());
+        }
+        
+        case 4 -> {
+            // analysiscustomer
+
+           report.generateUserRanking(orders);
+        }
+        
+         default -> {
+                continue;
+            }
+        }
+        
+
+        
+       
+        System.out.println();
+JLineMenu.waitMsg();
+                int continueOrNot = quitOrContinue.drawMenu();
+                if (continueOrNot == JLineMenu.BACK_OPTION) {
+                    return ;
+                }
+       
+        }
+    
+ 
+  }
+  
+  
+  
+  public static int getUserYearInput(String prompt) {
+    Scanner scan = new Scanner(System.in);
+    int year = 0;
+    boolean valid = false;
+
+    while (!valid) {
+        System.out.println(prompt);
+        String input = scan.next();
+        try {
+            year = Integer.parseInt(input);
+            if (year >= 1900 && year <= 2100) { //set the year range
+                valid = true;
+            } else {
+                System.out.print("Year out of range. Please try again.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid year format. Please enter a 4-digit year.");
+        }
+    }
+
+    return year;
+}
+  public static YearMonth getUserYearMonthInput(String prompt) {
+    Scanner scan = new Scanner(System.in);
+    YearMonth yearMonth = null;
+    boolean valid = false;
+
+    while (!valid) {
+        System.out.print(prompt);
+        String input = scan.next();
+        try {
+            yearMonth = YearMonth.parse(input); // user YYYY-MM format
+            valid = true;
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid format! Please enter in YYYY-MM format.");
+        }
+    }
+
+    return yearMonth;
+}
+
+
+ //check the date is valid format or not
+ public static LocalDate getUserDateInput(String prompt) {
+        LocalDate userDate = null;
+        boolean validInput = false;
+        Scanner scan = new Scanner(System.in);
+        // continue loop until valid format
+        while (!validInput) {
+            System.out.print(prompt);
+            String input = scan.next();
+
+            try {
+                userDate = LocalDate.parse(input); //get the date
+                validInput = true; // if no exception means is valid format
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid Format！Please try again");
+            }
+        }
+        
+        return userDate; // return valid date
+    }
     
     public static void productMainMenu() {
         while (true) {
@@ -1034,44 +1179,49 @@ static JLineMenu saveReceipt;
     
     //gets View Cart menu, has X(Cart Items) + 2 Choices (Place Order & Back)
     public static void viewCart() {
-        while (true) {
-            // Build dynamic options
-            ArrayList<String> options = new ArrayList<>();
+    while (true) {
+        // Build dynamic options
+        ArrayList<String> options = new ArrayList<>();
 
-            // 1. Add cart items as selectable options
-            currentCust.getCartItems().forEach((product, qty) -> {
-                options.add(String.format("%s x%d (RM %.2f)", 
-                    product.getName(), qty, product.getPrice() * qty));
-            });
+        // 1. Add cart items as selectable options
+        currentCust.getCartItems().forEach((product, qty) -> {
+            options.add(String.format("%s x%d (RM %.2f)", 
+                product.getName(), qty, product.getPrice() * qty));
+        });
 
-            // 2. Add standard buttons
-            if (!options.isEmpty()) options.add("Place Order");
-            options.add("Back");
-
-            // Display menu
-            JLineMenu cartMenu = new JLineMenu("Your Cart", options, 
-                options.isEmpty() ? "Your cart is empty" : "", 
-                false,  // Back is manually added
-                false
-            );
-
-            int selection = cartMenu.drawMenu();
-
-            // Handle selection
-            if (selection == JLineMenu.BACK_OPTION || 
-                selection == options.size() - 1) return; // Back
-
-            if (!options.isEmpty() && selection == options.size() - 2) {
-                System.out.print("Placeing ORder Placeholder");
-                //placeOrderFlow(); // Place Order
-                continue;
-            }
-
-            // Item selected - show action menu
-            Product selectedProduct = (Product) currentCust.getCartItems().keySet().toArray()[selection];
-            editCartItem(selectedProduct);
+        // 2. Add standard buttons
+        boolean isEmpty = options.isEmpty();
+        if (!isEmpty) {
+            options.add("Place Order");
         }
+        options.add("Back");
+
+        // Display menu with clearer empty state handling
+        String description = isEmpty ? JLineMenu.RED + "Your cart is empty!" + JLineMenu.RESET 
+                                   : "Select an item to edit.";
+        
+        JLineMenu cartMenu = new JLineMenu("Your Cart", options, 
+            description,  // Now more visible
+            false,  // Back is manually added
+            false
+        );
+
+        int selection = cartMenu.drawMenu();
+
+        // Handle selection
+        if (selection == JLineMenu.BACK_OPTION || 
+            selection == options.size() - 1) return;
+
+        if (!isEmpty && selection == options.size() - 2) {
+            placeOrderFlow();
+            continue;
+        }
+
+        // Item selected - show action menu
+        Product selectedProduct = (Product) currentCust.getCartItems().keySet().toArray()[selection];
+        editCartItem(selectedProduct);
     }
+}
     
     //Selects an item, gets 3 choices: Edit Quantity, Remove Item, Back
     private static void editCartItem(Product product) {
@@ -1261,6 +1411,7 @@ static JLineMenu saveReceipt;
         }
     }
     
+    //deduct item stock based on cart
     private static void loadStockFromCart() {
         Map<Integer, Map<Integer, Integer>> allCarts = CartStorage.loadAllCarts();
 
@@ -1274,6 +1425,304 @@ static JLineMenu saveReceipt;
             });
         });
     }
+    
+    //deduct item stock based on orders made
+    private static void loadStockFromOrders() {
+        try {
+            // Get all orders (regardless of status)
+            List<Order> allOrders = OrderStorage.loadOrdersForAll();
+
+            for (Order order : allOrders) {
+                // Only deduct stock for non-cancelled orders
+                if (!order.getStatus().equalsIgnoreCase("Cancelled")) {
+                    for (OrderItem item : order.getItems()) {
+                        Product p = inventory.getProductById(item.getProduct().getId());
+                        if (p != null) {
+                            p.minusStock(item.getQuantity());
+                        }
+                    }
+                }
+                // For cancelled orders, stock remains unchanged
+            }
+        } catch (IOException e) {
+            System.out.println("Warning: Could not update stock from orders - " + e.getMessage());
+        }
+    }
+    
+    //Print The Place Order Menu
+    public static void placeOrderFlow() {
+        if (currentCust.getCartItems().isEmpty()) {
+            System.out.println("Your cart is empty!");
+            JLineMenu.waitMsg();
+            return;
+        }
+
+        Order order = new Order(currentCust.getUID());
+        currentCust.getCartItems().forEach((product, quantity) -> {
+            order.addItem(product, quantity);
+        });
+        
+        ArrayList<String> options = new ArrayList<>();
+        options.add("Proceed to Payment");
+        String summary = buildOrderSummaryString(order);
+        JLineMenu orderMenu = new JLineMenu("Order Summary", options, summary, true, false);
+        int selection = orderMenu.drawMenu();
+        if (selection == 0) { // Proceed to Payment
+            processPayment(order);
+        }
+    }
+    
+    //Build Order Summary String to display the calculations and Grand Total of Order
+    private static String buildOrderSummaryString(Order order) {
+        StringBuilder sb = new StringBuilder();
+
+        // Header
+        sb.append(String.format("%-8s %-30s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
+        sb.append("--------------------------------------------------\n");
+
+        // Items
+        for (OrderItem item : order.getItems()) {
+            sb.append(String.format("%-8d %-30s %-10d RM%-8.2f%n",
+                item.getProduct().getId(),
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getSubtotal()));
+        }
+
+        // Totals
+        sb.append("\nSubtotal: \tRM ").append(String.format("%.2f", order.getSubtotal())).append("\n");
+        sb.append("Delivery Fee: \tRM 20.00\n");
+        sb.append("SST (6%): \tRM ").append(String.format("%.2f", order.getTax())).append("\n");
+        sb.append("-------------------------------------\n");
+        sb.append("GRAND TOTAL: \tRM ").append(String.format("%.2f", order.getGrandTotal())).append("\n");
+        sb.append("-------------------------------------\n");
+
+        return sb.toString();
+    }
+    
+    //if payment() returns true, we :
+    //1) set all the thingamagiks into order class
+    //2) clear & save cart
+    //3) PAYMENT SUCCESSFUL! FRICGGIN FINALLY JESUS CHRIST ALMIGHTY
+    private static void processPayment(Order order) {
+        if (payment(order)) {
+            try {
+                order.setPaymentMethod(getFormattedPaymentMethod());
+                order.setStatus("Pending");
+                OrderStorage.saveOrder(order);
+                currentCust.getCartItems().clear();
+                currentCust.saveCart();
+                System.out.println("Payment Successful! Order placed.");
+                JLineMenu.waitMsg();
+            } catch (IOException e) {
+                System.out.println("Error saving order: " + e.getMessage());
+                JLineMenu.waitMsg();
+            }
+        }
+    }
+  
+    //Customer view their made orders.
+    public static void viewOrders() {
+        try {
+            List<Order> userOrders = OrderStorage.loadOrdersForUser(currentCust.getUID());
+
+            if (userOrders.isEmpty()) {
+                JLineMenu.clearScreen();
+                System.out.println("No orders made yet.");
+                JLineMenu.waitMsg();
+                return;
+            }
+
+            ArrayList<String> options = new ArrayList<>();
+            for (int i = 0; i < userOrders.size(); i++) {
+                Order order = userOrders.get(i);
+                options.add(String.format("Order #%d - %s (RM %.2f)", 
+                    i+1, 
+                    order.getFormattedOrderDate(), 
+                    order.getGrandTotal()));
+            }
+
+            JLineMenu ordersMenu = new JLineMenu("Your Orders", options, 
+                "Select an order to view details", true, false);
+            int selection = ordersMenu.drawMenu();
+
+            if (selection >= 0 && selection < userOrders.size()) {
+                displayOrderDetails(userOrders.get(selection));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading orders: " + e.getMessage());
+            JLineMenu.waitMsg();
+        }
+    }
+
+    private static void displayOrderDetails(Order order) {
+        JLineMenu.clearScreen();
+        JLineMenu.printHeader("Order #" + order.getOrderId(), 20);
+
+        System.out.println("Order Date: " + order.getFormattedOrderDate());
+        System.out.println("Status: " + order.getStatus());
+        System.out.println("Payment Method: " + order.getPaymentMethod());
+        System.out.println("-------------------------------------");
+
+        System.out.printf("%-30s %-10s %-10s%n", "Product", "Qty", "Subtotal");
+        System.out.println("-------------------------------------");
+
+        for (OrderItem item : order.getItems()) {
+            System.out.printf("%-30s %-10d RM%-8.2f%n",
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getSubtotal());
+        }
+
+        System.out.println("\nGRAND TOTAL: \tRM " + String.format("%.2f", order.getGrandTotal()));
+        System.out.println("-------------------------------------");
+        JLineMenu.waitMsg();
+    }
+    
+    
+    //Section: Admin View Orders Menu
+    //String for description
+    private static String formatOrderDetails(Order order) {
+        String[] userDetails = AuthServices.getUserDetails(order.getUserId());
+        StringBuilder sb = new StringBuilder();
+
+        // Header Info
+        sb.append("Customer: ").append(userDetails[3]).append("\n");
+        sb.append("Date: ").append(order.getFormattedOrderDate()).append("\n");
+        sb.append("Status: ").append(order.getStatus()).append("\n");
+        sb.append("Payment: ").append(order.getPaymentMethod()).append("\n\n");
+
+        // Items Table
+        sb.append(String.format("%-8s %-30s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
+        sb.append("--------------------------------------------------\n");
+
+        order.getItems().forEach(item -> {
+            sb.append(String.format("%-8d %-30s %-10d RM%-8.2f%n",
+                item.getProduct().getId(),
+                item.getProduct().getName(),
+                item.getQuantity(),
+                item.getSubtotal()));
+        });
+
+        // Footer Totals
+        sb.append("\n-------------------------------------\n");
+        sb.append("GRAND TOTAL: RM").append(String.format("%.2f", order.getGrandTotal()));
+
+        return sb.toString();
+    }
+    
+    public static void adminViewAllOrders() {
+        String currentSort = "Date(^)";
+        boolean[] sortFlags = {true, true}; // [0] = dateAscending, [1] = nameAscending
+
+        while (true) {
+            try {
+                // Load and sort orders
+                List<Order> orders = OrderStorage.loadOrdersForAll();
+                
+                //Apply Sorting using final array (idfk what this is honestly)
+                if (currentSort.startsWith("Date")) {
+                    orders.sort(sortFlags[0] ? 
+                        Comparator.comparing(Order::getOrderDate) :
+                        Comparator.comparing(Order::getOrderDate).reversed());
+                } else {
+                    orders.sort((o1, o2) -> {
+                        String name1 = AuthServices.getUserDetails(o1.getUserId())[3];
+                        String name2 = AuthServices.getUserDetails(o2.getUserId())[3];
+                        return sortFlags[1] ? 
+                            name1.compareTo(name2) : name2.compareTo(name1);
+                    });
+                }
+
+                // Build menu
+                ArrayList<String> options = new ArrayList<>();
+                orders.forEach(order -> {
+                    String userName = AuthServices.getUserDetails(order.getUserId())[3];
+                    options.add(String.format("Order #%s (%s, %s) - %s", 
+                        order.getOrderId().substring(0,6),
+                        userName,
+                        order.getFormattedOrderDate(),
+                        order.getStatus()));
+                });
+
+                // Add sort options
+                options.add("Sort: Date" + (currentSort.startsWith("Date") ? 
+                    (sortFlags[0] ? "(^)" : "(v)") : ""));
+                options.add("Sort: Customer" + (currentSort.startsWith("Customer") ? 
+                    (sortFlags[1] ? "(^)" : "(v)") : ""));
+
+                JLineMenu menu = new JLineMenu("All Orders", options, 
+                    "Total Orders: " + orders.size(), true, false);
+
+                int selection = menu.drawMenu();
+
+                // Handle selection
+                if (selection == JLineMenu.BACK_OPTION) return;
+
+                if (selection == options.size() - 2) { // Date sort
+                    sortFlags[0] = !sortFlags[0];
+                    currentSort = "Date" + (sortFlags[0] ? "(^)" : "(v)");
+                } 
+                else if (selection == options.size() - 1) { // Name sort
+                    sortFlags[1] = !sortFlags[1];
+                    currentSort = "Customer" + (sortFlags[1] ? "(^)" : "(v)");
+                }
+                else {
+                    adminManageOrder(orders.get(selection));
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+                JLineMenu.waitMsg();
+            }
+        }
+    }
+    
+    //Selects an order, gives selection: Update Status which calls updateOrderStatus, and the description is the Order Details, Header is order ID.
+    private static void adminManageOrder(Order order) throws IOException {
+        while (true) {
+            // Create menu with order details as description
+            ArrayList<String> options = new ArrayList<>();
+            options.add("Update Status");
+
+            JLineMenu menu = new JLineMenu("Order " + order.getOrderId(), 
+                options, 
+                formatOrderDetails(order), 
+                true, false);
+
+            int choice = menu.drawMenu();
+
+            if (choice == JLineMenu.BACK_OPTION) return;
+            if (choice == 0) updateOrderStatus(order);
+        }
+    }
+    
+    
+    //Updates Order Status: Selections: Pending, Shipping, Completed, Cancelled. Theres no Validation if you select the same Status.
+    private static void updateOrderStatus(Order order) throws IOException {
+        String[] statusOptions = {"Pending", "Shipping", "Completed", "Cancelled"};
+
+        while (true) {
+            JLineMenu statusMenu = new JLineMenu("Update Status", 
+                Arrays.asList(statusOptions), 
+                "Current Status: " + order.getStatus(), 
+                true, false);
+
+            int selection = statusMenu.drawMenu();
+
+            if (selection == JLineMenu.BACK_OPTION) return;
+
+            String newStatus = statusOptions[selection];
+            if (!order.getStatus().equals(newStatus)) {
+                order.setStatus(newStatus);
+                OrderStorage.updateOrderStatus(order);
+                System.out.println("Status updated to: " + newStatus);
+                JLineMenu.waitMsg();
+                return; // Back to order view
+            }
+        }
+    }
+    
+    //End of Section: Admin View Orders Menu
 
     private static void editProductMenu() {
         List<Product> products = inventory.getAllProducts();
