@@ -42,6 +42,8 @@ import java.time.format.DateTimeParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import org.jline.console.impl.JlineCommandRegistry;
 
@@ -74,13 +76,37 @@ public class Main {
     // Here, these 2 is used to store Payment Method with/without Bank Name.
     private static String lastPaymentMethod;
     private static String lastBankName;
-
-    // Initialize Productinventory. Can be accessed anywhere in this project.
+    private static String hwid;
+    
     public static ProductInventory inventory;
     static {
         // initialize product inventory
         inventory = new ProductInventory();
         inventory.init();
+        
+        //getting the current HWID
+        try{
+            Process process = Runtime.getRuntime().exec("wmic csproduct get UUID");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            
+            String line;
+            boolean firstLineSkipped = false;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (!firstLineSkipped) {
+                    firstLineSkipped = true; // Skip header
+                    continue;
+                }
+                if (!line.isEmpty()) {
+                    hwid = line;
+                    break;
+                }
+            }
+        }catch (Exception e) {
+            hwid = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF";
+        }
+        
+        
     }
 
     public static void main(String[] args) {
@@ -162,6 +188,8 @@ public class Main {
         options.add("View Pending Orders");
         options.add("Change Account Details");
         options.add("Add Other Admin");
+        options.add("Suspend Admin");
+        options.add("Un-Suspend Admin");
         options.add("Suspend Customer");
         options.add("Un-Suspend Customer");
         options.add("View Report");
@@ -286,7 +314,7 @@ public class Main {
             if (selection == -1)
                 break;
 
-            if (selection == 8) {
+            if (selection == 10) {
                 currentAdmin = null;
                 break;
             }
@@ -317,25 +345,37 @@ public class Main {
                     register("admin");
                     break;
                 }
-
+                
                 case 5 -> {
-                    // suspend customer
-                    suspend(true);
+                    //suspend admin
+                    suspendAdmin(true);
                     break;
                 }
 
                 case 6 -> {
-                    // unsuspend customer
+                    //unsuspend admin
+                    suspendAdmin(false);
+                    break;
+                }
+                
+                case 7 -> {
+                    //suspend customer
+                    suspend(true);
+                    break;
+                }
+
+                case 8 -> {
+                    //unsuspend customer
                     suspend(false);
                     break;
                 }
-                case 7 -> {
-
-                    try {
-                        reportPage();
-                    } catch (IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                case 9 -> {
+                   
+                try {
+                    reportPage();
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                }
                     break;
                 }
 
@@ -399,6 +439,7 @@ public class Main {
         String address;
         String birthdate;
         String gender;
+        ArrayList<String> bannedHWID = AuthServices.getBannedHWID();
 
         if (type.equals("admin") && !currentAdmin.isMain()) {
             System.out.println(JLineMenu.RED + "Access Denied!" + JLineMenu.RESET);
@@ -406,13 +447,20 @@ public class Main {
             scanner.nextLine();
             return;
         }
+        
+        else if(type.equals("customer") && bannedHWID.contains(hwid)){
+            System.out.println(JLineMenu.RED+"You Have Been Banned!"+JLineMenu.RESET);
+            System.out.print("Press Enter To Go Back....");
+            scanner.nextLine();
+            return;
+        }
 
         // Username
         while (true) {
-            System.out.print("Enter a username: ");
+            System.out.print("Enter a username (-999 to go back): ");
             username = scanner.next();
             scanner.nextLine(); // flush
-
+            if(username.equals("-999")) return;
             if (!username.isEmpty() && !usernames.contains(username) && !username.matches(".*[^a-zA-Z0-9].*")) {
                 break;
             } else if (username.matches(".*[^a-zA-Z0-9].*")) {
@@ -576,14 +624,71 @@ public class Main {
         }
 
         if (type.equals("customer")) {
-            AuthServices.register(username, password, name, email, phoneNumber, address, birthdate, gender);
+            AuthServices.register(username, password, name, email, phoneNumber, address, birthdate, gender, hwid);
         } else {
-            AuthServices.registerAdmin(username, password, name, email, phoneNumber, address, birthdate, gender);
+            AuthServices.registerAdmin(username, password, name, email, phoneNumber, address, birthdate, gender, hwid);
         }
 
     }
+    
+    public static void suspendAdmin(boolean suspended){
+        JLineMenu.clearScreen();
+        String[] details;
+        int UID;
+        String action = "suspend";
+        if (!suspended) {
+            action = "unsuspend";
+        }
 
-    public static void suspend(boolean suspended) {
+        while (true) {
+            System.out.print("Enter a UID to " + action + " (-999 to exit): ");
+            try {
+                UID = scanner.nextInt();
+                scanner.nextLine();
+                if (UID == -999) {
+                    break;
+                }
+            } catch (Exception e) {
+                JLineMenu.clearScreen();
+                scanner.nextLine();
+                System.out.println("Invalid UID! \n");
+                continue;
+            }
+
+            //checking if the uid exists
+            if ((details = AuthServices.getUserDetails(UID)) != null && (!details[9].equals("customer") && !details[9].equals("main"))) {
+                JLineMenu.clearScreen();
+                System.out.println("-----------USER INFORMATION-----------");
+                System.out.println("Username: " + details[0]);
+                System.out.println("Name: " + details[3]);
+                System.out.println("UID: " + details[2]);
+                System.out.println("Role: " + details[9]);
+                System.out.println("Status: " + details[10]);
+                System.out.print("Are you sure you want to " + action + "? Y(es) N(o): ");
+                char selection = scanner.next().charAt(0);
+
+                scanner.nextLine();
+
+                switch (selection) {
+                    case 'y':
+                    case 'Y':
+                        AuthServices.suspend(UID, suspended);
+                        JLineMenu.clearScreen();
+                        System.out.println("Status Updated!\n");
+                        break;
+                    default:
+                        JLineMenu.clearScreen();
+                        break;
+                }
+
+            } else {
+                JLineMenu.clearScreen();
+                System.out.println("User Does not Exist!\n");
+            }
+        }
+    }
+    
+    public static void suspend(boolean suspended){
         JLineMenu.clearScreen();
         String[] details;
         int UID;
