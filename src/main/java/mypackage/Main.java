@@ -313,7 +313,7 @@ public class Main {
             if (selection == -1)
                 break;
 
-            if (selection == 9) {
+            if (selection == 10) {
                 currentAdmin = null;
                 break;
             }
@@ -345,30 +345,30 @@ public class Main {
                     break;
                 }
                 
-                case 4 -> {
+                case 5 -> {
                     //suspend admin
                     suspendAdmin(true);
                     break;
                 }
 
-                case 5 -> {
+                case 6 -> {
                     //unsuspend admin
                     suspendAdmin(false);
                     break;
                 }
                 
-                case 6 -> {
+                case 7 -> {
                     //suspend customer
                     suspend(true);
                     break;
                 }
 
-                case 7 -> {
+                case 8 -> {
                     //unsuspend customer
                     suspend(false);
                     break;
                 }
-                case 8 -> {
+                case 9 -> {
                    
                 try {
                     reportPage();
