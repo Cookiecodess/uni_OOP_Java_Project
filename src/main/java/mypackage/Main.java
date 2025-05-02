@@ -856,9 +856,9 @@ public class Main {
         String input;
 
         while (true) {
-            System.out.print("Enter Your Current Password (-999 to go back): ");
-            input = scanner.next();
-            scanner.nextLine();
+            System.out.print("Enter Your Current Password (-999 to go back):" + JLineMenu.GREEN);
+            input = JLineMenu.reader.readLine(" ", '*');
+            System.out.print(JLineMenu.RESET);
 
             if (input.equals("-999")) {
                 return;
