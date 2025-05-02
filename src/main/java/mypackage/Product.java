@@ -21,10 +21,12 @@ public class Product implements MenuItem {
 //    private ArrayList<ProductReview> reviews; // wait for teammate to write Review class
     private boolean isDiscontinued;
     
-    private static int nextId = 0; // initialize id with 0
+    private static int nextId = 0; // initialize id with 0    
     
-    public Product(String name, double price, int stock, ProductCategory category, String color, String description, boolean isDiscontinued) {
-        this.id = nextId++; // id auto-increments
+    // Used by loadProductsFromCSV
+    public Product(int id, String name, double price, int stock, ProductCategory category, String color,
+            String description, boolean isDiscontinued) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.stock = stock;
@@ -32,6 +34,11 @@ public class Product implements MenuItem {
         this.color = color;
         this.description = description;
         this.isDiscontinued = isDiscontinued;
+    }
+
+    // Used throughout the program
+    public Product(String name, double price, int stock, ProductCategory category, String color, String description, boolean isDiscontinued) {
+        this(nextId++, name, price, stock, category, color, description, isDiscontinued); // id auto-increments
     }
 
     public Product() {
