@@ -1357,7 +1357,7 @@ public class Main {
             // 2. Add standard buttons
             boolean isEmpty = options.isEmpty();
             if (!isEmpty) {
-                options.add("Place Order");
+                options.add(JLineMenu.GREEN + "Place Order" + JLineMenu.RESET);
             }
             options.add("Back");
 
@@ -1391,15 +1391,36 @@ public class Main {
     // Selects an item, gets 3 choices: Edit Quantity, Remove Item, Back
     private static void editCartItem(Product product) {
         int currentQty = currentCust.getCartItems().get(product);
+        double itemTotal = product.getPrice() * currentQty;
 
         while (true) {
             ArrayList<String> options = new ArrayList<>();
             options.add("Edit Quantity");
             options.add("Remove Item");
             options.add("Back");
+            
+            String productDetails = String.format(
+                JLineMenu.CYAN + "Category: " + JLineMenu.RESET + "%s\n" +
+                JLineMenu.CYAN + "Product Name: " + JLineMenu.RESET + "%s\n" +
+                JLineMenu.CYAN + "Unit Price: " + JLineMenu.RESET + "RM %.2f\n" +
+                JLineMenu.CYAN + "Description: " + JLineMenu.RESET + "%s\n" +
+                JLineMenu.CYAN + "Color: " + JLineMenu.RESET + "%s\n" +
+                JLineMenu.CYAN + "Stock Available: " + JLineMenu.RESET + "%d\n\n" +
+                JLineMenu.CYAN + "Current quantity: " + JLineMenu.RESET + "%d\n" +
+                JLineMenu.CYAN + "Item Total: " + JLineMenu.RESET + "RM %.2f\n\n" +
+                JLineMenu.GREEN + "Select an action." + JLineMenu.RESET,
+                product.getCategory().getName(),
+                product.getName(),
+                product.getPrice(),
+                product.getDescription(),
+                product.getColor(),
+                product.getStock(),
+                currentQty,
+                itemTotal
+            );
 
             JLineMenu actionMenu = new JLineMenu(product.getName(), options,
-                    String.format("Current quantity: %d", currentQty),
+                    productDetails,
                     false, false);
 
             int action = actionMenu.drawMenu();
