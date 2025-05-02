@@ -45,7 +45,7 @@ public boolean validation() {
 
 @Override
      public String failMessage(){
-     return "Sorry, please try again...";
+     return JLineMenu.RED+"Sorry, please try again..."+JLineMenu.RESET;
 }
 @Override
     public void generateReceipt(Order order){

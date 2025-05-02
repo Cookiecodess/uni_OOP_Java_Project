@@ -38,7 +38,7 @@ JLineMenu.printHeader("Online Banking",30);
     System.out.print("Enter your bank password : ");
     String password=scanner.nextLine();
         if (username.isEmpty() || password.isEmpty()) {
-        System.out.println("Username and password cannot be empty.");
+        System.out.println(JLineMenu.RED+"Username and password cannot be empty."+JLineMenu.RESET);
         return false;
     }
     
@@ -53,7 +53,7 @@ JLineMenu.printHeader("Online Banking",30);
      
      @Override
      public String failMessage(){
-     return "Sorry your bank username or password are invalid";
+     return JLineMenu.RED+"Sorry your bank username or password are invalid"+JLineMenu.RESET;
      }
      
      
