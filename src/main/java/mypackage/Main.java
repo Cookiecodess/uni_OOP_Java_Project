@@ -704,6 +704,13 @@ public class Main {
         if (!suspended) {
             action = "unsuspend";
         }
+        
+        if (!currentAdmin.isMain()) {
+            System.out.println(JLineMenu.RED + "Access Denied!" + JLineMenu.RESET);
+            System.out.print("Press Enter To Go Back....");
+            scanner.nextLine();
+            return;
+        }
 
         while (true) {
             System.out.print("Enter a UID to " + action + " (-999 to exit): ");
