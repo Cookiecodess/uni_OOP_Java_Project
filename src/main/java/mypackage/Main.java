@@ -67,7 +67,7 @@ public class Main {
     static JLineMenu manageProductMenu;
     static JLineMenu changeDetails;
     static JLineMenu quitOrContinue;
-    static JLineMenu menu1_1;
+    static JLineMenu cardType;
     static JLineMenu bankSelection;
     static JLineMenu payment;
     static JLineMenu reportSelection;
@@ -285,6 +285,15 @@ public class Main {
 
         bankSelection = new JLineMenu("Bank", options, "Select an action to continue.", true, true);
 
+                options.clear();
+        options.add("MasterCard");
+        options.add("Visa Card");
+
+
+        cardType = new JLineMenu("Bank", options, "Select an action to continue.", true, true);
+
+        
+        
         options.clear();
         options.add("Online Banking");
         options.add("Touch and Go");
@@ -1131,7 +1140,7 @@ public class Main {
     public static boolean cardPaymentProcess(Order order) {
 
         Payment paymentO;
-        String bankName;
+        String cardType;
         while (true) {
             int selection = bankSelection.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
@@ -1141,15 +1150,10 @@ public class Main {
             switch (selection) {
 
                 case 0 ->
-                    bankName = "Hong Leong Bank";
+                    cardType = "MasterCard";
                 case 1 ->
-                    bankName = "Alliance Bank";
-                case 2 ->
-                    bankName = "Public Bank";
-                case 3 ->
-                    bankName = "CIMB Bank";
-                case 4 ->
-                    bankName = "Maybank";
+                    cardType = "Visa Card";
+
                 default -> {
                     continue;
                 }
@@ -1159,9 +1163,9 @@ public class Main {
             // save payment method and bank name
             if (true) {
                 lastPaymentMethod = "Card Payment";
-                lastBankName = bankName;
+                lastBankName = cardType;
             }
-            paymentO = new CardPayment(order, bankName);
+            paymentO = new CardPayment(order, cardType);
             return processPayment(paymentO, order);
         }
 
