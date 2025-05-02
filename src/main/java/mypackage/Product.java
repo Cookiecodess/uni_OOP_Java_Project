@@ -167,7 +167,7 @@ public class Product implements MenuItem {
         return "Product{" + "id=" + id + ", name=" + name + ", price=" + price + ", stock=" + stock + ", category=" + category + ", color=" + color + ", description=" + description + '}';
     }
 
-    // Object.clone() is protected, so to use clone() publicly, we must override it
+    // Object.clone() is protected, so need to override it and make it public
     @Override
     public Product clone() {
         Product clone = new Product(this.name, this.price, this.stock, this.category, this.color, this.description, this.isDiscontinued);
