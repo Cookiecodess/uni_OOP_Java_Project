@@ -1677,12 +1677,12 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         // Header
-        sb.append(String.format("%-8s %-30s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
-        sb.append("--------------------------------------------------\n");
+        sb.append(String.format("%-8s %-36s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
+        sb.append("------------------------------------------------------------------\n");
 
         // Items
         for (OrderItem item : order.getItems()) {
-            sb.append(String.format("%-8d %-30s %-10d RM%-8.2f%n",
+            sb.append(String.format("%-8d %-36s %-10d RM%-8.2f%n",
                     item.getProduct().getId(),
                     item.getProduct().getName(),
                     item.getQuantity(),
