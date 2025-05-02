@@ -6,10 +6,11 @@ import java.util.Comparator;
 
 public class QuickTest {
     public static void main(String[] args) throws InterruptedException {
+        Scanner scanner= new Scanner(System.in);
 
-        Scanner scanner = new Scanner(System.in);
-
-        Helper.getNextDoubleInput(scanner, "Enter a number: ");
+        while (scanner.hasNextLine()) {
+            scanner.nextLine();
+        }
         
     }
 }

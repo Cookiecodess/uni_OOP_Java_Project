@@ -4,9 +4,13 @@
  */
 package mypackage;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 // import java.util.ArrayList;
-
 
 /**
  *
@@ -19,34 +23,35 @@ public class ProductInventory {
     private ArrayList<Product> products = new ArrayList<>();
     private ArrayList<ProductCategory> categories = new ArrayList<>();
 
-    // Create ProductCategory and Product objects, then store all Product objects in the productsMap hashmap (keys are the ids)
+    // Create ProductCategory and Product objects, then store all Product objects in
+    // the productsMap hashmap (keys are the ids)
     public void init() {
         // Create ProductCategory objects
         ProductCategory keyboards = new ProductCategory(
+                0,
                 "Keyboards",
-                "Pre-built and customizable keyboards of various sizes and layouts."
-        );
+                "Pre-built and customizable keyboards of various sizes and layouts.");
 
         ProductCategory switches = new ProductCategory(
+                1,
                 "Switches",
-                "Various mechanical switch types for different feels and sounds."
-        );
+                "Various mechanical switch types for different feels and sounds.");
 
         ProductCategory keycaps = new ProductCategory(
+                2,
                 "Keycaps",
-                "Durable and stylish keycap sets including artisan and themed options."
-        );
+                "Durable and stylish keycap sets including artisan and themed options.");
 
         ProductCategory accessories = new ProductCategory(
+                3,
                 "Accessories & Modding Tools",
-                "Tools and extras for modding, enhancing, and maintaining keyboards."
-        );
+                "Tools and extras for modding, enhancing, and maintaining keyboards.");
 
         ProductCategory storage = new ProductCategory(
+                4,
                 "Storage & Protection",
-                "Protective cases and desk mats for storing and styling your setup."
-        );
-        
+                "Protective cases and desk mats for storing and styling your setup.");
+
         this.categories.add(keyboards);
         this.categories.add(switches);
         this.categories.add(keycaps);
@@ -61,8 +66,7 @@ public class ProductInventory {
                 25,
                 keyboards,
                 "Black",
-                "Compact layout with RGB, hot-swappable, and no regrets.", false
-        );
+                "Compact layout with RGB, hot-swappable, and no regrets.", false);
 
         Product tklKeyboard = new Product(
                 "Tenkeyless Mechanical Keyboard",
@@ -70,8 +74,7 @@ public class ProductInventory {
                 15,
                 keyboards,
                 "White",
-                "Full function row without the numpad – for true WASD warriors.", false
-        );
+                "Full function row without the numpad – for true WASD warriors.", false);
 
         Product orthoBoard = new Product(
                 "Ortholinear Keyboard",
@@ -79,8 +82,7 @@ public class ProductInventory {
                 10,
                 keyboards,
                 "Navy Blue",
-                "Grid layout keyboard that will ruin and then improve your typing forever.", false
-        );
+                "Grid layout keyboard that will ruin and then improve your typing forever.", false);
 
         Product screamingKeyboard = new Product(
                 "Limited Edition Screaming Keyboard",
@@ -88,8 +90,7 @@ public class ProductInventory {
                 5,
                 keyboards,
                 "Neon Green",
-                "Plays a Wilhelm scream every time you hit Backspace. Unnecessary? Yes. Perfect? Also yes.", false
-        );
+                "Plays a Wilhelm scream every time you hit Backspace. Unnecessary? Yes. Perfect? Also yes.", false);
 
         // Switches category
         Product cherrySwitchSet = new Product(
@@ -98,8 +99,7 @@ public class ProductInventory {
                 100,
                 switches,
                 "Red",
-                "Linear switches with smooth actuation and zero drama.", false
-        );
+                "Linear switches with smooth actuation and zero drama.", false);
 
         Product gateronSet = new Product(
                 "Gateron Yellow Switch Set",
@@ -107,8 +107,7 @@ public class ProductInventory {
                 80,
                 switches,
                 "Yellow",
-                "Smooth like butter. Ideal for fast typists and casual butter fans.", false
-        );
+                "Smooth like butter. Ideal for fast typists and casual butter fans.", false);
 
         Product silentU4 = new Product(
                 "Gazzew Boba U4 Silent Switches",
@@ -116,8 +115,7 @@ public class ProductInventory {
                 30,
                 switches,
                 "White",
-                "Silky smooth and dead quiet – your coworkers will thank you.", false
-        );
+                "Silky smooth and dead quiet – your coworkers will thank you.", false);
 
         Product chaosSwitches = new Product(
                 "Mystery Switch Grab Bag",
@@ -125,8 +123,7 @@ public class ProductInventory {
                 20,
                 switches,
                 "Rainbow",
-                "100 random switches. No guarantees. You might cry. Or find enlightenment.", false
-        );
+                "100 random switches. No guarantees. You might cry. Or find enlightenment.", false);
 
         // Keycaps category
         Product pbtKeycaps = new Product(
@@ -135,8 +132,7 @@ public class ProductInventory {
                 60,
                 keycaps,
                 "Black/White",
-                "Durable legends and a crispy feel. Not edible, we checked.", false
-        );
+                "Durable legends and a crispy feel. Not edible, we checked.", false);
 
         Product artisanDragon = new Product(
                 "Artisan Keycap - Dragon Skull",
@@ -144,8 +140,7 @@ public class ProductInventory {
                 12,
                 keycaps,
                 "Purple",
-                "Resin masterpiece that intimidates nearby switches.", false
-        );
+                "Resin masterpiece that intimidates nearby switches.", false);
 
         Product gmkOcean = new Product(
                 "GMK Ocean Themed Keycap Set",
@@ -153,8 +148,7 @@ public class ProductInventory {
                 8,
                 keycaps,
                 "Teal",
-                "Premium feel, deep sea vibes. Costs as much as an actual vacation.", false
-        );
+                "Premium feel, deep sea vibes. Costs as much as an actual vacation.", false);
 
         Product bananaKeycap = new Product(
                 "Artisan Keycap - RGB Banana",
@@ -162,8 +156,7 @@ public class ProductInventory {
                 6,
                 keycaps,
                 "Yellow",
-                "Glows. Peels. Has no business being this cute.", false
-        );
+                "Glows. Peels. Has no business being this cute.", false);
 
         // Accessories and modding tools
         Product lubeKit = new Product(
@@ -172,8 +165,7 @@ public class ProductInventory {
                 50,
                 accessories,
                 "Silver",
-                "Everything you need to make your switches thicc and smooth.", false
-        );
+                "Everything you need to make your switches thicc and smooth.", false);
 
         Product stabilizerSet = new Product(
                 "Screw-in Stabilizer Pack",
@@ -181,8 +173,7 @@ public class ProductInventory {
                 40,
                 accessories,
                 "Black",
-                "Reduces rattle. Increases happiness. Science.", false
-        );
+                "Reduces rattle. Increases happiness. Science.", false);
 
         Product coiledCable = new Product(
                 "Custom Coiled Aviator Cable",
@@ -190,8 +181,7 @@ public class ProductInventory {
                 35,
                 accessories,
                 "Electric Blue",
-                "Braided, detachable, and 100% cooler than necessary.", false
-        );
+                "Braided, detachable, and 100% cooler than necessary.", false);
 
         Product modderStarterPack = new Product(
                 "Ultimate Modder Starter Pack",
@@ -199,8 +189,7 @@ public class ProductInventory {
                 10,
                 accessories,
                 "Various",
-                "Includes lube, opener, tweezers, and a playlist of Lo-Fi typing sounds.", false
-        );
+                "Includes lube, opener, tweezers, and a playlist of Lo-Fi typing sounds.", false);
 
         // Storage and protection
         Product carryCase = new Product(
@@ -209,8 +198,7 @@ public class ProductInventory {
                 40,
                 storage,
                 "Grey",
-                "Protects your keyboard like it’s the crown jewels. Foam included.", false
-        );
+                "Protects your keyboard like it’s the crown jewels. Foam included.", false);
 
         Product deskmatCat = new Product(
                 "Desk Mat - Cat Nap Edition",
@@ -218,8 +206,7 @@ public class ProductInventory {
                 22,
                 storage,
                 "Pastel Pink",
-                "Adorable, soft, and dangerously distracting.", false
-        );
+                "Adorable, soft, and dangerously distracting.", false);
 
         Product dustCover = new Product(
                 "Acrylic Dust Cover",
@@ -227,8 +214,7 @@ public class ProductInventory {
                 45,
                 storage,
                 "Clear",
-                "Keeps out dust, crumbs, and the judgment of non-keyboard people.", false
-        );
+                "Keeps out dust, crumbs, and the judgment of non-keyboard people.", false);
 
         Product keyboardArmor = new Product(
                 "Keyboard Armor Plating",
@@ -236,8 +222,7 @@ public class ProductInventory {
                 2,
                 storage,
                 "Titanium",
-                "Overkill? Yes. Will it survive a fall from space? Probably.", false
-        );
+                "Overkill? Yes. Will it survive a fall from space? Probably.", false);
 
         // Add all Product object to the productsMap hashmap
         // Keyboards
@@ -272,36 +257,140 @@ public class ProductInventory {
 
         // Put all products in array list
         // Makes subList'ing easier
-        // I'm not sure if we still need the hashMap version (productsMap) but i'm keeping it for now
+        // I'm not sure if we still need the hashMap version (productsMap) but i'm
+        // keeping it for now
         this.products = new ArrayList<>(productsMap.values());
     }
-    
-    //========================= Product methods
+
+    public void loadCategoriesFromCSV(String filename) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            int largestId = 0;
+            while ((line = reader.readLine()) != null) {
+                List<String> parts = Helper.parseCSVLine(line);
+                // String[] parts = line.split(",", -1); // -1 to include trailing empty fields
+                if (parts.size() < 3)
+                    continue; // skip malformed lines
+
+                int id = Integer.parseInt(parts.get(0));
+                String name = parts.get(1);
+                String description = parts.get(2);
+
+                ProductCategory category = new ProductCategory(id, name, description);
+                categories.add(category);
+
+                if (id > largestId) largestId = id;
+            }
+
+            // Set next ID of Product class after loading all products from CSV
+            ProductCategory.setNextId(largestId + 1);
+
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void saveCategoriesToCSV(String filename) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (ProductCategory category : categories) {
+                writer.write(
+                    String.format(
+                        "%d,%s,%s\n",
+                        category.getId(),
+                        Helper.escapeForCSV(category.getName()),
+                        Helper.escapeForCSV(category.getDescription())
+                    )
+                );
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadProductsFromCSV(String filename) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            int largestId = 0;
+            while ((line = reader.readLine()) != null) {
+                List<String> parts = Helper.parseCSVLine(line);
+                // String[] parts = line.split(",", -1); // -1 to include trailing empty fields
+                if (parts.size() < 8)
+                    continue; // skip malformed lines
+
+                int id = Integer.parseInt(parts.get(0));
+                String name = parts.get(1);
+                double price = Double.parseDouble(parts.get(2));
+                int stock = Integer.parseInt(parts.get(3));
+                ProductCategory category = getCategoryByName(parts.get(4));
+                String color = parts.get(5);
+                String description = parts.get(6);
+                boolean isDiscontinued = Boolean.parseBoolean(parts.get(7));
+
+                Product product = new Product(id, name, price, stock, category, color, description, isDiscontinued);
+                productsMap.put(id, product);
+                products.add(product);
+
+                if (id > largestId) largestId = id;
+            }
+
+            // Set next ID of Product class after loading all products from CSV
+            Product.setNextId(largestId + 1);
+
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void saveProductsToCSV(String filename) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (Product product : productsMap.values()) {
+                writer.write(String.format("%d,%s,%.2f,%d,%s,%s,%s,%b\n",
+                    product.getId(),
+                    Helper.escapeForCSV(product.getName()),
+                    product.getPrice(),
+                    product.getStock(),
+                    Helper.escapeForCSV(product.getCategory().getName()),
+                    Helper.escapeForCSV(product.getColor()),
+                    Helper.escapeForCSV(product.getDescription()),
+                    product.isDiscontinued())
+                );
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    // ========================= Product methods
     public ProductInventory addProduct(Product newbie) {
         productsMap.put(newbie.getId(), newbie);
         return this;
     }
-    
+
     public ProductInventory removeProductById(int retireeId) {
         productsMap.remove(retireeId);
         return this;
     }
-    
+
     public Product getProductById(int id) {
         Product prod = productsMap.get(id);
         if (prod == null) {
-//            System.out.println("Product with id "+id+" not found."); // error output should probably be handled outside
+            // System.out.println("Product with id "+id+" not found."); // error output
+            // should probably be handled outside
             return null;
         }
         return prod;
     }
-    
+
     // Use this when returning a product selected by customer from the menu
-    // DO NOT USE getProductById BECAUSE the productId MIGHT NOT MATCH the index in the ArrayList!!!
+    // DO NOT USE getProductById BECAUSE the productId MIGHT NOT MATCH the index in
+    // the ArrayList!!!
     public Product getProductByIndex(int index) {
         return this.getAllProducts().get(index);
     }
-    
+
     public ArrayList<Product> getProductsByCategoryName(String categoryName) {
         ArrayList<Product> results = new ArrayList<>();
         for (Product product : this.getAllProducts()) {
@@ -311,37 +400,48 @@ public class ProductInventory {
         }
         return results;
     }
-    
+
     public ArrayList<Product> getAllProducts() {
         return new ArrayList<>(productsMap.values());
     }
-    
+
     public ArrayList<String> getProductNames() {
         ArrayList<String> productNames = new ArrayList<>();
-        for (Product p: this.getAllProducts()) {
+        for (Product p : this.getAllProducts()) {
             productNames.add(p.getName());
         }
         return productNames;
     }
-    
+
     public int getProductCount() {
         return productsMap.size();
     }
 
-    public void updateProduct(Product product) {
-        if (!productsMap.containsKey(product.getId())) {
+    public void updateProduct(Product updated) {
+        if (!productsMap.containsKey(updated.getId())) {
             // if given Product's ID cannot be found, do nothing
             return;
         }
-        productsMap.put(product.getId(), product); // auto-replace the old Product with the new one
-        productsMap = new TreeMap<>(productsMap); // sort by key
+
+        Product old = productsMap.get(updated.getId());
+
+        old.setName(updated.getName());
+        old.setPrice(updated.getPrice());
+        old.setStock(updated.getStock());
+        old.setCategory(updated.getCategory());
+        old.setColor(updated.getColor());
+        old.setDescription(updated.getDescription());
+        old.setDiscontinuation(updated.isDiscontinued());
+
+        // productsMap.put(updated.getId(), updated); // auto-replace the old Product with the new one
+        // productsMap = new TreeMap<>(productsMap); // sort by key
     }
-    
-    //========================= Category methods 
+
+    // ========================= Category methods
     public ArrayList<ProductCategory> getAllCategories() {
         return this.categories;
     }
-    
+
     public ArrayList<String> getAllCategoryNames() {
         ArrayList<String> categoryNames = new ArrayList<>();
         for (ProductCategory category : this.categories) {
@@ -349,7 +449,7 @@ public class ProductInventory {
         }
         return categoryNames;
     }
-    
+
     public ProductCategory getCategoryByIndex(int index) {
         return this.categories.get(index);
     }
@@ -362,11 +462,57 @@ public class ProductInventory {
         }
         return null;
     }
-    
-    
-    
-    
-    
 
+    public ProductInventory removeCategoryById(int retireeId) {
+        categories.remove(retireeId);
+        return this;
+    }
+
+    public ProductCategory findOrCreateCategory(String name) {
+        ProductCategory found;
+        if ((found = getCategoryByName(name)) != null) {
+            return found;
+        }
+
+        // The category doesn't exist, so create it
+        found = new ProductCategory(name);
+        categories.add(found); // add new category to categories array
+        return found;
+    }
+
+    public void addCategory(ProductCategory newCategory) {
+        categories.add(newCategory);
+    }
+
+    public void updateCategory(ProductCategory old, ProductCategory updated) {
+        if (!categories.contains(old)) {
+            // if given category cannot be found, do nothing
+            return;
+        }
+
+        old.setName(updated.getName());
+        old.setDescription(updated.getDescription());
+
+        // for (int i = 0; i < categories.size(); i++) {
+        //     if (categories.get(i).getName().equals(updated.getName())) {
+        //         categories.set(i, updated);
+        //         break;
+        //     }
+        // }
+    }
+
+    /**
+     * Checks if a ProductCategory is unused, i.e. no Product belongs to this category.
+     * @param category The ProductCategory object to check.
+     * @return true if no Product belongs to this category, false otherwise.
+     */
+    public boolean isCategoryUnused(ProductCategory category) {
+        for (Product product : productsMap.values()) {
+            if (product.getCategory().equals(category)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }

@@ -34,16 +34,6 @@ public abstract class Payment implements Payable{    //since payment is an "idea
         this.paymentMethod = paymentMethod;
     }
 
-//    public double getAmount() {
-//        return amount;
-//    }
-
-//    public void setAmount(double amount) {
-//        if (amount < 0) {
-//            throw new IllegalArgumentException("Amount cannot be negative.");
-//        }
-//        this.amount = amount;
-//    }
 
     public Order getOrder() {
         return order;

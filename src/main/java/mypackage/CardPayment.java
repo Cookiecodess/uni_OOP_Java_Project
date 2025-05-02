@@ -20,7 +20,8 @@ public class CardPayment extends Payment{
     private static final String EXPIRE_DATE = "12/34";
     private static final String CVV = "123";
     private final String bankName;
-        public CardPayment(Order order,String bankName) {
+        
+    public CardPayment(Order order,String bankName) {
         super("Card", order);
         this.bankName=bankName;
     }
@@ -39,7 +40,7 @@ JLineMenu.printHeader("Card Payment",30);
     System.out.print("Enter your CVV : ");
     String cvvInput=scanner.nextLine();
         if (cNInput.isEmpty() || eDinput.isEmpty()||cvvInput.isEmpty()) {
-        System.out.println("Username and password cannot be empty.");
+        System.out.println(JLineMenu.RED+"Username and password cannot be empty."+JLineMenu.RESET);
         return false;
     }
         
@@ -57,7 +58,7 @@ JLineMenu.printHeader("Card Payment",30);
     
           @Override
      public String failMessage(){
-     return "Sorry your card detail is invalid";
+     return JLineMenu.RED+"Sorry your card detail is invalid"+JLineMenu.RESET;
 
      }
      @Override
@@ -68,7 +69,10 @@ JLineMenu.printHeader("Card Payment",30);
           System.out.println("Bank\t\t: "+bankName);
         System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getGrandTotal())+JLineMenu.RESET);
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
-         
+                   System.out.println("-------------------------------------------------------------------\n");
+
+            System.out.println("Tax\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getTax())+JLineMenu.RESET);
+            System.out.println("Delivery Fee\t: "+order.getDeliveryFee());
          System.out.println("-------------------------------------------------------------------\n");
 
         for (OrderItem item : order.getItems()) {
@@ -101,6 +105,11 @@ public void generatePrintableReceipt(Order order){
                 writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", order.getGrandTotal())+"\n");
                 writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
        
+                  writeReceipt.write("============================================\n");
+                  
+                           writeReceipt.write("Tax\t\t: RM "+ String.format("%.2f", order.getTax())+"\n");
+    
+                 writeReceipt.write("Delivery Fee\t: "+order.getDeliveryFee()+"\n");
         writeReceipt.write("============================================\n");
 
         for (OrderItem item : order.getItems()) {

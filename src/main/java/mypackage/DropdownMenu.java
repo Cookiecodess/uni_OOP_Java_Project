@@ -39,6 +39,7 @@ public class DropdownMenu {
 
             // Print additional info
             System.out.println("=".repeat(40));
+            System.out.print(Helper.CLR_LINE);
             currentItem.printInfo();
 
             try {
@@ -110,7 +111,7 @@ public class DropdownMenu {
 
     public void clearMenuItems() {
         System.out.print(JLineMenu.RST_CUR);
-        Helper.clearLinesBelow(20);
+        Helper.clearLinesBelow(40);
         // System.out.print(Helper.CUR_DOWN);
     }
 
