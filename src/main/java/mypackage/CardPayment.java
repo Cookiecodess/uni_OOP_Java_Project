@@ -16,9 +16,7 @@ import java.io.FileNotFoundException;
  * @author songl
  */
 public class CardPayment extends Payment{
-    private static final String CARD_NUMBER = "1234 5678 1234 5678";
-    private static final String EXPIRE_DATE = "12/34";
-    private static final String CVV = "123";
+
     private final String cardType;
         
     public CardPayment(Order order,String cardType) {
@@ -73,7 +71,7 @@ public class CardPayment extends Payment{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");//to set the format of the date and time
         System.out.println("Order ID\t: "+order.getOrderId());
          System.out.println("Payment Method\t: "+getPaymentMethod());
-          System.out.println("Card Type\t\t: "+cardType);
+          System.out.println("Card Type\t: "+cardType);
         System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getGrandTotal())+JLineMenu.RESET);
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
                    System.out.println("-------------------------------------------------------------------\n");
@@ -108,7 +106,7 @@ public void generatePrintableReceipt(Order order){
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");//to set the format of the date and time
                 writeReceipt.write("Order ID\t: "+order.getOrderId()+"\n");
                 writeReceipt.write("Payment Method\t: "+getPaymentMethod()+"\n");
-                   writeReceipt.write("Bank\t\t: "+cardType+"\n");
+                   writeReceipt.write("Card Type\t\t: "+cardType+"\n");
                 writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", order.getGrandTotal())+"\n");
                 writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
        
