@@ -732,10 +732,10 @@ public class Main {
                 JLineMenu.clearScreen();
                 System.out.println("-----------USER INFORMATION-----------");
                 System.out.println("Username: " + details[0]);
-                System.out.println("Name: " + details[3]);
-                System.out.println("UID: " + details[2]);
-                System.out.println("Role: " + details[9]);
-                System.out.println("Status: " + details[10]);
+                System.out.println("Name    : " + details[3]);
+                System.out.println("UID     : " + details[2]);
+                System.out.println("Role    : " + details[9]);
+                System.out.println("Status  : " + details[10]);
                 System.out.print("Are you sure you want to " + action + "? Y(es) N(o): ");
                 char selection = scanner.next().charAt(0);
 
@@ -790,10 +790,10 @@ public class Main {
                 JLineMenu.clearScreen();
                 System.out.println("-----------USER INFORMATION-----------");
                 System.out.println("Username: " + details[0]);
-                System.out.println("Name: " + details[3]);
-                System.out.println("UID: " + details[2]);
-                System.out.println("Role: " + details[9]);
-                System.out.println("Status: " + details[10]);
+                System.out.println("Name    : " + details[3]);
+                System.out.println("UID     : " + details[2]);
+                System.out.println("Role    : " + details[9]);
+                System.out.println("Status  : " + details[10]);
                 System.out.print("Are you sure you want to " + action + "? Y(es) N(o): ");
                 char selection = scanner.next().charAt(0);
 
