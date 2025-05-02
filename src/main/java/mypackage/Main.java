@@ -71,7 +71,36 @@ public class Main {
     static JLineMenu payment;
     static JLineMenu reportSelection;
     static JLineMenu saveReceipt;
-     static JLineMenu returnReportPage;
+    static JLineMenu returnReportPage;
+
+    // Temporary message -- can be used throughout Main.java
+    // You can set this variable to a message, and access it with printMainTempMsg() or getAndConsumeMainTempMsg().
+    // Once accessed, this variable is emptied, ensuring the message only shows up once.
+    static String mainTempMsg = "";
+
+    /**
+     * Prints a temporary message (set with global String variable `mainTempMsg`) only once.
+     */
+    static void printMainTempMsg() {
+        if (!mainTempMsg.isBlank()) {
+            System.out.println(mainTempMsg);
+            mainTempMsg = "";
+        }
+    }
+
+    /**
+     * Returns the value of global String variable `mainTempMsg`, and then unsets it.
+     */
+    static String getAndConsumeMainTempMsg() {
+        if (mainTempMsg.isBlank()) {
+            return "";
+        }
+        String msg = mainTempMsg;
+        mainTempMsg = "";
+        return msg;
+    }
+
+
     // Global user objects
     static Customer currentCust = null;
     static Admin currentAdmin = null;
@@ -127,35 +156,14 @@ public class Main {
         
     }
 
-    static String mainTempMsg = "";
-
-    /**
-     * Prints a temporary message (set with global String variable `mainTempMsg`) only once.
-     */
-    static void printMainTempMsg() {
-        if (!mainTempMsg.isBlank()) {
-            System.out.println(mainTempMsg);
-            mainTempMsg = "";
-        }
-    }
-
-    /**
-     * Returns the value of global String variable `mainTempMsg`, and then unsets it.
-     */
-    static String getAndConsumeMainTempMsg() {
-        if (mainTempMsg.isBlank()) {
-            return "";
-        }
-        String msg = mainTempMsg;
-        mainTempMsg = "";
-        return msg;
-    }
+    
 
     public static void main(String[] args) {
 
-        // deduct stock based on cart and orders
-        loadStockFromCart();
-        loadStockFromOrders();
+        // deduct stock based on cart and orders (no longer need this as product stock is now persistent thanks to products.csv)
+        // loadStockFromCart();
+        // loadStockFromOrders();
+        
         // initialize all menus
         initAllMenus();
 
