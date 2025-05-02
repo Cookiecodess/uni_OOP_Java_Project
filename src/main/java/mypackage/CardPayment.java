@@ -28,26 +28,33 @@ public class CardPayment extends Payment{
 
          @Override
     public boolean validation(){
-    Scanner scanner = new Scanner(System.in);
-JLineMenu.printHeader("Card Payment",30);
+        Scanner scanner = new Scanner(System.in);
+        JLineMenu.printHeader("Card Payment",30);
           
         System.out.print("Enter your Card Number (**** **** **** ****): ");
-    String cNInput=scanner.nextLine();
+        String cNInput=scanner.nextLine();
     
-    System.out.print("Enter your Card Expire Date (exp: 01/30) : ");
-    String eDinput=scanner.nextLine();
+        System.out.print("Enter your Card Expire Date (exp: 01/30) : ");
+        String eDinput=scanner.nextLine();
     
-    System.out.print("Enter your CVV : ");
-    String cvvInput=scanner.nextLine();
+        System.out.print("Enter your CVV : ");
+        String cvvInput=scanner.nextLine();
+        cNInput = cNInput.replace(" ","");
+        eDinput = eDinput.strip();
+        String[] expDate = eDinput.split("/");
         if (cNInput.isEmpty() || eDinput.isEmpty()||cvvInput.isEmpty()) {
         System.out.println(JLineMenu.RED+"Username and password cannot be empty."+JLineMenu.RESET);
-        return false;
-    }
+        return false;      
+        }
+        
+        else if(!cNInput.matches("^[245]\\d{15}$") || ( Integer.parseInt(expDate[0]) < 6 &&  Integer.parseInt(expDate[1]) == 25) ||  Integer.parseInt(expDate[1]) < 25 ){
+            return false;
+        }
         
 //        System.out.println( cNInput.compareTo(CARD_NUMBER)==0);
 //        System.out.println( eDinput.compareTo(EXPIRE_DATE)==0);
 //        System.out.println( cvvInput.compareTo(CVV)==0);
-    return cNInput.compareTo(CARD_NUMBER)==0 && eDinput.compareTo(EXPIRE_DATE)==0 && cvvInput.compareTo(CVV)==0;
+    return true;
     }
     
      @Override
