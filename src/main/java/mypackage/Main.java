@@ -1794,7 +1794,7 @@ public class Main {
     //Used to Confirm Hide History
     private static boolean confirmHideHistory(int orderCount) {
         JLineMenu confirmMenu = new JLineMenu("Confirm", 
-            List.of(JLineMenu.RED + "Hide " + orderCount + " Orders" + JLineMenu.RESET, "Cancel"), 
+            List.of(JLineMenu.RED + "Delete " + orderCount + " Orders" + JLineMenu.RESET, "Cancel"), 
             "Are you sure? This willl clear your order history!", 
             false, false);
         return confirmMenu.drawMenu() == 0;
