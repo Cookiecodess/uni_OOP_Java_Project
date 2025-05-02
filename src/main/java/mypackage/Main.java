@@ -28,6 +28,8 @@ package mypackage;
 //     )
 import java.io.IOException;
 import java.util.*; // import everything lumpsum je la
+
+import static mypackage.JLineMenu.SAV_CUR;
 // import java.util.Scanner;
 // import java.util.List;
 // import java.util.Arrays;
@@ -82,7 +84,23 @@ public class Main {
     static {
         // initialize product inventory
         inventory = new ProductInventory();
-        inventory.init();
+        // inventory.init();
+
+        // NOTE TO DEVS: if your products.csv or categories.csv is corrupted, just delete them and run this program again -- it will re-generate products.csv and categories.csv, good as new.
+        if (!Helper.doesFileExist("categories.csv") || !Helper.doesFileExist("products.csv")) {
+            // Band-aid code to create products.csv and categories.csv for those who don't have the files on their device yet. (need this bcuz these files won't be tracked by Git)
+            inventory.init(); // Create Category and Product objetcs from hardcoded construction code
+            inventory.saveCategoriesToCSV("categories.csv");
+            inventory.saveProductsToCSV("products.csv");
+        }
+        else {
+            // You have the file on your device dy. Good. We can just load data from the file.
+            // Your products.csv and categories.csv are corrupted? No worries. 
+            // Just delete them and run this program again -- it will re-generate products.csv and categories.csv, good as new.
+            inventory.loadCategoriesFromCSV("categories.csv");
+            inventory.loadProductsFromCSV("products.csv");
+        }
+
         
         //getting the current HWID
         try{
@@ -107,6 +125,30 @@ public class Main {
         }
         
         
+    }
+
+    static String mainTempMsg = "";
+
+    /**
+     * Prints a temporary message (set with global String variable `mainTempMsg`) only once.
+     */
+    static void printMainTempMsg() {
+        if (!mainTempMsg.isBlank()) {
+            System.out.println(mainTempMsg);
+            mainTempMsg = "";
+        }
+    }
+
+    /**
+     * Returns the value of global String variable `mainTempMsg`, and then unsets it.
+     */
+    static String getAndConsumeMainTempMsg() {
+        if (mainTempMsg.isBlank()) {
+            return "";
+        }
+        String msg = mainTempMsg;
+        mainTempMsg = "";
+        return msg;
     }
 
     public static void main(String[] args) {
@@ -1903,7 +1945,8 @@ public class Main {
         OOMenu editProductMenu = new OOMenu("Edit Products", menuItems, "Select a product to edit.", true, false);
         editProductMenu.ignoreDisabled(true); // so that admin can select discontinued/zero-stock products
 
-        String message = "";
+        
+        // String message = getAndConsumeMainTempMsg();
         while (true) {
             products = inventory.getAllProducts(); // update view of products
             // products.sort(Comparator.comparing(Product::getName)); // Sort alphabetically
@@ -1911,24 +1954,29 @@ public class Main {
             menuItems = new ArrayList<>(products);
             editProductMenu.setOptions(menuItems);
 
-            int selection = editProductMenu.drawMenu(message);
+            String tempMsg = getAndConsumeMainTempMsg();
+            if (!tempMsg.isBlank()) {
+                tempMsg += "\n\n"; // only add newlines if tempMsg isn't blank
+            }
+            String productCountMsg = "Product count: " + inventory.getProductCount();
+
+            int selection = editProductMenu.drawMenu(tempMsg + productCountMsg);
             if (selection == JLineMenu.BACK_OPTION) {
                 return;
             }
 
-            boolean isChangesMade = editProductPage(products.get(selection));
-            if (isChangesMade) {
-                message = JLineMenu.GREEN + "Product details updated." + JLineMenu.RESET;
-            } else {
-                message = JLineMenu.YELLOW + "No changes made." + JLineMenu.RESET;
-            }
+            editProductPage(products.get(selection));
         }
     }
 
-    private static boolean editProductPage(Product product) {
+    private static void editProductPage(Product product) {
         Product productBuffer = (Product) product.clone();
+        final String MSG_PROD_UPDATED = JLineMenu.GREEN + "Product details updated." + JLineMenu.RESET;
+        final String MSG_NO_CHANGES = JLineMenu.YELLOW + "No changes made." + JLineMenu.RESET;
+        final String MSG_PROD_DELETED = JLineMenu.GREEN + "Product deleted." + JLineMenu.RESET;
 
         boolean showInvalidMsg = false;
+        String tempMsg = "";
         while (true) {
             JLineMenu.clearScreen();
 
@@ -1936,16 +1984,35 @@ public class Main {
             System.out.print("\n\n");
 
             if (showInvalidMsg) {
-                System.out.println("Invalid input. Try again.");
+                System.out.println(JLineMenu.RED + "Invalid input. Try again." + JLineMenu.RESET);
+                showInvalidMsg = false;
             }
-            showInvalidMsg = false;
 
-            System.out.print("Select a number to edit a field (enter 'b' to cancel and go back): ");
+            if (!tempMsg.isBlank()) {
+                System.out.println(tempMsg);
+                tempMsg = "";
+            }
+
+            System.out.println("Select a number to edit a field.");
+            System.out.println("Enter "+JLineMenu.YELLOW+"'b'"+JLineMenu.RESET+" to "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", or");
+            System.out.println("      "+JLineMenu.RED+"'delete'"+JLineMenu.RESET+" to "+JLineMenu.RED+"delete this product"+JLineMenu.RESET+".");
+            System.out.print("> ");
             String input = scanner.nextLine();
             if (input.equalsIgnoreCase("b")) {
-                return false;
+                mainTempMsg = MSG_NO_CHANGES;
+                return;
+            } else if (input.equalsIgnoreCase("delete")) { 
+                System.out.println(); // newline for visual divide between last printed line and the delete confirmation prompt               
+                if (confirmDeleteProduct()) {
+                    inventory.removeProductById(product.getId());
+                    mainTempMsg = MSG_PROD_DELETED;
+                    return;
+                    // return false;
+                }
+                continue;
             } else if (!Helper.isPositiveInt(input)) {
                 showInvalidMsg = true;
+                // tempMsg = JLineMenu.RED + "Invalid input. Try again." + JLineMenu.RESET;
                 continue;
             }
             int selection = Integer.valueOf(input);
@@ -2037,11 +2104,13 @@ public class Main {
                     inventory.updateProduct(productBuffer);
                     // product = productBuffer;
                     // inventory.replaceProduct(product, productBuffer);
-                    return true;
+                    mainTempMsg = MSG_PROD_UPDATED;
+                    return;
                 } else if (response.equals("e")) {
                     break;
                 } else if (response.equals("d")) {
-                    return false;
+                    mainTempMsg = MSG_NO_CHANGES;
+                    return;
                 }
 
                 System.out.print("Invalid input. Please try again.");
@@ -2054,6 +2123,29 @@ public class Main {
         // If user selects a field,
 
         // return false;
+    }
+
+    public static boolean confirmDeleteProduct() {
+        System.out.println("Delete this product?");
+        System.out.println("Enter 'DELETE' to confirm,");
+        System.out.println("      'NO' to cancel. (case-insensitive)");
+
+        String input;
+        while (true) {
+            System.out.print(JLineMenu.SAV_CUR + "> "); // input prompt 
+            input = scanner.nextLine();
+            if (input.equalsIgnoreCase("DELETE")) {
+                System.out.print(Helper.CLR_LINE); // clear error message below prompt line
+                return true;
+            }
+            if (input.equalsIgnoreCase("NO")) {
+                System.out.print(Helper.CLR_LINE); // clear error message below prompt line
+                return false;
+            }
+            System.out.print("Invalid input. Please try again.");
+            System.out.print(JLineMenu.RST_CUR + Helper.CLR_LINE);
+        }
+        
     }
 
     public static void printProductDetails(Product product) {

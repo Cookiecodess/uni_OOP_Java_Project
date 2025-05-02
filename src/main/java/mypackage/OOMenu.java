@@ -421,17 +421,7 @@ public class OOMenu {
     }
 
     public static void confirmExit() {
-        while (true) {
-            clearScreen();
-            System.out.print("Are you sure you want to exit this program? (y)es or (n)o: ");
-            String input = scanner.nextLine();
-            if (input.equals("y") || input.equals("Y")) {
-                System.out.println("Exiting the program...");
-                System.exit(0); // exit normally
-            } else if (input.equals("n") || input.equals("N")) {
-                return; // Do not exit and return to where confirmExit() was called
-            }
-        }
+        JLineMenu.confirmExit();
     }
 
     // Getters and setters

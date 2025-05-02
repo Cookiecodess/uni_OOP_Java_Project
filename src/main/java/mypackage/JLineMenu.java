@@ -326,6 +326,10 @@ public class JLineMenu {
             System.out.print("Are you sure you want to exit this program? (y)es or (n)o: ");
             String input = scanner.nextLine();
             if (input.equals("y") || input.equals("Y")) {
+                // Write product and category data to file
+                Main.inventory.saveCategoriesToCSV("categories.csv");
+                Main.inventory.saveProductsToCSV("products.csv");
+                
                 System.out.println("Exiting the program...");
                 System.exit(0); // exit normally
             } else if (input.equals("n") || input.equals("N")) {

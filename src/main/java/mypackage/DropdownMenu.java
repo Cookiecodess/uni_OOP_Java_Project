@@ -110,7 +110,7 @@ public class DropdownMenu {
 
     public void clearMenuItems() {
         System.out.print(JLineMenu.RST_CUR);
-        Helper.clearLinesBelow(20);
+        Helper.clearLinesBelow(40);
         // System.out.print(Helper.CUR_DOWN);
     }
 
