@@ -264,4 +264,8 @@ public class Helper {
         File file = new File(filename);
         return file.exists();
     }
+
+    public static String colorStr(String str, String color) {
+        return color + str + JLineMenu.RESET;
+    }
 }

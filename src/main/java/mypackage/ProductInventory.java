@@ -463,9 +463,13 @@ public class ProductInventory {
         return null;
     }
 
-    public ProductInventory removeCategoryById(int retireeId) {
-        categories.remove(retireeId);
-        return this;
+    public void removeCategoryById(int retireeId) {
+        for (int i=0; i<categories.size(); i++) {
+            if (categories.get(i).getId() == retireeId) {
+                categories.remove(i);
+                break;
+            }
+        }
     }
 
     public ProductCategory findOrCreateCategory(String name) {

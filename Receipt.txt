@@ -1,15 +1,14 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: 28f51ba4
+Order ID	: f762b526
 Payment Method	: Card
-Bank		: CIMB Bank
-Amount		: RM 71.54
-Date		: 2025-05-02 20:47:28
+Bank		: MasterCard
+Amount		: RM 105.99
+Date		: 2025-05-02 23:22:54
 ============================================
-Tax		: RM 4.05
+Tax		: RM 6.00
 Delivery Fee	: 20.0
 ============================================
-Cherry MX Switch Set - Red	1	24.5
-Gateron Yellow Switch Set	1	22.99
+60% Mechanical Keyboard	1	79.99
 ============================================

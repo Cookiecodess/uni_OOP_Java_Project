@@ -16,38 +16,43 @@ import java.io.FileNotFoundException;
  * @author songl
  */
 public class CardPayment extends Payment{
-    private static final String CARD_NUMBER = "1234 5678 1234 5678";
-    private static final String EXPIRE_DATE = "12/34";
-    private static final String CVV = "123";
-    private final String bankName;
+
+    private final String cardType;
         
-    public CardPayment(Order order,String bankName) {
+    public CardPayment(Order order,String cardType) {
         super("Card", order);
-        this.bankName=bankName;
+        this.cardType=cardType;
     }
 
          @Override
     public boolean validation(){
-    Scanner scanner = new Scanner(System.in);
-JLineMenu.printHeader("Card Payment",30);
+        Scanner scanner = new Scanner(System.in);
+        JLineMenu.printHeader("Card Payment",30);
           
         System.out.print("Enter your Card Number (**** **** **** ****): ");
-    String cNInput=scanner.nextLine();
+        String cNInput=scanner.nextLine();
     
-    System.out.print("Enter your Card Expire Date (exp: 01/30) : ");
-    String eDinput=scanner.nextLine();
+        System.out.print("Enter your Card Expire Date (exp: 01/30) : ");
+        String eDinput=scanner.nextLine();
     
-    System.out.print("Enter your CVV : ");
-    String cvvInput=scanner.nextLine();
+        System.out.print("Enter your CVV : ");
+        String cvvInput=scanner.nextLine();
+        cNInput = cNInput.replace(" ","");
+        eDinput = eDinput.strip();
+        String[] expDate = eDinput.split("/");
         if (cNInput.isEmpty() || eDinput.isEmpty()||cvvInput.isEmpty()) {
         System.out.println(JLineMenu.RED+"Username and password cannot be empty."+JLineMenu.RESET);
-        return false;
-    }
+        return false;      
+        }
+        
+        else if(!cNInput.matches("^[245]\\d{15}$") || ( Integer.parseInt(expDate[0]) < 6 &&  Integer.parseInt(expDate[1]) == 25) ||  Integer.parseInt(expDate[1]) < 25 ||  Integer.parseInt(expDate[0]) > 12 || Integer.parseInt(expDate[0]) < 1){
+            return false;
+        }
         
 //        System.out.println( cNInput.compareTo(CARD_NUMBER)==0);
 //        System.out.println( eDinput.compareTo(EXPIRE_DATE)==0);
 //        System.out.println( cvvInput.compareTo(CVV)==0);
-    return cNInput.compareTo(CARD_NUMBER)==0 && eDinput.compareTo(EXPIRE_DATE)==0 && cvvInput.compareTo(CVV)==0;
+    return true;
     }
     
      @Override
@@ -66,7 +71,7 @@ JLineMenu.printHeader("Card Payment",30);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");//to set the format of the date and time
         System.out.println("Order ID\t: "+order.getOrderId());
          System.out.println("Payment Method\t: "+getPaymentMethod());
-          System.out.println("Bank\t\t: "+bankName);
+          System.out.println("Card Type\t: "+cardType);
         System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getGrandTotal())+JLineMenu.RESET);
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
                    System.out.println("-------------------------------------------------------------------\n");
@@ -101,7 +106,7 @@ public void generatePrintableReceipt(Order order){
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");//to set the format of the date and time
                 writeReceipt.write("Order ID\t: "+order.getOrderId()+"\n");
                 writeReceipt.write("Payment Method\t: "+getPaymentMethod()+"\n");
-                   writeReceipt.write("Bank\t\t: "+bankName+"\n");
+                   writeReceipt.write("Card Type\t\t: "+cardType+"\n");
                 writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", order.getGrandTotal())+"\n");
                 writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
        

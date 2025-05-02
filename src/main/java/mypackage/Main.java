@@ -67,7 +67,7 @@ public class Main {
     static JLineMenu manageProductMenu;
     static JLineMenu changeDetails;
     static JLineMenu quitOrContinue;
-    static JLineMenu menu1_1;
+    static JLineMenu cardTypeMenu;
     static JLineMenu bankSelection;
     static JLineMenu payment;
     static JLineMenu reportSelection;
@@ -285,6 +285,15 @@ public class Main {
 
         bankSelection = new JLineMenu("Bank", options, "Select an action to continue.", true, true);
 
+                options.clear();
+        options.add("MasterCard");
+        options.add("Visa Card");
+
+
+        cardTypeMenu = new JLineMenu("Bank", options, "Select an action to continue.", true, true);
+
+        
+        
         options.clear();
         options.add("Online Banking");
         options.add("Touch and Go");
@@ -695,6 +704,13 @@ public class Main {
         if (!suspended) {
             action = "unsuspend";
         }
+        
+        if (!currentAdmin.isMain()) {
+            System.out.println(JLineMenu.RED + "Access Denied!" + JLineMenu.RESET);
+            System.out.print("Press Enter To Go Back....");
+            scanner.nextLine();
+            return;
+        }
 
         while (true) {
             System.out.print("Enter a UID to " + action + " (-999 to exit): ");
@@ -847,11 +863,11 @@ public class Main {
         String input;
 
         while (true) {
-            System.out.print("Enter Your Current Password (999 to go back): ");
-            input = scanner.next();
-            scanner.nextLine();
+            System.out.print("Enter Your Current Password (-999 to go back):" + JLineMenu.GREEN);
+            input = JLineMenu.reader.readLine(" ", '*');
+            System.out.print(JLineMenu.RESET);
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -893,10 +909,10 @@ public class Main {
 
         while (true) {
             System.out.println("Your Current Name: " + x.getName());
-            System.out.print("Enter Your New Name (999 to go back): ");
+            System.out.print("Enter Your New Name (-999 to go back): ");
             input = scanner.nextLine();
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -921,10 +937,10 @@ public class Main {
 
         while (true) {
             System.out.println("Your Current Address: " + x.getAddress());
-            System.out.print("Enter Your New Address (999 to go back): ");
+            System.out.print("Enter Your New Address (-999 to go back): ");
             input = scanner.nextLine();
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -945,11 +961,11 @@ public class Main {
 
         while (true) {
             System.out.println("Your Current Phone: +" + x.getPhone());
-            System.out.print("Enter Your New Phone (999 to go back): +60");
+            System.out.print("Enter Your New Phone (-999 to go back): +60");
             input = scanner.next();
             scanner.nextLine();
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -971,10 +987,10 @@ public class Main {
 
         while (true) {
             System.out.println("Your Current Email: " + x.getEmail());
-            System.out.print("Enter Your New Email (999 to go back): ");
+            System.out.print("Enter Your New Email (-999 to go back): ");
             input = scanner.nextLine();
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -1128,9 +1144,9 @@ public class Main {
     public static boolean cardPaymentProcess(Order order) {
 
         Payment paymentO;
-        String bankName;
+        String cardType;
         while (true) {
-            int selection = bankSelection.drawMenu();
+            int selection = cardTypeMenu.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                 return false;
             }
@@ -1138,15 +1154,10 @@ public class Main {
             switch (selection) {
 
                 case 0 ->
-                    bankName = "Hong Leong Bank";
+                    cardType = "MasterCard";
                 case 1 ->
-                    bankName = "Alliance Bank";
-                case 2 ->
-                    bankName = "Public Bank";
-                case 3 ->
-                    bankName = "CIMB Bank";
-                case 4 ->
-                    bankName = "Maybank";
+                    cardType = "Visa Card";
+
                 default -> {
                     continue;
                 }
@@ -1156,9 +1167,9 @@ public class Main {
             // save payment method and bank name
             if (true) {
                 lastPaymentMethod = "Card Payment";
-                lastBankName = bankName;
+                lastBankName = cardType;
             }
-            paymentO = new CardPayment(order, bankName);
+            paymentO = new CardPayment(order, cardType);
             return processPayment(paymentO, order);
         }
 
@@ -2132,7 +2143,10 @@ public class Main {
             printProductDetails(productBuffer);
             System.out.print("\n\n");
 
-            System.out.println("[c]onfirm changes, keep [e]diting, or [d]iscard changes?");
+            String green_c = Helper.colorStr("c", JLineMenu.GREEN);
+            String cyan_e = Helper.colorStr("e", JLineMenu.CYAN);
+            String red_d = Helper.colorStr("d", JLineMenu.RED);
+            System.out.println("["+green_c+"]onfirm changes, keep ["+cyan_e+"]diting, or ["+red_d+"]iscard changes?");
             while (true) {
                 System.out.print(Helper.CLR_LINE + JLineMenu.SAV_CUR + "> ");
 
@@ -2244,6 +2258,7 @@ public class Main {
             // Input name
             String name = Helper.getNonEmptyStringInputInterruptable(scanner, "Name: ", backKey);
             if (name == null) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             }
             newProduct.setName(name);        
@@ -2251,6 +2266,7 @@ public class Main {
             // Input price
             double price = Helper.getNextDoubleInputInterruptable(scanner, "Price: RM ", true, backKey);
             if (price == Helper.INTRP) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             } 
             newProduct.setPrice(price);  
@@ -2259,6 +2275,7 @@ public class Main {
             // Input stock
             int stock = Helper.getNextIntInputInterruptable(scanner, "Stock: ", true, backKey);
             if (stock == Helper.INTRP) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             } 
             newProduct.setStock(stock);
@@ -2275,6 +2292,7 @@ public class Main {
             // Input color
             String color = Helper.getNonEmptyStringInputInterruptable(scanner, "Color: ", backKey);
             if (color == null) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             }
             newProduct.setColor(color);
@@ -2282,6 +2300,7 @@ public class Main {
             // Input description
             String desc = Helper.getNonEmptyStringInputInterruptable(scanner, "Description: ", backKey);
             if (desc == null) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             }
             newProduct.setDescription(desc);
@@ -2292,14 +2311,15 @@ public class Main {
                 System.out.print("(y/n) > ");
                 String launchOrNot = scanner.nextLine();
                 if (launchOrNot.equalsIgnoreCase(backKey)) {
+                    Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                     return;
                 }
                 if (launchOrNot.equalsIgnoreCase("y")) {
-                    newProduct.reinstate();
+                    newProduct.setDiscontinuation(false);
                     break;
                 } 
                 if (launchOrNot.equalsIgnoreCase("n")) {
-                    newProduct.discontinue();
+                    newProduct.setDiscontinuation(true);
                     break;
                 } 
                 System.out.println("Invalid input. Please try again.");
@@ -2373,6 +2393,7 @@ public class Main {
             // Input name
             String name = Helper.getNonEmptyStringInputInterruptable(scanner, "Name: ", backKey);
             if (name == null) {
+                ProductCategory.setNextId(newCategory.getId()); // undo the auto-incrementing of ID from creation of the new ProductCategory: the next ID should be the ID of the discarded new ProductCategory
                 return;
             }
             newCategory.setName(name);        
@@ -2380,6 +2401,7 @@ public class Main {
             // Input description
             String desc = Helper.getNonEmptyStringInputInterruptable(scanner, "Description: ", backKey);
             if (desc == null) {
+                ProductCategory.setNextId(newCategory.getId()); // undo the auto-incrementing of ID from creation of the new ProductCategory: the next ID should be the ID of the discarded new ProductCategory
                 return;
             }
             newCategory.setDescription(desc);
@@ -2405,6 +2427,7 @@ public class Main {
         }
 
     }
+
 
     private static void editCategoryMenu() {
         List<ProductCategory> categories = inventory.getAllCategories();

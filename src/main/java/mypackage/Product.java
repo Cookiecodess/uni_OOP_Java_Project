@@ -87,26 +87,6 @@ public class Product implements MenuItem {
     public boolean isDiscontinued() {
         return this.isDiscontinued;
     }
-    
-    /**
-     * Discontinue a Product.
-     */
-    public void discontinue() {
-        this.isDiscontinued = true;
-    }
-
-    /**
-     * Make a Product available for sale again. Same as Product.disdiscontinue().
-     */
-    public void reinstate() {
-        this.isDiscontinued = false;
-    }
-    /**
-     * Undo the discontinuation of a Product. Same as Product.reinstate().
-     */
-    public void disdiscontinue() {
-        this.isDiscontinued = false;
-    }
 
     /**
      * Discontinue a Product if it's on sale, or reinstate it if it's discontinued.
