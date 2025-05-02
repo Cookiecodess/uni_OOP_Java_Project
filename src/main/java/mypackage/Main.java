@@ -2254,6 +2254,7 @@ public class Main {
             // Input name
             String name = Helper.getNonEmptyStringInputInterruptable(scanner, "Name: ", backKey);
             if (name == null) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             }
             newProduct.setName(name);        
@@ -2261,6 +2262,7 @@ public class Main {
             // Input price
             double price = Helper.getNextDoubleInputInterruptable(scanner, "Price: RM ", true, backKey);
             if (price == Helper.INTRP) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             } 
             newProduct.setPrice(price);  
@@ -2269,6 +2271,7 @@ public class Main {
             // Input stock
             int stock = Helper.getNextIntInputInterruptable(scanner, "Stock: ", true, backKey);
             if (stock == Helper.INTRP) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             } 
             newProduct.setStock(stock);
@@ -2285,6 +2288,7 @@ public class Main {
             // Input color
             String color = Helper.getNonEmptyStringInputInterruptable(scanner, "Color: ", backKey);
             if (color == null) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             }
             newProduct.setColor(color);
@@ -2292,6 +2296,7 @@ public class Main {
             // Input description
             String desc = Helper.getNonEmptyStringInputInterruptable(scanner, "Description: ", backKey);
             if (desc == null) {
+                Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                 return;
             }
             newProduct.setDescription(desc);
@@ -2302,14 +2307,15 @@ public class Main {
                 System.out.print("(y/n) > ");
                 String launchOrNot = scanner.nextLine();
                 if (launchOrNot.equalsIgnoreCase(backKey)) {
+                    Product.setNextId(newProduct.getId()); // undo the auto-incrementing of ID from creation of the new Product: the next ID should be the ID of the discarded new Product
                     return;
                 }
                 if (launchOrNot.equalsIgnoreCase("y")) {
-                    newProduct.reinstate();
+                    newProduct.setDiscontinuation(false);
                     break;
                 } 
                 if (launchOrNot.equalsIgnoreCase("n")) {
-                    newProduct.discontinue();
+                    newProduct.setDiscontinuation(true);
                     break;
                 } 
                 System.out.println("Invalid input. Please try again.");
@@ -2383,6 +2389,7 @@ public class Main {
             // Input name
             String name = Helper.getNonEmptyStringInputInterruptable(scanner, "Name: ", backKey);
             if (name == null) {
+                ProductCategory.setNextId(newCategory.getId()); // undo the auto-incrementing of ID from creation of the new ProductCategory: the next ID should be the ID of the discarded new ProductCategory
                 return;
             }
             newCategory.setName(name);        
@@ -2390,6 +2397,7 @@ public class Main {
             // Input description
             String desc = Helper.getNonEmptyStringInputInterruptable(scanner, "Description: ", backKey);
             if (desc == null) {
+                ProductCategory.setNextId(newCategory.getId()); // undo the auto-incrementing of ID from creation of the new ProductCategory: the next ID should be the ID of the discarded new ProductCategory
                 return;
             }
             newCategory.setDescription(desc);
@@ -2415,6 +2423,7 @@ public class Main {
         }
 
     }
+
 
     private static void editCategoryMenu() {
         List<ProductCategory> categories = inventory.getAllCategories();
