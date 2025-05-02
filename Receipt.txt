@@ -1,10 +1,11 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: f28cbb41
-Payment Method	: QR code Payment
+Order ID	: badd3833
+Payment Method	: Card
+Bank		: Maybank
 Amount		: RM 105.99
-Date		: 2025-05-01 19:53:35
+Date		: 2025-05-02 13:54:27
 ============================================
 60% Mechanical Keyboard	1	79.99
 ============================================

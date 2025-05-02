@@ -20,7 +20,8 @@ public class CardPayment extends Payment{
     private static final String EXPIRE_DATE = "12/34";
     private static final String CVV = "123";
     private final String bankName;
-        public CardPayment(Order order,String bankName) {
+        
+    public CardPayment(Order order,String bankName) {
         super("Card", order);
         this.bankName=bankName;
     }
@@ -39,7 +40,7 @@ JLineMenu.printHeader("Card Payment",30);
     System.out.print("Enter your CVV : ");
     String cvvInput=scanner.nextLine();
         if (cNInput.isEmpty() || eDinput.isEmpty()||cvvInput.isEmpty()) {
-        System.out.println("Username and password cannot be empty.");
+        System.out.println(JLineMenu.RED+"Username and password cannot be empty."+JLineMenu.RESET);
         return false;
     }
         
@@ -57,7 +58,7 @@ JLineMenu.printHeader("Card Payment",30);
     
           @Override
      public String failMessage(){
-     return "Sorry your card detail is invalid";
+     return JLineMenu.RED+"Sorry your card detail is invalid"+JLineMenu.RESET;
 
      }
      @Override

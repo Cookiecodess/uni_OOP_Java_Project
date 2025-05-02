@@ -1044,11 +1044,11 @@ public class Main {
                     bankName = "Hong Leong Bank";
                 case 1 ->
                     bankName = "Alliance Bank";
-                case 3 ->
+                case 2 ->
                     bankName = "Public Bank";
-                case 4 ->
+                case 3 ->
                     bankName = "CIMB Bank";
-                case 5 ->
+                case 4 ->
                     bankName = "Maybank";
                 default -> {
                     continue;
@@ -1134,11 +1134,11 @@ public class Main {
                     bankName = "Hong Leong Bank";
                 case 1 ->
                     bankName = "Alliance Bank";
-                case 3 ->
+                case 2 ->
                     bankName = "Public Bank";
-                case 4 ->
+                case 3 ->
                     bankName = "CIMB Bank";
-                case 5 ->
+                case 4 ->
                     bankName = "Maybank";
                 default -> {
                     continue;
