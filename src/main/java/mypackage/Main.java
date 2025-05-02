@@ -433,10 +433,10 @@ public class Main {
     public static void login(String type) {
         JLineMenu.clearScreen();
         while (true) {
-            System.out.print("Enter your UserName (999 to go back): ");
+            System.out.print("Enter your UserName (-999 to go back): ");
             String username = scanner.next();
             scanner.nextLine(); // for cleaning buffer purposes
-            if (username.equals("999")) {
+            if (username.equals("-999")) {
                 break;
             }
 
