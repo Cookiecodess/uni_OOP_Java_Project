@@ -2139,7 +2139,10 @@ public class Main {
             printProductDetails(productBuffer);
             System.out.print("\n\n");
 
-            System.out.println("[c]onfirm changes, keep [e]diting, or [d]iscard changes?");
+            String green_c = Helper.colorStr("c", JLineMenu.GREEN);
+            String cyan_e = Helper.colorStr("e", JLineMenu.CYAN);
+            String red_d = Helper.colorStr("d", JLineMenu.RED);
+            System.out.println("["+green_c+"]onfirm changes, keep ["+cyan_e+"]diting, or ["+red_d+"]iscard changes?");
             while (true) {
                 System.out.print(Helper.CLR_LINE + JLineMenu.SAV_CUR + "> ");
 

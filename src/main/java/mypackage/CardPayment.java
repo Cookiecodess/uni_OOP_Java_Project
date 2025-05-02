@@ -45,7 +45,7 @@ public class CardPayment extends Payment{
         return false;      
         }
         
-        else if(!cNInput.matches("^[245]\\d{15}$") || ( Integer.parseInt(expDate[0]) < 6 &&  Integer.parseInt(expDate[1]) == 25) ||  Integer.parseInt(expDate[1]) < 25 ){
+        else if(!cNInput.matches("^[245]\\d{15}$") || ( Integer.parseInt(expDate[0]) < 6 &&  Integer.parseInt(expDate[1]) == 25) ||  Integer.parseInt(expDate[1]) < 25 ||  Integer.parseInt(expDate[0]) > 12 || Integer.parseInt(expDate[0]) < 1){
             return false;
         }
         
