@@ -535,7 +535,7 @@ public class Main {
             System.out.print("Enter your email: ");
             email = scanner.next();
             scanner.nextLine();
-            if (email.contains("@") && email.contains(".") && !email.contains(",")) {
+            if (email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$") && !email.contains(",")) {
                 break;
             }
             JLineMenu.clearScreen();
@@ -926,7 +926,7 @@ public class Main {
                 return;
             }
 
-            if (input.contains("@") && input.contains(".") && !input.contains(",")) {
+            if (input.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$") && !input.contains(",")) {
                 break;
             }
             JLineMenu.clearScreen();
