@@ -2104,6 +2104,9 @@ public class Main {
 
             // Input name
             String name = Helper.getNonEmptyStringInputInterruptable(scanner, "Name: ", backKey);
+            if (name == null) {
+                return;
+            }
             newProduct.setName(name);        
     
             // Input price
@@ -2132,14 +2135,20 @@ public class Main {
     
             // Input color
             String color = Helper.getNonEmptyStringInputInterruptable(scanner, "Color: ", backKey);
+            if (color == null) {
+                return;
+            }
             newProduct.setColor(color);
     
             // Input description
             String desc = Helper.getNonEmptyStringInputInterruptable(scanner, "Description: ", backKey);
+            if (desc == null) {
+                return;
+            }
             newProduct.setDescription(desc);
     
             // Launch right now?
-            System.out.println(SAV_CUR+"Would you like to launch this product now? \nCustomers will be able to see this product right away.");
+            System.out.println(SAV_CUR+"Would you like to launch this product now? \nIf you do, customers will be able to see this product right away.");
             while (true) {
                 System.out.print("(y/n) > ");
                 String launchOrNot = scanner.nextLine();
@@ -2163,7 +2172,7 @@ public class Main {
             System.out.println("Status: " + (newProduct.isDiscontinued() ? "Discontinued" : "On sale"));
     
             System.out.println();
-            System.out.println("Enter 'yes' to add new product, 'no' to discard all changes and go back.");
+            System.out.println("Enter 'yes' to confirm adding this product, \n      'no' to discard all changes and go back.");
             while (true) {
                 System.out.print(SAV_CUR+"> ");
                 String confirm = scanner.nextLine();
