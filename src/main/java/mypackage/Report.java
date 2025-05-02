@@ -44,7 +44,7 @@ public class Report {
             int totalSales = 0;
              double totalAmount = 0;
             for (Order order : orderList) {
-               // if (!order.getStatus().equalsIgnoreCase("Complete")) continue;
+                if (!order.getStatus().equalsIgnoreCase("Completed")) continue;
                         // only consider the product between start date end date
                         //convert order's LocalDateTime to LocalDate
                 LocalDate orderDate = order.getOrderDate().toLocalDate();
@@ -55,7 +55,7 @@ public class Report {
                     for (OrderItem item : order.getItems()) {
                         if (item.getProduct().equals(product)) {
                             totalSales += item.getQuantity();
-                             totalAmount += item.getQuantity() * product.getPrice();
+                            totalAmount += item.getQuantity() * item.getProduct().getPrice();
                         }
                     }
                 }
@@ -68,14 +68,14 @@ public class Report {
             .sorted(Map.Entry.<Product, Integer>comparingByValue().reversed())
             .collect(Collectors.toList());
 
-           System.out.printf("%-5s %-45s %-15s %-15s%n", "Rank", "Product Name", "Quantity", "Sales (RM)");//%-50s means 50 space
+           System.out.printf("%-5s %-5s %-45s %-15s %-15s%n", "Rank","ID", "Product Name", "Quantity", "Sales (RM)");//%-50s means 50 space
 
         int rank = 1;
         for (Map.Entry<Product, Integer> entry : sortedSalesList) { //loop the product that already rank, and get the sales quantity
          Product product = entry.getKey();//get current product
         int qty = entry.getValue(); //get this product sales
         double revenue = productRevenueMap.get(product);    //sales=quantity*amount
-        System.out.printf("%-5d %-45s %-15d RM %-12.2f%n", rank++, product.getName(), qty, revenue);
+        System.out.printf("%-5d %-5d %-45s %-15d RM %-12.2f%n", rank++,product.getId(), product.getName(), qty, revenue);
         }
         
         
@@ -91,7 +91,7 @@ public class Report {
     Map<Integer, Double> userSpendingMap = new HashMap<>();
 
     for (Order order : orderList) {
-    //    if (!order.getStatus().equalsIgnoreCase("Complete")) continue;
+       if (!order.getStatus().equalsIgnoreCase("Completed")) continue;
 
         int userId = order.getUserId();
         double amount = order.getGrandTotal();
