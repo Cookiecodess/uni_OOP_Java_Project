@@ -67,7 +67,7 @@ public class Main {
     static JLineMenu manageProductMenu;
     static JLineMenu changeDetails;
     static JLineMenu quitOrContinue;
-    static JLineMenu cardType;
+    static JLineMenu cardTypeMenu;
     static JLineMenu bankSelection;
     static JLineMenu payment;
     static JLineMenu reportSelection;
@@ -290,7 +290,7 @@ public class Main {
         options.add("Visa Card");
 
 
-        cardType = new JLineMenu("Bank", options, "Select an action to continue.", true, true);
+        cardTypeMenu = new JLineMenu("Bank", options, "Select an action to continue.", true, true);
 
         
         
@@ -1142,7 +1142,7 @@ public class Main {
         Payment paymentO;
         String cardType;
         while (true) {
-            int selection = bankSelection.drawMenu();
+            int selection = cardTypeMenu.drawMenu();
             if (selection == JLineMenu.BACK_OPTION) {
                 return false;
             }

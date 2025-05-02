@@ -1,16 +1,14 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: 206fbc22
-Payment Method	: QR code Payment
-Amount		: RM 200.82
-Date		: 2025-05-02 22:31:50
+Order ID	: f762b526
+Payment Method	: Card
+Bank		: MasterCard
+Amount		: RM 105.99
+Date		: 2025-05-02 23:22:54
 ============================================
-Tax		: RM 11.37
+Tax		: RM 6.00
 Delivery Fee	: 20.0
 ============================================
-Switch Lubing Kit	1	14.99
-PBT Doubleshot Keycaps	1	39.99
-Keyboard Carrying Case	3	89.97
-Cherry MX Switch Set - Red	1	24.5
+60% Mechanical Keyboard	1	79.99
 ============================================
