@@ -990,9 +990,6 @@ public class Main {
     }
 
     public static boolean payment(Order order) {
-        Order dummyOrder = new Order(currentCust.getUID());
-        currentCust.getCartItems().forEach((p, q) -> dummyOrder.addItem(p, q));
-
         boolean valid = false;
         while (!valid) { // =true then
             int selection = payment.drawMenu();
@@ -1003,19 +1000,19 @@ public class Main {
             // here, depending on what we chose, save the payment method
             switch (selection) {
                 case 0 -> {
-                    valid = onlineBankingPaymentProcess(dummyOrder);
+                    valid = onlineBankingPaymentProcess(order);
                     if (valid)
                         lastPaymentMethod = "Online Banking";
                     continue;
                 }
                 case 1 -> {
-                    valid = qrCodePayment(dummyOrder);
+                    valid = qrCodePayment(order);
                     if (valid)
                         lastPaymentMethod = "Touch and Go";
                     continue;
                 }
                 case 2 -> {
-                    valid = cardPaymentProcess(dummyOrder);
+                    valid = cardPaymentProcess(order);
                     if (valid)
                         lastPaymentMethod = "Card Payment";
                     continue;
