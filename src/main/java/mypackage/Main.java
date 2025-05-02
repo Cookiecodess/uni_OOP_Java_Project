@@ -1993,7 +1993,7 @@ public class Main {
                 tempMsg = "";
             }
 
-            System.out.println("Select a number to edit a field.");
+            System.out.println("Select a "+JLineMenu.CYAN+"number"+JLineMenu.RESET+" to "+JLineMenu.CYAN+"edit a field"+JLineMenu.RESET+".");
             System.out.println("Enter "+JLineMenu.YELLOW+"'b'"+JLineMenu.RESET+" to "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", or");
             System.out.println("      "+JLineMenu.RED+"'delete'"+JLineMenu.RESET+" to "+JLineMenu.RED+"delete this product"+JLineMenu.RESET+".");
             System.out.print("> ");
