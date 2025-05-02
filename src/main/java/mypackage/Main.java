@@ -856,11 +856,11 @@ public class Main {
         String input;
 
         while (true) {
-            System.out.print("Enter Your Current Password (999 to go back): ");
+            System.out.print("Enter Your Current Password (-999 to go back): ");
             input = scanner.next();
             scanner.nextLine();
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -902,10 +902,10 @@ public class Main {
 
         while (true) {
             System.out.println("Your Current Name: " + x.getName());
-            System.out.print("Enter Your New Name (999 to go back): ");
+            System.out.print("Enter Your New Name (-999 to go back): ");
             input = scanner.nextLine();
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -930,10 +930,10 @@ public class Main {
 
         while (true) {
             System.out.println("Your Current Address: " + x.getAddress());
-            System.out.print("Enter Your New Address (999 to go back): ");
+            System.out.print("Enter Your New Address (-999 to go back): ");
             input = scanner.nextLine();
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -954,11 +954,11 @@ public class Main {
 
         while (true) {
             System.out.println("Your Current Phone: +" + x.getPhone());
-            System.out.print("Enter Your New Phone (999 to go back): +60");
+            System.out.print("Enter Your New Phone (-999 to go back): +60");
             input = scanner.next();
             scanner.nextLine();
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -980,10 +980,10 @@ public class Main {
 
         while (true) {
             System.out.println("Your Current Email: " + x.getEmail());
-            System.out.print("Enter Your New Email (999 to go back): ");
+            System.out.print("Enter Your New Email (-999 to go back): ");
             input = scanner.nextLine();
 
-            if (input.equals("999")) {
+            if (input.equals("-999")) {
                 return;
             }
 
@@ -1721,7 +1721,7 @@ public class Main {
 
                 // 2. Add action buttons
                 if (!visibleOrders.isEmpty()) {
-                    options.add(JLineMenu.RED + "Hide All Visible Orders" + JLineMenu.RESET);
+                    options.add(JLineMenu.RED + "Delete All Order History" + JLineMenu.RESET);
                 }
                 options.add("Back to Dashboard");
 
@@ -1729,7 +1729,7 @@ public class Main {
                     "Your Orders", 
                     options,
                     visibleOrders.isEmpty() ? 
-                        "No visible orders found" : 
+                        "No orders found!" : 
                         "Select an order to view details",
                     false, 
                     false
