@@ -704,6 +704,13 @@ public class Main {
         if (!suspended) {
             action = "unsuspend";
         }
+        
+        if (!currentAdmin.isMain()) {
+            System.out.println(JLineMenu.RED + "Access Denied!" + JLineMenu.RESET);
+            System.out.print("Press Enter To Go Back....");
+            scanner.nextLine();
+            return;
+        }
 
         while (true) {
             System.out.print("Enter a UID to " + action + " (-999 to exit): ");
@@ -725,10 +732,10 @@ public class Main {
                 JLineMenu.clearScreen();
                 System.out.println("-----------USER INFORMATION-----------");
                 System.out.println("Username: " + details[0]);
-                System.out.println("Name: " + details[3]);
-                System.out.println("UID: " + details[2]);
-                System.out.println("Role: " + details[9]);
-                System.out.println("Status: " + details[10]);
+                System.out.println("Name    : " + details[3]);
+                System.out.println("UID     : " + details[2]);
+                System.out.println("Role    : " + details[9]);
+                System.out.println("Status  : " + details[10]);
                 System.out.print("Are you sure you want to " + action + "? Y(es) N(o): ");
                 char selection = scanner.next().charAt(0);
 
@@ -783,10 +790,10 @@ public class Main {
                 JLineMenu.clearScreen();
                 System.out.println("-----------USER INFORMATION-----------");
                 System.out.println("Username: " + details[0]);
-                System.out.println("Name: " + details[3]);
-                System.out.println("UID: " + details[2]);
-                System.out.println("Role: " + details[9]);
-                System.out.println("Status: " + details[10]);
+                System.out.println("Name    : " + details[3]);
+                System.out.println("UID     : " + details[2]);
+                System.out.println("Role    : " + details[9]);
+                System.out.println("Status  : " + details[10]);
                 System.out.print("Are you sure you want to " + action + "? Y(es) N(o): ");
                 char selection = scanner.next().charAt(0);
 
@@ -856,9 +863,9 @@ public class Main {
         String input;
 
         while (true) {
-            System.out.print("Enter Your Current Password (-999 to go back): ");
-            input = scanner.next();
-            scanner.nextLine();
+            System.out.print("Enter Your Current Password (-999 to go back):" + JLineMenu.GREEN);
+            input = JLineMenu.reader.readLine(" ", '*');
+            System.out.print(JLineMenu.RESET);
 
             if (input.equals("-999")) {
                 return;
@@ -999,9 +1006,6 @@ public class Main {
     }
 
     public static boolean payment(Order order) {
-        Order dummyOrder = new Order(currentCust.getUID());
-        currentCust.getCartItems().forEach((p, q) -> dummyOrder.addItem(p, q));
-
         boolean valid = false;
         while (!valid) { // =true then
             int selection = payment.drawMenu();
@@ -1012,19 +1016,19 @@ public class Main {
             // here, depending on what we chose, save the payment method
             switch (selection) {
                 case 0 -> {
-                    valid = onlineBankingPaymentProcess(dummyOrder);
+                    valid = onlineBankingPaymentProcess(order);
                     if (valid)
                         lastPaymentMethod = "Online Banking";
                     continue;
                 }
                 case 1 -> {
-                    valid = qrCodePayment(dummyOrder);
+                    valid = qrCodePayment(order);
                     if (valid)
                         lastPaymentMethod = "Touch and Go";
                     continue;
                 }
                 case 2 -> {
-                    valid = cardPaymentProcess(dummyOrder);
+                    valid = cardPaymentProcess(order);
                     if (valid)
                         lastPaymentMethod = "Card Payment";
                     continue;
@@ -1353,7 +1357,7 @@ public class Main {
             // 2. Add standard buttons
             boolean isEmpty = options.isEmpty();
             if (!isEmpty) {
-                options.add("Place Order");
+                options.add(JLineMenu.GREEN + "Place Order" + JLineMenu.RESET);
             }
             options.add("Back");
 
@@ -1387,15 +1391,36 @@ public class Main {
     // Selects an item, gets 3 choices: Edit Quantity, Remove Item, Back
     private static void editCartItem(Product product) {
         int currentQty = currentCust.getCartItems().get(product);
+        double itemTotal = product.getPrice() * currentQty;
 
         while (true) {
             ArrayList<String> options = new ArrayList<>();
             options.add("Edit Quantity");
             options.add("Remove Item");
             options.add("Back");
+            
+            String productDetails = String.format(
+                JLineMenu.CYAN + "Category: " + JLineMenu.RESET + "%s\n" +
+                JLineMenu.CYAN + "Product Name: " + JLineMenu.RESET + "%s\n" +
+                JLineMenu.CYAN + "Unit Price: " + JLineMenu.RESET + "RM %.2f\n" +
+                JLineMenu.CYAN + "Description: " + JLineMenu.RESET + "%s\n" +
+                JLineMenu.CYAN + "Color: " + JLineMenu.RESET + "%s\n" +
+                JLineMenu.CYAN + "Stock Available: " + JLineMenu.RESET + "%d\n\n" +
+                JLineMenu.CYAN + "Current quantity: " + JLineMenu.RESET + "%d\n" +
+                JLineMenu.CYAN + "Item Total: " + JLineMenu.RESET + "RM %.2f\n\n" +
+                JLineMenu.GREEN + "Select an action." + JLineMenu.RESET,
+                product.getCategory().getName(),
+                product.getName(),
+                product.getPrice(),
+                product.getDescription(),
+                product.getColor(),
+                product.getStock(),
+                currentQty,
+                itemTotal
+            );
 
             JLineMenu actionMenu = new JLineMenu(product.getName(), options,
-                    String.format("Current quantity: %d", currentQty),
+                    productDetails,
                     false, false);
 
             int action = actionMenu.drawMenu();
