@@ -1665,7 +1665,7 @@ public class Main {
 
                 // 2. Add action buttons
                 if (!visibleOrders.isEmpty()) {
-                    options.add(JLineMenu.RED + "Hide All Visible Orders" + JLineMenu.RESET);
+                    options.add(JLineMenu.RED + "Delete All Order History" + JLineMenu.RESET);
                 }
                 options.add("Back to Dashboard");
 
@@ -1673,7 +1673,7 @@ public class Main {
                     "Your Orders", 
                     options,
                     visibleOrders.isEmpty() ? 
-                        "No visible orders found" : 
+                        "No orders found!" : 
                         "Select an order to view details",
                     false, 
                     false
