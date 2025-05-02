@@ -48,7 +48,7 @@ public class Table {
         this.hasIndex = trueOrFalse;
     }
 
-    public void calcColumnLengths() {
+    private void calcColumnLengths() {
         for (List<String> row : rows) {
             for (int col = 0; col < this.numOfColumns; col++) {
                 int cellLength = row.get(col).length();
@@ -63,7 +63,7 @@ public class Table {
         }
     }
 
-    public void printSpaces(int n) {
+    private void printSpaces(int n) {
         for (int times=0; times<n; times++) {
             System.out.print(" ");
         }
