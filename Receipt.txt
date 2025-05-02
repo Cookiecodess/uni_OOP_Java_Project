@@ -1,12 +1,15 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: 3024a264
-Payment Method	: Online Banking
-Bank		: Hong Leong Bank
-Amount		: RM 137.78
-Date		: 2025-05-02 14:07:08
+Order ID	: 28f51ba4
+Payment Method	: Card
+Bank		: CIMB Bank
+Amount		: RM 71.54
+Date		: 2025-05-02 20:47:28
 ============================================
-Keyboard Carrying Case	1	29.99
-60% Mechanical Keyboard	1	79.99
+Tax		: RM 4.05
+Delivery Fee	: 20.0
+============================================
+Cherry MX Switch Set - Red	1	24.5
+Gateron Yellow Switch Set	1	22.99
 ============================================

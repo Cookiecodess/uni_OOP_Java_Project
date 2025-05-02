@@ -16,8 +16,8 @@ import java.io.FileNotFoundException;
  */
 
 public class OnlineBankingPayment extends Payment{
-     private static final String BANKINGUSERNAME = "aaa";
-     private static final String BANKINGPASSWORD = "bbb";
+     private static final String BANKINGUSERNAME = "username";
+     private static final String BANKINGPASSWORD = "password";
      private final String bankName;
      public  OnlineBankingPayment(Order order,String bankName) {
        super("Online Banking", order);
@@ -67,7 +67,9 @@ JLineMenu.printHeader("Online Banking",30);
         System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getGrandTotal())+JLineMenu.RESET);
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
           System.out.println("-------------------------------------------------------------------\n");
-
+                    System.out.println("Tax\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getTax())+JLineMenu.RESET);
+            System.out.println("Delivery Fee\t: "+order.getDeliveryFee());
+             System.out.println("-------------------------------------------------------------------\n");
         for (OrderItem item : order.getItems()) {
             System.out.printf("%-30s %-10d RM%-8.2f%n",item.getProduct().getName(),item.getQuantity(),item.getSubtotal());
         }
@@ -103,6 +105,11 @@ JLineMenu.printHeader("Online Banking",30);
              writeReceipt.write("Bank\t\t: "+bankName+"\n");
             writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", order.getGrandTotal())+"\n");
             writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
+                             writeReceipt.write("============================================\n");
+                  
+                      writeReceipt.write("Tax\t\t: RM "+ String.format("%.2f", order.getTax())+"\n");
+    
+                 writeReceipt.write("Delivery Fee\t: "+order.getDeliveryFee()+"\n");
             writeReceipt.write("============================================\n");
 
         for (OrderItem item : order.getItems()) {

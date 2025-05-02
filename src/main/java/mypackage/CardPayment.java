@@ -69,7 +69,10 @@ JLineMenu.printHeader("Card Payment",30);
           System.out.println("Bank\t\t: "+bankName);
         System.out.println("Amount\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getGrandTotal())+JLineMenu.RESET);
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
-         
+                   System.out.println("-------------------------------------------------------------------\n");
+
+            System.out.println("Tax\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getTax())+JLineMenu.RESET);
+            System.out.println("Delivery Fee\t: "+order.getDeliveryFee());
          System.out.println("-------------------------------------------------------------------\n");
 
         for (OrderItem item : order.getItems()) {
@@ -102,6 +105,11 @@ public void generatePrintableReceipt(Order order){
                 writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", order.getGrandTotal())+"\n");
                 writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
        
+                  writeReceipt.write("============================================\n");
+                  
+                           writeReceipt.write("Tax\t\t: RM "+ String.format("%.2f", order.getTax())+"\n");
+    
+                 writeReceipt.write("Delivery Fee\t: "+order.getDeliveryFee()+"\n");
         writeReceipt.write("============================================\n");
 
         for (OrderItem item : order.getItems()) {
