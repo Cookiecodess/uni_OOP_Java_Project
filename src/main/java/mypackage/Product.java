@@ -114,6 +114,8 @@ public class Product implements MenuItem {
     public void toggleDiscontinuation() {
         this.isDiscontinued = !this.isDiscontinued;
     }
+
+
     
     // Getters and setters
     public static int getNextId() {
@@ -174,6 +176,10 @@ public class Product implements MenuItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setDiscontinuation(boolean isDiscontinued) {
+        this.isDiscontinued = isDiscontinued;
     }
 
     @Override

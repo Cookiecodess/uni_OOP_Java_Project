@@ -39,6 +39,7 @@ public class DropdownMenu {
 
             // Print additional info
             System.out.println("=".repeat(40));
+            System.out.print(Helper.CLR_LINE);
             currentItem.printInfo();
 
             try {
