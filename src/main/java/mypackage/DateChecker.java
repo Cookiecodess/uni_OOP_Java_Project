@@ -22,27 +22,27 @@ public class DateChecker {
     }
 
     // set Monthly Report in one month
-    public void setMonthlyReport(LocalDate selectedMonthAnyDay) {
-        this.startDate = selectedMonthAnyDay.withDayOfMonth(1);
-        this.endDate = selectedMonthAnyDay.withDayOfMonth(selectedMonthAnyDay.lengthOfMonth());
+    public void setMonthlyReport(LocalDate selectedMonth) {
+        this.startDate = selectedMonth.withDayOfMonth(1);
+        this.endDate = selectedMonth.withDayOfMonth(selectedMonth.lengthOfMonth());
     }
 
     // set Yearly Report in one year
-    public void setYearlyReport(LocalDate selectedYearAnyDay) {
-        this.startDate = selectedYearAnyDay.withDayOfYear(1);
-        this.endDate = selectedYearAnyDay.withDayOfYear(selectedYearAnyDay.lengthOfYear());
+    public void setYearlyReport(LocalDate selectedYear) {
+        this.startDate = selectedYear.withDayOfYear(1);
+        this.endDate = selectedYear.withDayOfYear(selectedYear.lengthOfYear());
     }
 
     // set Custom Report date domain
-    public void setCustomizeReport(LocalDate start, LocalDate end) {
-         if (start.isAfter(end)) {
+    public void setCustomizeReport(LocalDate startD, LocalDate endD) {
+         if (startD.isAfter(endD)) {
         // automatic change if user input up sidedown
-        LocalDate temp = start;
-        start = end;
-        end = temp;
+        LocalDate temp = startD;
+        startD = endD;
+        endD = temp;
     }
-        this.startDate = start;
-        this.endDate = end;
+        this.startDate = startD;
+        this.endDate = endD;
     }
 
   //getter

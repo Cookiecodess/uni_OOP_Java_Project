@@ -283,7 +283,7 @@ public class JLineMenu {
 
     // Waits for user to press any key before continuing
     public static void waitMsg() {
-        System.out.println("Press Enter to continue...");
+        System.out.println(MAGENTA+"Press Enter to continue..."+RESET);
         scanner.nextLine();
     }
 
