@@ -28,22 +28,27 @@ public class ProductInventory {
     public void init() {
         // Create ProductCategory objects
         ProductCategory keyboards = new ProductCategory(
+                0,
                 "Keyboards",
                 "Pre-built and customizable keyboards of various sizes and layouts.");
 
         ProductCategory switches = new ProductCategory(
+                1,
                 "Switches",
                 "Various mechanical switch types for different feels and sounds.");
 
         ProductCategory keycaps = new ProductCategory(
+                2,
                 "Keycaps",
                 "Durable and stylish keycap sets including artisan and themed options.");
 
         ProductCategory accessories = new ProductCategory(
+                3,
                 "Accessories & Modding Tools",
                 "Tools and extras for modding, enhancing, and maintaining keyboards.");
 
         ProductCategory storage = new ProductCategory(
+                4,
                 "Storage & Protection",
                 "Protective cases and desk mats for storing and styling your setup.");
 
@@ -260,18 +265,25 @@ public class ProductInventory {
     public void loadCategoriesFromCSV(String filename) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
+            int largestId = 0;
             while ((line = reader.readLine()) != null) {
                 List<String> parts = Helper.parseCSVLine(line);
                 // String[] parts = line.split(",", -1); // -1 to include trailing empty fields
-                if (parts.size() < 2)
+                if (parts.size() < 3)
                     continue; // skip malformed lines
 
-                String name = parts.get(0);
-                String description = parts.get(1);
+                int id = Integer.parseInt(parts.get(0));
+                String name = parts.get(1);
+                String description = parts.get(2);
 
-                ProductCategory category = new ProductCategory(name, description);
+                ProductCategory category = new ProductCategory(id, name, description);
                 categories.add(category);
+
+                if (id > largestId) largestId = id;
             }
+
+            // Set next ID of Product class after loading all products from CSV
+            ProductCategory.setNextId(largestId + 1);
 
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
@@ -284,7 +296,8 @@ public class ProductInventory {
             for (ProductCategory category : categories) {
                 writer.write(
                     String.format(
-                        "%s,%s\n",
+                        "%d,%s,%s\n",
+                        category.getId(),
                         Helper.escapeForCSV(category.getName()),
                         Helper.escapeForCSV(category.getDescription())
                     )
@@ -404,13 +417,24 @@ public class ProductInventory {
         return productsMap.size();
     }
 
-    public void updateProduct(Product product) {
-        if (!productsMap.containsKey(product.getId())) {
+    public void updateProduct(Product updated) {
+        if (!productsMap.containsKey(updated.getId())) {
             // if given Product's ID cannot be found, do nothing
             return;
         }
-        productsMap.put(product.getId(), product); // auto-replace the old Product with the new one
-        productsMap = new TreeMap<>(productsMap); // sort by key
+
+        Product old = productsMap.get(updated.getId());
+
+        old.setName(updated.getName());
+        old.setPrice(updated.getPrice());
+        old.setStock(updated.getStock());
+        old.setCategory(updated.getCategory());
+        old.setColor(updated.getColor());
+        old.setDescription(updated.getDescription());
+        old.setDiscontinuation(updated.isDiscontinued());
+
+        // productsMap.put(updated.getId(), updated); // auto-replace the old Product with the new one
+        // productsMap = new TreeMap<>(productsMap); // sort by key
     }
 
     // ========================= Category methods
@@ -439,6 +463,11 @@ public class ProductInventory {
         return null;
     }
 
+    public ProductInventory removeCategoryById(int retireeId) {
+        categories.remove(retireeId);
+        return this;
+    }
+
     public ProductCategory findOrCreateCategory(String name) {
         ProductCategory found;
         if ((found = getCategoryByName(name)) != null) {
@@ -449,6 +478,41 @@ public class ProductInventory {
         found = new ProductCategory(name);
         categories.add(found); // add new category to categories array
         return found;
+    }
+
+    public void addCategory(ProductCategory newCategory) {
+        categories.add(newCategory);
+    }
+
+    public void updateCategory(ProductCategory old, ProductCategory updated) {
+        if (!categories.contains(old)) {
+            // if given category cannot be found, do nothing
+            return;
+        }
+
+        old.setName(updated.getName());
+        old.setDescription(updated.getDescription());
+
+        // for (int i = 0; i < categories.size(); i++) {
+        //     if (categories.get(i).getName().equals(updated.getName())) {
+        //         categories.set(i, updated);
+        //         break;
+        //     }
+        // }
+    }
+
+    /**
+     * Checks if a ProductCategory is unused, i.e. no Product belongs to this category.
+     * @param category The ProductCategory object to check.
+     * @return true if no Product belongs to this category, false otherwise.
+     */
+    public boolean isCategoryUnused(ProductCategory category) {
+        for (Product product : productsMap.values()) {
+            if (product.getCategory().equals(category)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

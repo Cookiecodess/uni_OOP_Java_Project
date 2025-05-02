@@ -440,33 +440,6 @@ public class Main {
 
     }
 
-    public static void manageProductMenu() {
-        while (true) {
-            int selection = manageProductMenu.drawMenu();
-            if (selection == JLineMenu.BACK_OPTION) {
-                return;
-            }
-            switch (selection) {
-                case 0 -> {
-                    addProductPage();
-                    continue;
-                }
-                case 1 -> {
-                    // add category
-                    continue;
-                }
-                case 2 -> {
-                    editProductMenu();
-                    continue;
-                }
-                case 3 -> {
-                    // edit category
-                    continue;
-                }
-            }
-        }
-    }
-
     public static void login(String type) {
         JLineMenu.clearScreen();
         while (true) {
@@ -1975,6 +1948,35 @@ public class Main {
 
     // End of Section: Admin View Orders Menu
 
+    public static void manageProductMenu() {
+        while (true) {
+            int selection = manageProductMenu.drawMenu();
+            if (selection == JLineMenu.BACK_OPTION) {
+                return;
+            }
+            switch (selection) {
+                case 0 -> {
+                    addProductPage();
+                    continue;
+                }
+                case 1 -> {
+                    // add category
+                    addCategoryPage();
+                    continue;
+                }
+                case 2 -> {
+                    editProductMenu();
+                    continue;
+                }
+                case 3 -> {
+                    // edit category
+                    editCategoryMenu();
+                    continue;
+                }
+            }
+        }
+    }
+
     private static void editProductMenu() {
         List<Product> products = inventory.getAllProducts();
         List<MenuItem> menuItems = new ArrayList<>(products);
@@ -2007,7 +2009,7 @@ public class Main {
     }
 
     private static void editProductPage(Product product) {
-        Product productBuffer = (Product) product.clone();
+        Product productBuffer = product.clone();
         final String MSG_PROD_UPDATED = JLineMenu.GREEN + "Product details updated." + JLineMenu.RESET;
         final String MSG_NO_CHANGES = JLineMenu.YELLOW + "No changes made." + JLineMenu.RESET;
         final String MSG_PROD_DELETED = JLineMenu.GREEN + "Product deleted." + JLineMenu.RESET;
@@ -2031,22 +2033,23 @@ public class Main {
             }
 
             System.out.println("Select a "+JLineMenu.CYAN+"number"+JLineMenu.RESET+" to "+JLineMenu.CYAN+"edit a field"+JLineMenu.RESET+".");
-            System.out.println("Enter "+JLineMenu.YELLOW+"'b'"+JLineMenu.RESET+" to "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", or");
-            System.out.println("      "+JLineMenu.RED+"'delete'"+JLineMenu.RESET+" to "+JLineMenu.RED+"delete this product"+JLineMenu.RESET+".");
+            System.out.println("Enter "+JLineMenu.YELLOW+"'b'"+JLineMenu.RESET+" to "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET);
+            // System.out.println("Enter "+JLineMenu.YELLOW+"'b'"+JLineMenu.RESET+" to "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", or");
+            // System.out.println("      "+JLineMenu.RED+"'delete'"+JLineMenu.RESET+" to "+JLineMenu.RED+"delete this product"+JLineMenu.RESET+".");
             System.out.print("> ");
             String input = scanner.nextLine();
             if (input.equalsIgnoreCase("b")) {
                 mainTempMsg = MSG_NO_CHANGES;
                 return;
-            } else if (input.equalsIgnoreCase("delete")) { 
-                System.out.println(); // newline for visual divide between last printed line and the delete confirmation prompt               
-                if (confirmDeleteProduct()) {
-                    inventory.removeProductById(product.getId());
-                    mainTempMsg = MSG_PROD_DELETED;
-                    return;
-                    // return false;
-                }
-                continue;
+            // } else if (input.equalsIgnoreCase("delete")) { 
+            //     System.out.println(); // newline for visual divide between last printed line and the delete confirmation prompt               
+            //     if (confirmDeleteProduct()) {
+            //         inventory.removeProductById(product.getId());
+            //         mainTempMsg = MSG_PROD_DELETED;
+            //         return;
+            //         // return false;
+            //     }
+            //     continue;
             } else if (!Helper.isPositiveInt(input)) {
                 showInvalidMsg = true;
                 // tempMsg = JLineMenu.RED + "Invalid input. Try again." + JLineMenu.RESET;
@@ -2201,6 +2204,16 @@ public class Main {
         productDetailsTable.print();
     }
 
+    public static void printCategoryDetails(ProductCategory category) {
+        Table categoryDetailsTable = new Table(2, 5);
+        categoryDetailsTable.add("ID", String.valueOf(category.getId()));
+        categoryDetailsTable.add("Name", category.getName());
+        categoryDetailsTable.add("Description", category.getDescription());
+
+        categoryDetailsTable.setIndex(true);
+        categoryDetailsTable.print();
+    }
+
     public static void addProductPage() {
         final String backKey = "b";
         final String SAV_CUR = JLineMenu.SAV_CUR; // save cursor position
@@ -2301,7 +2314,7 @@ public class Main {
             System.out.println("Status: " + (newProduct.isDiscontinued() ? "Discontinued" : "On sale"));
     
             System.out.println();
-            System.out.println("Enter 'yes' to confirm adding this product, \n      'no' to discard all changes and reload this page.");
+            System.out.println("Enter 'yes' to confirm adding this product, \n      'no' to discard all data entered and reload this page.");
             while (true) {
                 System.out.print(SAV_CUR+"> ");
                 String confirm = scanner.nextLine();
@@ -2322,5 +2335,215 @@ public class Main {
             }
         }
 
+    }
+
+    public static void addCategoryPage() {
+        final String backKey = "b";
+        final String SAV_CUR = JLineMenu.SAV_CUR; // save cursor position
+        final String RST_CUR = JLineMenu.RST_CUR; // restore cursor position
+        final String CLR_LN = Helper.CLR_LINE; // clear line and carriage return (move cursor to first column)
+        final String CUR_UP = Helper.CUR_UP; // move cursor one line up
+        
+        // boolean showTempMsg = false;
+        // String tempMsg = "";
+        
+        while (true) {
+
+            JLineMenu.clearScreen();
+    
+            ProductCategory newCategory = new ProductCategory();            
+            
+            JLineMenu.printHeader("Add New Category", JLineMenu.LEFT_RIGHT_PADDING);
+            
+            // if (showTempMsg) {
+            //     System.out.println(tempMsg + "\n");
+            //     showTempMsg = false;
+            // }
+
+            String tempMsg = getAndConsumeMainTempMsg();
+            if (!tempMsg.isBlank()) {
+                tempMsg += "\n\n"; // only add newlines if there IS a message
+            }
+            System.out.print(tempMsg);
+            
+            System.out.println("Please enter the details of the new category. \nThe input fields will appear one at a time.\n");
+            System.out.println("To "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", enter '"+JLineMenu.YELLOW + backKey + JLineMenu.RESET+"' in any field. "+JLineMenu.RED+"\nPlease beware that doing this discards all details entered."+JLineMenu.RESET);
+            System.out.println();
+
+            // Print auto-incremented product ID
+            System.out.println("ID: " + newCategory.getId());
+    
+            // Input name
+            String name = Helper.getNonEmptyStringInputInterruptable(scanner, "Name: ", backKey);
+            if (name == null) {
+                return;
+            }
+            newCategory.setName(name);        
+    
+            // Input description
+            String desc = Helper.getNonEmptyStringInputInterruptable(scanner, "Description: ", backKey);
+            if (desc == null) {
+                return;
+            }
+            newCategory.setDescription(desc);
+    
+            System.out.println();
+            System.out.println("Enter 'yes' to confirm adding this category, \n      'no' to discard all data entered and reload this page.");
+            while (true) {
+                System.out.print(SAV_CUR+"> ");
+                String confirm = scanner.nextLine();
+                if (confirm.equalsIgnoreCase("yes")) {
+                    inventory.addCategory(newCategory);
+                    mainTempMsg = JLineMenu.GREEN + "Category added." + JLineMenu.RESET;
+                    break;
+                } 
+                if (confirm.equalsIgnoreCase("no")) {
+                    ProductCategory.setNextId(newCategory.getId()); // undo the auto-incrementing of ID from creation of the new ProductCategory: the next ID should be the ID of the discarded new ProductCategory
+                    mainTempMsg = JLineMenu.YELLOW + "Category not added." + JLineMenu.RESET;
+                    break;
+                } 
+                System.out.println("Invalid input. Please try again.");
+                System.out.print(RST_CUR + CLR_LN); // move cursor back to the prompt line ("(y/n) > ") and clear that line
+            }
+        }
+
+    }
+
+    private static void editCategoryMenu() {
+        List<ProductCategory> categories = inventory.getAllCategories();
+        List<MenuItem> menuItems = new ArrayList<>(categories);
+
+        OOMenu editCategoryMenu = new OOMenu("Edit Products", menuItems, "Select a category to edit.", true, false);
+        
+        // String message = getAndConsumeMainTempMsg();
+        while (true) {
+            categories = inventory.getAllCategories(); // update view of products
+            // products.sort(Comparator.comparing(Product::getName)); // Sort alphabetically
+            // by name
+            menuItems = new ArrayList<>(categories);
+            editCategoryMenu.setOptions(menuItems);
+
+            String tempMsg = getAndConsumeMainTempMsg();
+            if (!tempMsg.isBlank()) {
+                tempMsg += "\n\n"; // only add newlines if tempMsg isn't blank
+            }
+            String categoryCountMsg = "Category count: " + categories.size();
+
+            int selection = editCategoryMenu.drawMenu(tempMsg + categoryCountMsg);
+            if (selection == JLineMenu.BACK_OPTION) {
+                return;
+            }
+
+            editCategoryPage(categories.get(selection));
+        }
+    }
+
+    private static void editCategoryPage(ProductCategory oldCategory) {
+        ProductCategory categoryBuffer = oldCategory.clone();
+        final String MSG_CAT_UPDATED = JLineMenu.GREEN + "Category details updated." + JLineMenu.RESET;
+        final String MSG_NO_CHANGES = JLineMenu.YELLOW + "No changes made." + JLineMenu.RESET;
+        final String MSG_CAT_DELETED = JLineMenu.GREEN + "Category deleted." + JLineMenu.RESET;
+
+        boolean showInvalidMsg = false;
+        String tempMsg = "";
+        while (true) {
+            JLineMenu.clearScreen();
+
+            printCategoryDetails(categoryBuffer);
+            System.out.print("\n\n");
+
+            if (showInvalidMsg) {
+                System.out.println(JLineMenu.RED + "Invalid input. Try again." + JLineMenu.RESET);
+                showInvalidMsg = false;
+            }
+
+            if (!tempMsg.isBlank()) {
+                System.out.println(tempMsg);
+                tempMsg = "";
+            }
+
+            System.out.println("Select a "+JLineMenu.CYAN+"number"+JLineMenu.RESET+" to "+JLineMenu.CYAN+"edit a field"+JLineMenu.RESET+".");
+
+            if (inventory.isCategoryUnused(oldCategory)) { // check original ProductCategory object rather than the buffer one here
+                System.out.println("Enter "+JLineMenu.YELLOW+"'b'"+JLineMenu.RESET+" to "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", or");
+                System.out.println("      "+JLineMenu.RED+"'delete'"+JLineMenu.RESET+" to "+JLineMenu.RED+"delete this category"+JLineMenu.RESET+".");
+            } else {
+                System.out.println("Enter "+JLineMenu.YELLOW+"'b'"+JLineMenu.RESET+" to "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET);
+                System.out.println(OOMenu.DISABLED_COLOR +"[Sorry, you cannot delete this category as some products belong to it.]"+JLineMenu.RESET);
+            }
+
+            System.out.print("> ");
+            String input = scanner.nextLine();
+            if (input.equalsIgnoreCase("b")) {
+                mainTempMsg = MSG_NO_CHANGES;
+                return;
+            } else if (inventory.isCategoryUnused(oldCategory) && input.equalsIgnoreCase("delete")) { 
+                System.out.println(); // newline for visual divide between last printed line and the delete confirmation prompt               
+                if (confirmDeleteProduct()) {
+                    inventory.removeCategoryById(oldCategory.getId());
+                    mainTempMsg = MSG_CAT_DELETED;
+                    return;
+                    // return false;
+                }
+                continue;
+            } else if (!Helper.isPositiveInt(input)) {
+                showInvalidMsg = true;
+                // tempMsg = JLineMenu.RED + "Invalid input. Try again." + JLineMenu.RESET;
+                continue;
+            }
+            int selection = Integer.valueOf(input);
+            selection--; // normalize for index
+            switch (selection) {
+                case 0:
+                    System.out.println("Sorry, you can't change the ID!");
+                    JLineMenu.waitMsg();
+                    continue;
+                case 1:
+                    System.out.print("Enter new name: ");
+                    categoryBuffer.setName(scanner.nextLine());
+                    break;
+                case 2:
+                    System.out.println("Enter new description: ");
+                    String newDesc = scanner.nextLine();
+                    categoryBuffer.setDescription(newDesc);
+                    break;
+                default:
+                    showInvalidMsg = true;
+                    continue;
+            }
+
+            JLineMenu.clearScreen();
+
+            printCategoryDetails(categoryBuffer);
+            System.out.print("\n\n");
+
+            System.out.println("[c]onfirm changes, keep [e]diting, or [d]iscard changes?");
+            while (true) {
+                System.out.print(Helper.CLR_LINE + JLineMenu.SAV_CUR + "> ");
+
+                String response = (scanner.nextLine()).toLowerCase();
+                if (response.equals("c")) {
+                    inventory.updateCategory(oldCategory, categoryBuffer);
+                    // product = productBuffer;
+                    // inventory.replaceProduct(product, productBuffer);
+                    mainTempMsg = MSG_CAT_UPDATED;
+                    return;
+                } else if (response.equals("e")) {
+                    break;
+                } else if (response.equals("d")) {
+                    mainTempMsg = MSG_NO_CHANGES;
+                    return;
+                }
+
+                System.out.print("Invalid input. Please try again.");
+                System.out.print(JLineMenu.RST_CUR);
+            }
+
+        }
+        // Display product info and let user choose which field they'd like to change
+
+        // If user selects a field,
+
+        // return false;
     }
 }
