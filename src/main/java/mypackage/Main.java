@@ -64,6 +64,7 @@ public class Main {
     static OOMenu productCategoryMenu;
     // static JLineMenu productListMenu;
     static JLineMenu adminDb;
+    static JLineMenu manageProductMenu;
     static JLineMenu changeDetails;
     static JLineMenu quitOrContinue;
     static JLineMenu menu1_1;
@@ -233,8 +234,7 @@ public class Main {
         productCategoryMenu = new OOMenu("Browse by Category", menuItems, "Select a product category.", true, false);
 
         options.clear();
-        options.add("Add New Products");
-        options.add("Edit Products");
+        options.add("Manage Products");
         options.add("View Pending Orders");
         options.add("Change Account Details");
         options.add("Add Other Admin");
@@ -245,6 +245,13 @@ public class Main {
         options.add("View Report");
         options.add("Log Out");
         adminDb = new JLineMenu("Admin Dashboard", options, "Select an action to continue.", true, false);
+
+        options.clear();
+        options.add("Add New Products");
+        options.add("Add New Categories");
+        options.add("Edit Products");
+        options.add("Edit Categories");
+        manageProductMenu = new JLineMenu("Manage Products", options, "Select an action to continue.", true, false);
 
         options.clear();
         options.add("Change Name");
@@ -367,75 +374,97 @@ public class Main {
             if (selection == -1)
                 break;
 
-            if (selection == 10) {
+            if (selection == 9) {
                 currentAdmin = null;
                 break;
             }
 
             switch (selection) {
                 case 0 -> {
-                    addProductPage();
+                    manageProductMenu();
                     break;
                 }
 
                 case 1 -> {
-                    editProductMenu();
-                    break;
-                }
-
-                case 2 -> {
                     // Call to View ALL orders made by customers. So far code is running ok, but
                     // further testing needs to be done.
                     adminViewAllOrders();
                 }
 
-                case 3 -> {
+                case 2 -> {
                     updateInfo("admin");
                     break;
                 }
 
-                case 4 -> {
+                case 3 -> {
                     // register admin
                     register("admin");
                     break;
                 }
                 
-                case 5 -> {
+                case 4 -> {
                     //suspend admin
                     suspendAdmin(true);
                     break;
                 }
 
-                case 6 -> {
+                case 5 -> {
                     //unsuspend admin
                     suspendAdmin(false);
                     break;
                 }
                 
-                case 7 -> {
+                case 6 -> {
                     //suspend customer
                     suspend(true);
                     break;
                 }
 
-                case 8 -> {
+                case 7 -> {
                     //unsuspend customer
                     suspend(false);
                     break;
                 }
-                case 9 -> {
+                case 8 -> {
                    
-                try {
-                    reportPage();
-                } catch (IOException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                    try {
+                        reportPage();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     break;
                 }
 
             }
         }
 
+    }
+
+    public static void manageProductMenu() {
+        while (true) {
+            int selection = manageProductMenu.drawMenu();
+            if (selection == JLineMenu.BACK_OPTION) {
+                return;
+            }
+            switch (selection) {
+                case 0 -> {
+                    addProductPage();
+                    continue;
+                }
+                case 1 -> {
+                    // add category
+                    continue;
+                }
+                case 2 -> {
+                    editProductMenu();
+                    continue;
+                }
+                case 3 -> {
+                    // edit category
+                    continue;
+                }
+            }
+        }
     }
 
     public static void login(String type) {
@@ -2272,7 +2301,7 @@ public class Main {
             System.out.println("Status: " + (newProduct.isDiscontinued() ? "Discontinued" : "On sale"));
     
             System.out.println();
-            System.out.println("Enter 'yes' to confirm adding this product, \n      'no' to discard all changes and go back.");
+            System.out.println("Enter 'yes' to confirm adding this product, \n      'no' to discard all changes and reload this page.");
             while (true) {
                 System.out.print(SAV_CUR+"> ");
                 String confirm = scanner.nextLine();
