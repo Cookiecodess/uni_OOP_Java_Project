@@ -26,6 +26,8 @@ dist/
 nbdist/
 .nb-gradle/
 nb-configuration.xml
+
+# Project data files
 carts.csv
 orders.csv
 order_visibility.csv
