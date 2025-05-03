@@ -116,7 +116,6 @@ public class OOMenu {
         List<Product> products = Main.inventory.getProductsByCategoryName("Keyboards");
         List<MenuItem> menuItems = new ArrayList<>(products);
 
-        // List<String> productNames = PropertyExtractor.extractProperty(products, "name");
         String header = "Products: Keyboards";
         OOMenu productMenu = new OOMenu(header, menuItems, "Select a product for more details.", true, false);
         

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static mypackage.TestMain.scanner;
+// import static mypackage.TestMain.scanner;
 
 // NOTE:
 // This interactive menu only works properly in a terminal
