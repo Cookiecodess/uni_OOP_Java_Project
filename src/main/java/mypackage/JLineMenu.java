@@ -62,6 +62,10 @@ public class JLineMenu {
     public static final String CYAN = "\u001B[36m";
     public static final String WHITE = "\u001B[37m";
 
+    public static final String SOFT_YELLOW = "\033[38;5;229m";
+    public static final String SOFT_BLUE = "\033[38;5;153m";
+    
+
     // background color
     public static final String BG_BLACK = "\u001B[40m";
     public static final String BG_RED = "\u001B[41m";

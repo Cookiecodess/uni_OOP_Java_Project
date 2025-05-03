@@ -2063,6 +2063,7 @@ public class Main {
 
             System.out.println("Select a "+JLineMenu.CYAN+"number"+JLineMenu.RESET+" to "+JLineMenu.CYAN+"edit a field"+JLineMenu.RESET+".");
             System.out.println("Enter "+JLineMenu.YELLOW+"'b'"+JLineMenu.RESET+" to "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET);
+            System.out.println(OOMenu.DISABLED_COLOR+"[Reminder: You "+OOMenu.BOLD+"cannot"+OOMenu.RESET+OOMenu.DISABLED_COLOR+" delete a product. However, you can \n discontinue it by setting Status to 'Discontinued'.]"+JLineMenu.RESET);
             // System.out.println("Enter "+JLineMenu.YELLOW+"'b'"+JLineMenu.RESET+" to "+JLineMenu.YELLOW+"cancel and go back"+JLineMenu.RESET+", or");
             // System.out.println("      "+JLineMenu.RED+"'delete'"+JLineMenu.RESET+" to "+JLineMenu.RED+"delete this product"+JLineMenu.RESET+".");
             System.out.print("> ");
