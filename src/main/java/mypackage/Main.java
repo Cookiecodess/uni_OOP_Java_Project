@@ -283,14 +283,14 @@ public class Main {
         options.add("CIMB Bank");
         options.add("Maybank");
 
-        bankSelection = new JLineMenu("Bank", options, "Select an action to continue.", true, true);
+        bankSelection = new JLineMenu("Bank", options, "Select a bank to continue.", true, true);
 
                 options.clear();
         options.add("MasterCard");
         options.add("Visa Card");
 
 
-        cardTypeMenu = new JLineMenu("Bank", options, "Select an action to continue.", true, true);
+        cardTypeMenu = new JLineMenu("Card type", options, "Select a card type to continue.", true, true);
 
         
         

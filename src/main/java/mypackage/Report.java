@@ -44,7 +44,7 @@ public class Report {
             int totalSales = 0;
              double totalAmount = 0;
             for (Order order : orderList) {
-               // if (!order.getStatus().equalsIgnoreCase("Completed")) continue;
+                if (order.getStatus().equalsIgnoreCase("Cancelled")) continue;
                         // only consider the product between start date end date
                         //convert order's LocalDateTime to LocalDate
                 LocalDate orderDate = order.getOrderDate().toLocalDate();
@@ -91,7 +91,7 @@ public class Report {
     Map<Integer, Double> userSpendingMap = new HashMap<>();
 
     for (Order order : orderList) {
-      // if (!order.getStatus().equalsIgnoreCase("Completed")) continue;
+      if (order.getStatus().equalsIgnoreCase("Cancelled")) continue;
 
         int userId = order.getUserId();
         double amount = order.getGrandTotal();
