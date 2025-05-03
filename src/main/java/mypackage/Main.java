@@ -1677,12 +1677,12 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         // Header
-        sb.append(String.format("%-8s %-30s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
-        sb.append("--------------------------------------------------\n");
+        sb.append(String.format("%-8s %-36s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
+        sb.append("------------------------------------------------------------------\n");
 
         // Items
         for (OrderItem item : order.getItems()) {
-            sb.append(String.format("%-8d %-30s %-10d RM%-8.2f%n",
+            sb.append(String.format("%-8d %-36s %-10d RM%-8.2f%n",
                     item.getProduct().getId(),
                     item.getProduct().getName(),
                     item.getQuantity(),
@@ -1794,7 +1794,7 @@ public class Main {
     //Used to Confirm Hide History
     private static boolean confirmHideHistory(int orderCount) {
         JLineMenu confirmMenu = new JLineMenu("Confirm", 
-            List.of(JLineMenu.RED + "Hide " + orderCount + " Orders" + JLineMenu.RESET, "Cancel"), 
+            List.of(JLineMenu.RED + "Delete " + orderCount + " Orders" + JLineMenu.RESET, "Cancel"), 
             "Are you sure? This willl clear your order history!", 
             false, false);
         return confirmMenu.drawMenu() == 0;
@@ -1839,17 +1839,17 @@ public class Main {
         StringBuilder sb = new StringBuilder();
 
         // Header Info
-        sb.append("Customer: ").append(userDetails[3]).append("\n");
-        sb.append("Date: ").append(order.getFormattedOrderDate()).append("\n");
-        sb.append("Status: ").append(order.getStatus()).append("\n");
-        sb.append("Payment: ").append(order.getPaymentMethod()).append("\n\n");
+        sb.append(JLineMenu.CYAN + "Customer: " + JLineMenu.RESET).append(userDetails[3]).append("\n");
+        sb.append(JLineMenu.CYAN + "Date: " + JLineMenu.RESET).append(order.getFormattedOrderDate()).append("\n");
+        sb.append(JLineMenu.CYAN + "Status: " + JLineMenu.RESET).append(order.getStatus()).append("\n");
+        sb.append(JLineMenu.CYAN + "Payment: " + JLineMenu.RESET).append(order.getPaymentMethod()).append("\n\n");
 
         // Items Table
-        sb.append(String.format("%-8s %-30s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
-        sb.append("--------------------------------------------------\n");
+        sb.append(String.format("%-8s %-36s %-10s %-10s%n", "ID", "Product", "Qty", "Subtotal"));
+        sb.append("---------------------------------------------------------------------\n");
 
         order.getItems().forEach(item -> {
-            sb.append(String.format("%-8d %-30s %-10d RM%-8.2f%n",
+            sb.append(String.format("%-8d %-36s %-10d RM%-8.2f%n",
                     item.getProduct().getId(),
                     item.getProduct().getName(),
                     item.getQuantity(),
@@ -1857,7 +1857,7 @@ public class Main {
         });
 
         // Footer Totals
-        sb.append("\n-------------------------------------\n");
+        sb.append("\n---------------------------------------------------------------------\n");
         sb.append("GRAND TOTAL: RM").append(String.format("%.2f", order.getGrandTotal()));
 
         return sb.toString();

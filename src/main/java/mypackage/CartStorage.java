@@ -11,7 +11,6 @@ public class CartStorage {
     private static final String FILE_PATH = "carts.csv";
     private static final String HEADER = "UID,ProductID,Quantity";
 
-    // Changed parameter type from Map<Product,Integer> to Map<Integer,Integer>
     public static void saveCart(int userId, Map<Integer, Integer> productIdToQuantity) {
         
         //load all existing carts
@@ -55,6 +54,7 @@ public class CartStorage {
         return cart;
     }
     
+    //load all carts from carts.
     static Map<Integer, Map<Integer, Integer>> loadAllCarts() {
         Map<Integer, Map<Integer, Integer>> allCarts = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
