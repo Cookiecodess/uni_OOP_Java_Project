@@ -1127,7 +1127,7 @@ public class Main {
     }
 
     public static boolean qrCodePayment(Order order) {
-        Payment paymentO = new qrCodePayment(order);
+        Payment paymentO = new QrCodePayment(order);
         JLineMenu.printHeader("QR code Payment", 45);
         paymentO.generateQR();
 
