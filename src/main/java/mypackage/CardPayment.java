@@ -29,7 +29,7 @@ public class CardPayment extends Payment{
         Scanner scanner = new Scanner(System.in);
         JLineMenu.printHeader("Card Payment",30);
           
-        System.out.print("Enter your Card Number (**** **** **** ****): ");
+        System.out.print("Enter your Card Number : ");
         String cNInput=scanner.nextLine();
     
         System.out.print("Enter your Card Expire Date (exp: 01/30) : ");
@@ -77,11 +77,11 @@ public class CardPayment extends Payment{
                    System.out.println("-------------------------------------------------------------------\n");
 
             System.out.println("Tax\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getTax())+JLineMenu.RESET);
-            System.out.println("Delivery Fee\t: "+order.getDeliveryFee());
+            System.out.println("Delivery Fee\t: RM"+JLineMenu.GREEN+order.getDeliveryFee()+JLineMenu.RESET);
          System.out.println("-------------------------------------------------------------------\n");
 
         for (OrderItem item : order.getItems()) {
-            System.out.printf("%-30s %-10d RM%-8.2f%n",item.getProduct().getName(),item.getQuantity(),item.getSubtotal());
+            System.out.printf("%-45s %-10d RM%-8.2f%n",item.getProduct().getName(),item.getQuantity(),item.getSubtotal());
         }
       
          System.out.println("===================================================================");
@@ -106,7 +106,7 @@ public void generatePrintableReceipt(Order order){
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");//to set the format of the date and time
                 writeReceipt.write("Order ID\t: "+order.getOrderId()+"\n");
                 writeReceipt.write("Payment Method\t: "+getPaymentMethod()+"\n");
-                   writeReceipt.write("Card Type\t\t: "+cardType+"\n");
+                   writeReceipt.write("Card Type\t: "+cardType+"\n");
                 writeReceipt.write("Amount\t\t: RM "+ String.format("%.2f", order.getGrandTotal())+"\n");
                 writeReceipt.write("Date\t\t: "+getDateTime().format(formatter)+"\n");
        
@@ -114,11 +114,12 @@ public void generatePrintableReceipt(Order order){
                   
                            writeReceipt.write("Tax\t\t: RM "+ String.format("%.2f", order.getTax())+"\n");
     
-                 writeReceipt.write("Delivery Fee\t: "+order.getDeliveryFee()+"\n");
+                 writeReceipt.write("Delivery Fee\t: RM "+order.getDeliveryFee()+"\n");
         writeReceipt.write("============================================\n");
 
         for (OrderItem item : order.getItems()) {
-            writeReceipt.write(item.getProduct().getName()+"\t"+item.getQuantity()+"\t"+item.getSubtotal()+"\n");
+            writeReceipt.write(item.getProduct().getName()+"\n");
+            writeReceipt.write("\t\t\t* "+item.getQuantity()+"\t"+item.getSubtotal()+"\n");
         }
          writeReceipt.write("============================================\n");
             }

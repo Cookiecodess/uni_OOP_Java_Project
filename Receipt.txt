@@ -1,14 +1,17 @@
 ============================================
 		RECEIPT
 ============================================
-Order ID	: f762b526
+Order ID	: a7bf4446
 Payment Method	: Card
-Bank		: MasterCard
-Amount		: RM 105.99
-Date		: 2025-05-02 23:22:54
+Card Type		: MasterCard
+Amount		: RM 201.38
+Date		: 2025-05-03 09:56:30
 ============================================
-Tax		: RM 6.00
-Delivery Fee	: 20.0
+Tax		: RM 11.40
+Delivery Fee	: RM 20.0
 ============================================
-60% Mechanical Keyboard	1	79.99
+Tenkeyless Mechanical Keyboard
+			* 1	89.99
+60% Mechanical Keyboard
+			* 1	79.99
 ============================================

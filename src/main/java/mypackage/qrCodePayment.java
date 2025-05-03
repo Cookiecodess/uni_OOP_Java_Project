@@ -56,12 +56,12 @@ public boolean validation() {
          System.out.println("Date\t\t: "+JLineMenu.GREEN+getDateTime().format(formatter)+JLineMenu.RESET);
                    System.out.println("-------------------------------------------------------------------\n");
                     System.out.println("Tax\t\t: RM "+JLineMenu.GREEN+ String.format("%.2f", order.getTax())+JLineMenu.RESET);
-            System.out.println("Delivery Fee\t: "+order.getDeliveryFee());
+            System.out.println("Delivery Fee\t: RM "+JLineMenu.GREEN+order.getDeliveryFee()+JLineMenu.RESET);
             
           System.out.println("-------------------------------------------------------------------\n");
 
         for (OrderItem item : order.getItems()) {
-            System.out.printf("%-30s %-10d RM%-8.2f%n",item.getProduct().getName(),item.getQuantity(),item.getSubtotal());
+            System.out.printf("%-45s %-10d RM%-8.2f%n",item.getProduct().getName(),item.getQuantity(),item.getSubtotal());
         }
       
          System.out.println("===================================================================");
@@ -97,11 +97,12 @@ try {
                           writeReceipt.write("============================================\n");
                   writeReceipt.write("Tax\t\t: RM "+ String.format("%.2f", order.getTax())+"\n");
     
-                 writeReceipt.write("Delivery Fee\t: "+order.getDeliveryFee()+"\n");
+                 writeReceipt.write("Delivery Fee\t: RM "+order.getDeliveryFee()+"\n");
         writeReceipt.write("============================================\n");
 
         for (OrderItem item : order.getItems()) {
-            writeReceipt.write(item.getProduct().getName()+"\t"+item.getQuantity()+"\t"+item.getSubtotal()+"\n");
+           writeReceipt.write(item.getProduct().getName()+"\n");
+            writeReceipt.write("\t\t\t* "+item.getQuantity()+"\t"+item.getSubtotal()+"\n");
         }
          writeReceipt.write("============================================\n");
     }
