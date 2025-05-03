@@ -74,7 +74,7 @@ public class JLineMenu {
 
     public static Terminal terminal; // put public because OOMenu uses this (cannot initialize Terminal twice in a
                                      // program!)
-    private static Scanner scanner;
+    public static Scanner scanner;
     public static LineReader reader; // put public because OOMenu uses this (cannot initialize LineReader twice in a
                                      // program!)
 
@@ -115,15 +115,15 @@ public class JLineMenu {
 
     // Instance variables
     private String textHeader;
-    ArrayList<String> options;
-    int numOfOptions; // want to access in subclass
+    private List<String> options;
+    private int numOfOptions; // want to access in subclass
     private String textPrompt;
     // private MenuBottomContent bottomContent;
     private boolean hasBackOption;
     private boolean hasExitOption;
 
-    int firstItemIdx = 0;
-    int currentSelection = 0; // want to access in subclass
+    private int firstItemIdx = 0;
+    private int currentSelection = 0; // want to access in subclass
     private boolean running = true;
 
     // Public constructor of a JLineMenu object
@@ -339,7 +339,7 @@ public class JLineMenu {
     }
 
     // Getters and setters
-    public void setOptions(ArrayList<String> options) {
+    public void setOptions(List<String> options) {
         this.options = options;
     }
 

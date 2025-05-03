@@ -141,7 +141,7 @@ public class OOMenu {
             System.out.println("\n" + "testing...");
     
             // divider (==========)
-            productMenu.printDivider("=");
+            productMenu.printDivider('=');
     
             // print info/description related to the currently selected item of the menu
             productMenu.printAdditionalInfo();
@@ -172,17 +172,17 @@ public class OOMenu {
 
     // Instance variables
     private String textHeader;
-    List<MenuItem> options;
+    private List<MenuItem> options;
     // List<String> optionLabels;
-    int numOfOptions; // want to access in subclass
+    private int numOfOptions; // want to access in subclass
     private String textPrompt;
     // private MenuBottomContent bottomContent;
     private boolean hasBackOption;
     private boolean hasExitOption;
     private boolean ignoreDisabled;
 
-    int firstItemIdx = 0;
-    int currentSelection; // want to access in subclass
+    private int firstItemIdx = 0;
+    private int currentSelection; // want to access in subclass
     private boolean running = true;
 
     // Public constructor of a JLineMenu object
@@ -239,10 +239,10 @@ public class OOMenu {
         this.options.get(currentSelection).printInfo();
     }
 
-    public void printDivider(String character) {
+    public static void printDivider(char ch) {
         // System.out.println();
         for (int i = 0; i < MENU_WIDTH; i++) {
-            System.out.print(character);
+            System.out.print(ch);
         }
         System.out.println();
     }
@@ -300,10 +300,10 @@ public class OOMenu {
             drawOptions();
 
             // divider (==========)
-            printDivider("=");            
+            printDivider('=');            
             // print info/description related to the currently selected item of the menu
             printAdditionalInfo();
-            printDivider("=");
+            printDivider('=');
 
             // Display text prompt
             System.out.println("\n" + textPrompt);
