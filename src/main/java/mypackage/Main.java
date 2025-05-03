@@ -2225,7 +2225,7 @@ public class Main {
         Table productDetailsTable = new Table(2, 5);
         productDetailsTable.add("ID", String.valueOf(product.getId()));
         productDetailsTable.add("Name", product.getName());
-        productDetailsTable.add("Price", "RM " + String.valueOf(product.getPrice()));
+        productDetailsTable.add("Price", String.format("RM %.2f", product.getPrice()));
         productDetailsTable.add("Stock", String.valueOf(product.getStock()));
         productDetailsTable.add("Category", product.getCategory().getName());
         productDetailsTable.add("Color", product.getColor());
