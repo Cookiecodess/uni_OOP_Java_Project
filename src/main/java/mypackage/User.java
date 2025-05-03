@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author wayne
  */
-public class User {
+public abstract class User {
     
     private int UID;
     private String name;
