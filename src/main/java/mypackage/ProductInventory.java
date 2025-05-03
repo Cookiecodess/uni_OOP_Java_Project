@@ -20,8 +20,8 @@ public class ProductInventory {
 
     // Maps ProductID to Product. Speeds up searching by productID.
     private Map<Integer, Product> productsMap = new HashMap<>();
-    private ArrayList<Product> products = new ArrayList<>();
-    private ArrayList<ProductCategory> categories = new ArrayList<>();
+    // private ArrayList<Product> products = new ArrayList<>();
+    private List<ProductCategory> categories = new ArrayList<>();
 
     // Create ProductCategory and Product objects, then store all Product objects in
     // the productsMap hashmap (keys are the ids)
@@ -259,7 +259,7 @@ public class ProductInventory {
         // Makes subList'ing easier
         // I'm not sure if we still need the hashMap version (productsMap) but i'm
         // keeping it for now
-        this.products = new ArrayList<>(productsMap.values());
+        // this.products = new ArrayList<>(productsMap.values());
     }
 
     public void loadCategoriesFromCSV(String filename) {
@@ -282,7 +282,7 @@ public class ProductInventory {
                 if (id > largestId) largestId = id;
             }
 
-            // Set next ID of Product class after loading all products from CSV
+            // Set next ID of ProductCategory class after loading all categories from CSV
             ProductCategory.setNextId(largestId + 1);
 
         } catch (IOException | NumberFormatException e) {
@@ -329,7 +329,7 @@ public class ProductInventory {
 
                 Product product = new Product(id, name, price, stock, category, color, description, isDiscontinued);
                 productsMap.put(id, product);
-                products.add(product);
+                // products.add(product);
 
                 if (id > largestId) largestId = id;
             }
@@ -364,23 +364,21 @@ public class ProductInventory {
 
 
     // ========================= Product methods
-    public ProductInventory addProduct(Product newbie) {
+    public void addProduct(Product newbie) {
         productsMap.put(newbie.getId(), newbie);
-        return this;
     }
 
-    public ProductInventory removeProductById(int retireeId) {
+    public void removeProductById(int retireeId) {
         productsMap.remove(retireeId);
-        return this;
     }
 
     public Product getProductById(int id) {
         Product prod = productsMap.get(id);
-        if (prod == null) {
+        // if (prod == null) {
             // System.out.println("Product with id "+id+" not found."); // error output
             // should probably be handled outside
-            return null;
-        }
+        //     return null;
+        // }
         return prod;
     }
 
@@ -391,8 +389,8 @@ public class ProductInventory {
         return this.getAllProducts().get(index);
     }
 
-    public ArrayList<Product> getProductsByCategoryName(String categoryName) {
-        ArrayList<Product> results = new ArrayList<>();
+    public List<Product> getProductsByCategoryName(String categoryName) {
+        List<Product> results = new ArrayList<>();
         for (Product product : this.getAllProducts()) {
             if (product.getCategory().getName().equalsIgnoreCase(categoryName)) {
                 results.add(product);
@@ -401,12 +399,12 @@ public class ProductInventory {
         return results;
     }
 
-    public ArrayList<Product> getAllProducts() {
+    public List<Product> getAllProducts() {
         return new ArrayList<>(productsMap.values());
     }
 
-    public ArrayList<String> getProductNames() {
-        ArrayList<String> productNames = new ArrayList<>();
+    public List<String> getProductNames() {
+        List<String> productNames = new ArrayList<>();
         for (Product p : this.getAllProducts()) {
             productNames.add(p.getName());
         }
@@ -438,12 +436,12 @@ public class ProductInventory {
     }
 
     // ========================= Category methods
-    public ArrayList<ProductCategory> getAllCategories() {
+    public List<ProductCategory> getAllCategories() {
         return this.categories;
     }
 
-    public ArrayList<String> getAllCategoryNames() {
-        ArrayList<String> categoryNames = new ArrayList<>();
+    public List<String> getAllCategoryNames() {
+        List<String> categoryNames = new ArrayList<>();
         for (ProductCategory category : this.categories) {
             categoryNames.add(category.getName());
         }
@@ -511,7 +509,7 @@ public class ProductInventory {
      * @return true if no Product belongs to this category, false otherwise.
      */
     public boolean isCategoryUnused(ProductCategory category) {
-        for (Product product : productsMap.values()) {
+        for (Product product : this.getAllProducts()) {
             if (product.getCategory().equals(category)) {
                 return false;
             }
