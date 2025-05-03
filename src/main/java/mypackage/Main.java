@@ -2455,7 +2455,7 @@ public class Main {
         List<ProductCategory> categories = inventory.getAllCategories();
         List<MenuItem> menuItems = new ArrayList<>(categories);
 
-        OOMenu editCategoryMenu = new OOMenu("Edit Products", menuItems, "Select a category to edit.", true, false);
+        OOMenu editCategoryMenu = new OOMenu("Edit Categories", menuItems, "Select a category to edit.", true, false);
         
         // String message = getAndConsumeMainTempMsg();
         while (true) {
