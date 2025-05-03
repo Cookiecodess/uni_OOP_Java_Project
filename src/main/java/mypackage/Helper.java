@@ -16,7 +16,7 @@ public class Helper {
     public static final String CUR_DOWN = "\u001B[1B";
     public static final String CLR_LINE = "\r" + " ".repeat(terminal.getWidth()) + "\r";
 
-    static final int INTRP = -1; // the getInput methods return this if a designated interruptStr is input
+    public static final int INTRP = -1; // the getInput methods return this if a designated interruptStr is input
 
     public static int getNextIntInput(Scanner scanner, String prompt, boolean onlyZeroOrPositive) {
         while (true) {
